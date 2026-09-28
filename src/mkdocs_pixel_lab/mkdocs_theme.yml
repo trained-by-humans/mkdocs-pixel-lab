@@ -1,2 +1,6 @@
 name: pixel-lab
 footer_text: ""
+header_background: "#4caf50"
+accent_color: "#4caf50"
+accent_dark_color: "#287c35"
+accent_foreground_color: "#101410"

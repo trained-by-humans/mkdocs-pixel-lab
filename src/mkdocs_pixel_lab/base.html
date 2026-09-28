@@ -9,6 +9,14 @@
       <link rel="canonical" href="{{ page.canonical_url }}">
     {% endif %}
     <link rel="stylesheet" href="{{ 'assets/css/style.css' | url }}">
+    <style id="pixel-lab-palette">
+      :root {
+        --accent: {{ config.theme.accent_color }};
+        --accent-dark: {{ config.theme.accent_dark_color }};
+        --accent-foreground: {{ config.theme.accent_foreground_color }};
+        --header-background: {{ config.theme.header_background }};
+      }
+    </style>
     {% for style in config.extra_css %}
       <link rel="stylesheet" href="{{ style | url }}">
     {% endfor %}
