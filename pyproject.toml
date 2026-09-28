@@ -1,0 +1,60 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mkdocs-pixel-lab"
+version = "0.1.0rc1"
+description = "A vibrant, accessible MkDocs documentation theme by Trained-by-Humans."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE", "THIRD_PARTY_LICENSES.md"]
+authors = [{ name = "Trained-by-Humans" }]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: MkDocs",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "mkdocs>=1.6,<2",
+    "pymdown-extensions>=10,<11",
+]
+
+[project.urls]
+Homepage = "https://github.com/trained-by-humans/mkdocs-pixel-lab"
+Documentation = "https://github.com/trained-by-humans/mkdocs-pixel-lab#readme"
+Repository = "https://github.com/trained-by-humans/mkdocs-pixel-lab"
+Issues = "https://github.com/trained-by-humans/mkdocs-pixel-lab/issues"
+Changelog = "https://github.com/trained-by-humans/mkdocs-pixel-lab/releases"
+
+[project.entry-points."mkdocs.themes"]
+pixel-lab = "mkdocs_pixel_lab"
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8",
+    "pytest-playwright>=0.7",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mkdocs_pixel_lab"]
+include = ["src/mkdocs_pixel_lab/**/*.html", "src/mkdocs_pixel_lab/**/*.yml", "src/mkdocs_pixel_lab/assets/**/*"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "LICENSE",
+    "THIRD_PARTY_LICENSES.md",
+    "README.md",
+    "pyproject.toml",
+    "src/mkdocs_pixel_lab",
+    "tests",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

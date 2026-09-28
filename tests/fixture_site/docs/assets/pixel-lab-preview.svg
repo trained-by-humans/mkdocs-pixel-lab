@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title description">
+  <title id="title">Pixel Lab media preview</title>
+  <desc id="description">Abstract green data-flow diagram with three linked processing cards.</desc>
+  <rect width="960" height="540" fill="#f4f1df"/>
+  <path d="M0 90h960M0 180h960M0 270h960M0 360h960M0 450h960M120 0v540M240 0v540M360 0v540M480 0v540M600 0v540M720 0v540M840 0v540" stroke="#182018" stroke-opacity=".08"/>
+  <g stroke="#101410" stroke-width="6">
+    <rect x="86" y="190" width="200" height="150" fill="#f5c842"/>
+    <rect x="380" y="110" width="200" height="150" fill="#38a9b8"/>
+    <rect x="674" y="280" width="200" height="150" fill="#4caf50"/>
+  </g>
+  <g fill="#182018" font-family="monospace" font-weight="700" font-size="24">
+    <text x="118" y="245">SOURCE</text><text x="118" y="278">FRAME</text>
+    <text x="412" y="165">PROCESS</text><text x="412" y="198">SIGNAL</text>
+    <text x="706" y="335">OUTPUT</text><text x="706" y="368">RESULT</text>
+  </g>
+  <g fill="none" stroke="#182018" stroke-width="12" stroke-linecap="square">
+    <path d="M286 265h94l-22-22m22 22-22 22"/>
+    <path d="M580 185h48v140h46l-22-22m22 22-22 22"/>
+  </g>
+</svg>
