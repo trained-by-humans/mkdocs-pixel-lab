@@ -219,7 +219,7 @@ pre, .highlight pre {
   max-width: calc(100% - 5px);
 }
 pre code, .highlight pre code { background: transparent; border: 0; color: inherit; padding: 0; }
-.highlight { background: transparent; position: relative; }
+.highlight { position: relative; }
 .code-copy {
   background: var(--surface);
   border: 2px solid var(--black);

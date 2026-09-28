@@ -79,12 +79,14 @@ def test_desktop_experience(page, site_url: str, tmp_path: Path) -> None:
 
     expect(page.locator("main img")).to_be_visible()
     expect(page.locator(".sidebar")).to_have_count(0)
+    expect(page.locator("pre.highlight")).to_have_css("background-color", "rgb(16, 20, 16)")
     capture_snapshot(page, "desktop.png", tmp_path)
 
     page.get_by_role("button", name="SEARCH").click()
     expect(page.locator("#mkdocs-search-query")).to_be_visible()
-    page.get_by_role("button", name="Copy code to clipboard").click()
-    expect(page.get_by_role("button", name="Copy code to clipboard")).to_have_text("COPIED")
+    copy_button = page.get_by_role("button", name="Copy code to clipboard").first
+    copy_button.click()
+    expect(copy_button).to_have_text("COPIED")
 
 
 def test_mobile_navigation_and_skip_link(page, site_url: str, tmp_path: Path) -> None:

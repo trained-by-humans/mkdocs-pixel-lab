@@ -6,6 +6,8 @@
 print("copy me")
 ```
 
+<pre class="highlight"><code class="language-bash">pixel-lab --check</code></pre>
+
 | Capability | Status |
 | --- | --- |
 | Search | Ready |
