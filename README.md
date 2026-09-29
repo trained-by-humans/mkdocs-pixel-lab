@@ -59,6 +59,23 @@ CSS variables.
 This separation lets a site change its border and shadow independently without
 having to maintain CSS overrides or edit the theme.
 
+## GitHub Alerts
+
+Enable GitHub-style Markdown alerts explicitly when a site uses them:
+
+```yaml
+markdown_extensions:
+  - mkdocs_pixel_lab.github_alerts
+```
+
+The extension supports `NOTE`, `TIP`, `IMPORTANT`, `WARNING`, and `CAUTION`:
+
+```markdown
+> [!TIP]
+>
+> Use semantic callouts for important guidance.
+```
+
 Pixel Lab includes responsive navigation, search, code-copy controls, heading
 fragment tracking, a skip link, and styling for standard MkDocs and Pymdown
 content.

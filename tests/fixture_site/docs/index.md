@@ -1,5 +1,9 @@
 # Fixture home
 
+> [!NOTE]
+>
+> GitHub-style alerts retain rich Markdown inside a semantic callout.
+
 ## Searchable heading
 
 ```python

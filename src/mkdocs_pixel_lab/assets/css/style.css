@@ -227,6 +227,33 @@ pre code, .highlight pre code { background: transparent; border: 0; color: inher
 .highlight .c, .highlight .c1, .highlight .cm { color: var(--code-comment); }
 
 blockquote { border-left: 4px solid var(--accent); color: var(--muted); margin: 24px 0; padding-left: 18px; }
+.gh-alert {
+  --alert-color: var(--alert-note);
+  --alert-surface: var(--alert-note-surface);
+  background: var(--alert-surface);
+  border: 2px solid var(--border);
+  border-left: 6px solid var(--alert-color);
+  box-shadow: 4px 4px 0 var(--shadow);
+  color: var(--ink);
+  margin: 24px 0;
+  padding: 14px 18px;
+}
+.gh-alert--note { --alert-color: var(--alert-note); --alert-surface: var(--alert-note-surface); }
+.gh-alert--tip { --alert-color: var(--alert-tip); --alert-surface: var(--alert-tip-surface); }
+.gh-alert--important { --alert-color: var(--alert-important); --alert-surface: var(--alert-important-surface); }
+.gh-alert--warning { --alert-color: var(--alert-warning); --alert-surface: var(--alert-warning-surface); }
+.gh-alert--caution { --alert-color: var(--alert-caution); --alert-surface: var(--alert-caution-surface); }
+.gh-alert__title {
+  align-items: center;
+  color: var(--alert-color);
+  display: flex;
+  font: 700 11px "IBM Plex Mono", monospace;
+  gap: 7px;
+  letter-spacing: 0.04em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+.gh-alert > :last-child { margin-bottom: 0; }
 table {
   border-collapse: collapse;
   display: table;
