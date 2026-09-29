@@ -63,6 +63,17 @@
         <span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span>
       </button>
       <a class="brand" href="{{ nav.homepage.url | url }}">{{ config.site_name | upper }}<sup class="brand-trademark" aria-hidden="true"><span class="brand-trademark__glyphs"><svg class="brand-trademark__t" viewBox="0 0 5 6" shape-rendering="crispEdges"><path d="M0 0h5v1H3v5H2V1H0z"/></svg><svg class="brand-trademark__m" viewBox="0 0 5 6" shape-rendering="crispEdges"><path d="M0 0h1v1h1v1h1V1h1V0h1v6H4V3H3v1H2V3H1v3H0z"/></svg></span></sup></a>
+      {% set site_navigation = config.extra.get("site_navigation") %}
+      {% if site_navigation and site_navigation.get("show_header", true) and site_navigation.get("catalog") %}
+        <nav class="package-inline" aria-label="Related sites">
+          {% for item in site_navigation.get("items", [])[:site_navigation.get("header_size", 1) - 1] %}
+            {% if not loop.first %}<span class="package-inline__divider" aria-hidden="true">·</span>{% endif %}
+            <a{% if item.active %} class="active"{% endif %} href="{{ item.url }}">{{ item.title }}</a>
+          {% endfor %}
+          <span class="package-inline__divider" aria-hidden="true">·</span>
+          <a href="{{ site_navigation.catalog.url }}">{{ site_navigation.catalog.title }}</a>
+        </nav>
+      {% endif %}
       <div class="header-right">
         <div class="search-shell">
           <button class="header-btn header-btn--search" id="search-toggle" type="button" aria-expanded="false" aria-controls="search-panel"><span class="header-btn__icon" aria-hidden="true">⌕</span><span>SEARCH</span></button>
@@ -112,7 +123,20 @@
       <main class="main" id="main-content" tabindex="-1">
         {% if page and page.meta and page.meta.crumb %}<div class="crumb">{{ page.meta.crumb | upper }}</div>{% endif %}
         {% if page %}{{ page.content }}{% endif %}
-        <footer class="footer">{% if config.theme.footer_text %}<span>{{ config.theme.footer_text | upper }}</span> · {% endif %}BUILT WITH <a href="https://github.com/trained-by-humans/mkdocs-pixel-lab">PIXEL LAB</a> BY <a href="https://github.com/trained-by-humans">TRAINED-BY-HUMANS</a></footer>
+        <footer class="footer">
+          {% if site_navigation and site_navigation.get("show_footer", true) and site_navigation.get("catalog") %}
+            <nav class="package-footer" aria-label="Related sites">
+              <span class="package-footer__label">{{ site_navigation.get("footer_label", "Related sites") | upper }}</span>
+              {% for item in site_navigation.get("items", [])[:site_navigation.get("footer_size", 1) - 1] %}
+                {% if not loop.first %}<span class="package-footer__divider" aria-hidden="true">·</span>{% endif %}
+                <a{% if item.active %} class="active"{% endif %} href="{{ item.url }}">{{ item.title }}</a>
+              {% endfor %}
+              <span class="package-footer__divider" aria-hidden="true">·</span>
+              <a href="{{ site_navigation.catalog.url }}">{{ site_navigation.catalog.title }}</a>
+            </nav>
+          {% endif %}
+          <span class="footer-credit">{% if config.theme.footer_text %}{{ config.theme.footer_text | upper }} · {% endif %}BUILT WITH <a href="https://github.com/trained-by-humans/mkdocs-pixel-lab">PIXEL LAB</a> BY <a href="https://github.com/trained-by-humans">TRAINED-BY-HUMANS</a></span>
+        </footer>
       </main>
     </div>
     <script>var base_url = {{ base_url | tojson }};</script>

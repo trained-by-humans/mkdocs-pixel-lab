@@ -80,6 +80,39 @@ Pixel Lab includes responsive navigation, search, code-copy controls, heading
 fragment tracking, a skip link, and styling for standard MkDocs and Pymdown
 content.
 
+## Site navigation
+
+An optional compact navigation lane can link related documentation sites.
+Configure the displayed links, active site, catalog, and independent
+header/footer capacities in `extra.site_navigation`:
+
+```yaml
+extra:
+  site_navigation:
+    show_header: true
+    show_footer: true
+    header_size: 4 # includes the catalog link
+    footer_size: 7 # includes the catalog link
+    footer_label: Packages
+    items:
+      - title: Core
+        url: https://ml-pipes.com/
+      - title: Supervision
+        url: https://supervision.ml-pipes.com/
+        active: true
+      - title: Vision
+        url: https://github.com/trained-by-humans/ml-pipes/tree/main/packages/vision
+    catalog:
+      title: All Packages →
+      url: https://ml-pipes.com/PACKAGES/
+```
+
+Omit `site_navigation` to render neither lane. When it is configured,
+`show_header` and `show_footer` independently control whether each lane is
+rendered (both default to `true`). The header renders up to `header_size` links
+and the footer up to `footer_size`; each capacity includes the catalog link. On
+narrow screens, the header lane hides and the footer links stack vertically.
+
 ## Preview
 
 <table>

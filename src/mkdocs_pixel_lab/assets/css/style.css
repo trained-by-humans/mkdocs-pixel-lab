@@ -155,6 +155,13 @@ body {
 .tab:hover { color: var(--ink); }
 .tab.active { color: var(--accent-dark); }
 .tab.active::before { color: var(--accent); content: "▶ "; }
+.package-inline { align-items: center; display: flex; gap: 13px; margin-left: 28px; }
+.package-inline a { color: var(--accent-foreground); font: 700 10px "IBM Plex Mono", monospace; opacity: 0.76; text-decoration: none; text-transform: uppercase; }
+.package-inline__divider { color: var(--accent-foreground); font-size: 12px; opacity: 0.55; }
+.package-inline a:hover { opacity: 1; }
+.package-inline a.active { opacity: 1; }
+.package-inline a.active::before { content: "[ "; }
+.package-inline a.active::after { content: " ]"; }
 
 .layout { display: flex; margin: auto; max-width: 1440px; overflow-x: clip; width: 100%; }
 .sidebar {
@@ -376,6 +383,18 @@ details > * { max-width: none; }
 .node { background: var(--surface); border: 2px solid var(--border); box-shadow: 3px 3px 0 var(--shadow); font: 700 10px "IBM Plex Mono", monospace; padding: 9px 11px; }
 .arrow { color: var(--accent-dark); font-weight: 900; }
 .footer { border-top: 2px solid var(--border); color: var(--muted); font: 11px "IBM Plex Mono", monospace; margin-top: 70px; padding-top: 20px; }
+/* The package lane begins at the footer's padding edge; attribution follows as
+   a deliberately quieter second line. */
+.package-footer { align-items: center; display: flex; flex-wrap: wrap; gap: 6px 10px; margin: 0; }
+.package-footer__label { color: var(--ink); font-weight: 700; letter-spacing: 0.05em; }
+.package-footer a { color: var(--muted); text-decoration: none; text-transform: uppercase; }
+.package-footer a:hover,
+.package-footer a.active { color: var(--accent-dark); }
+.package-footer a.active::before { content: "[ "; }
+.package-footer a.active::after { content: " ]"; }
+.package-footer__divider { color: var(--muted); }
+.footer-credit { display: block; line-height: 1.5; }
+.package-footer + .footer-credit { margin-top: 12px; }
 
 /* A content card owns its elevation. Nested cards, media, and code stay flat. */
 :is(.gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example)
@@ -387,6 +406,9 @@ details > * { max-width: none; }
   .sidebar { display: none; }
   .main { padding: 36px 24px 70px; width: 100%; }
   .tabs { gap: 15px; overflow-x: auto; padding-left: 18px; }
+  .package-inline { display: none; }
+  .package-footer { align-items: flex-start; flex-direction: column; gap: 5px; }
+  .package-footer__divider { display: none; }
   .header-btn--menu {
     align-items: center;
     cursor: pointer;
