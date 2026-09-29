@@ -11,10 +11,43 @@
     <link rel="stylesheet" href="{{ 'assets/css/style.css' | url }}">
     <style id="pixel-lab-palette">
       :root {
+        --bg: {{ config.theme.background_color }};
+        --surface: {{ config.theme.surface_color }};
+        --surface2: {{ config.theme.surface_alt_color }};
+        --ink: {{ config.theme.text_color }};
+        --strong-text: {{ config.theme.strong_text_color }};
+        --muted: {{ config.theme.muted_text_color }};
+        --border: {{ config.theme.border_color }};
+        --shadow: {{ config.theme.shadow_color }};
+        --subtle-border: {{ config.theme.subtle_border_color }};
+        --sidebar-border: {{ config.theme.sidebar_border_color }};
+        --grid: {{ config.theme.grid_color }};
+        --overlay: {{ config.theme.overlay_color }};
         --accent: {{ config.theme.accent_color }};
         --accent-dark: {{ config.theme.accent_dark_color }};
         --accent-foreground: {{ config.theme.accent_foreground_color }};
         --header-background: {{ config.theme.header_background }};
+        --highlight: {{ config.theme.highlight_color }};
+        --secondary: {{ config.theme.secondary_color }};
+        --input-focus-background: {{ config.theme.input_focus_background_color }};
+        --inline-code-border: {{ config.theme.inline_code_border_color }};
+        --tab-hover: {{ config.theme.tab_hover_color }};
+        --code: {{ config.theme.code_background_color }};
+        --code-text: {{ config.theme.code_text_color }};
+        --code-keyword: {{ config.theme.code_keyword_color }};
+        --code-string: {{ config.theme.code_string_color }};
+        --code-function: {{ config.theme.code_function_color }};
+        --code-comment: {{ config.theme.code_comment_color }};
+        --alert-note: {{ config.theme.alert_note_color }};
+        --alert-note-surface: {{ config.theme.alert_note_surface_color }};
+        --alert-tip: {{ config.theme.alert_tip_color }};
+        --alert-tip-surface: {{ config.theme.alert_tip_surface_color }};
+        --alert-important: {{ config.theme.alert_important_color }};
+        --alert-important-surface: {{ config.theme.alert_important_surface_color }};
+        --alert-warning: {{ config.theme.alert_warning_color }};
+        --alert-warning-surface: {{ config.theme.alert_warning_surface_color }};
+        --alert-caution: {{ config.theme.alert_caution_color }};
+        --alert-caution-surface: {{ config.theme.alert_caution_surface_color }};
       }
     </style>
     {% for style in config.extra_css %}

@@ -79,6 +79,8 @@ def test_desktop_experience(page, site_url: str, tmp_path: Path) -> None:
 
     expect(page.locator("main img")).to_be_visible()
     expect(page.locator(".sidebar")).to_have_count(0)
+    expect(page.locator("pre.highlight")).to_have_css("border-top-color", "rgb(18, 52, 86)")
+    expect(page.locator("pre.highlight")).to_have_css("box-shadow", "rgb(101, 67, 33) 5px 5px 0px 0px")
     expect(page.locator("pre.highlight")).to_have_css("background-color", "rgb(16, 20, 16)")
     capture_snapshot(page, "desktop.png", tmp_path)
 

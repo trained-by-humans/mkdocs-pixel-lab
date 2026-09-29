@@ -4,6 +4,8 @@ site_url: https://example.invalid/
 theme:
   name: pixel-lab
   footer_text: Fixture documentation
+  border_color: "#123456"
+  shadow_color: "#654321"
 nav:
   - Home: index.md
   - Guide:
