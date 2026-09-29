@@ -50,12 +50,27 @@ body {
   z-index: 10;
 }
 .brand {
+  align-items: center;
   color: var(--accent-foreground);
+  display: inline-flex;
   font: 700 17px/1 "IBM Plex Mono", monospace;
   letter-spacing: -0.04em;
   text-decoration: none;
   text-transform: uppercase;
 }
+.brand-trademark {
+  align-items: center;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  display: inline-flex;
+  height: 16px;
+  justify-content: center;
+  margin-left: 3px;
+  width: 16px;
+}
+.brand-trademark__glyphs { display: inline-flex; gap: 1px; padding: 0 1px; transform: scale(0.8); }
+.brand-trademark__t,
+.brand-trademark__m { fill: currentColor; height: 7px; stroke: currentColor; stroke-width: 0.4; width: 6px; }
 .header-right { align-items: center; display: flex; gap: 10px; margin-left: auto; }
 .search-shell { position: relative; }
 .header-btn {
