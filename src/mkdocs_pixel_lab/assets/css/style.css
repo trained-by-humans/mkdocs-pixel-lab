@@ -40,8 +40,8 @@ body {
 .header {
   align-items: center;
   background: var(--header-background);
-  border-bottom: 3px solid var(--accent-dark);
-  box-shadow: 0 4px 0 var(--accent-dark);
+  border-bottom: 3px solid var(--header-border);
+  box-shadow: 0 4px 0 var(--header-shadow);
   display: flex;
   height: 64px;
   padding: 0 28px;
@@ -352,8 +352,6 @@ details > * { max-width: none; }
 .tabbed-set > input:nth-child(7):checked ~ .tabbed-content > .tabbed-block:nth-child(7),
 .tabbed-set > input:nth-child(8):checked ~ .tabbed-content > .tabbed-block:nth-child(8) { display: block; }
 .tabbed-content { padding: 0 20px; }
-.tabbed-content pre,
-.tabbed-content .highlight pre { box-shadow: none; }
 
 .lead { color: var(--muted); font-size: 17px; max-width: 760px; }
 .pixel-panel, .example { background: var(--surface); border: 2px solid var(--border); box-shadow: 5px 5px 0 var(--shadow); }
@@ -367,6 +365,12 @@ details > * { max-width: none; }
 .node { background: var(--surface); border: 2px solid var(--border); box-shadow: 3px 3px 0 var(--shadow); font: 700 10px "IBM Plex Mono", monospace; padding: 9px 11px; }
 .arrow { color: var(--accent-dark); font-weight: 900; }
 .footer { border-top: 2px solid var(--border); color: var(--muted); font: 11px "IBM Plex Mono", monospace; margin-top: 70px; padding-top: 20px; }
+
+/* A content card owns its elevation. Nested cards, media, and code stay flat. */
+:is(.gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example)
+  :is(pre, .highlight pre, img, video, .gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example, .node) {
+  box-shadow: none;
+}
 
 @media (max-width: 850px) {
   .sidebar { display: none; }

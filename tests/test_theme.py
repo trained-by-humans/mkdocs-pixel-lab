@@ -84,6 +84,8 @@ def test_desktop_experience(page, site_url: str, tmp_path: Path) -> None:
     expect(page.locator("pre.highlight")).to_have_css("border-top-color", "rgb(18, 52, 86)")
     expect(page.locator("pre.highlight")).to_have_css("box-shadow", "rgb(101, 67, 33) 5px 5px 0px 0px")
     expect(page.locator("pre.highlight")).to_have_css("background-color", "rgb(16, 20, 16)")
+    expect(page.locator(".admonition pre")).to_have_css("box-shadow", "none")
+    expect(page.locator(".table-scroll img")).to_have_css("box-shadow", "none")
     capture_snapshot(page, "desktop.png", tmp_path)
 
     page.get_by_role("button", name="SEARCH").click()

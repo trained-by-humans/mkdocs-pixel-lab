@@ -16,8 +16,16 @@ print("copy me")
 | --- | --- |
 | Search | Ready |
 
+| Media inside an elevated table |
+| --- |
+| ![The Pixel Lab data-flow diagram](assets/pixel-lab-preview.svg) |
+
 !!! note
     An admonition validates the baseline styling.
+
+    ```python
+    print("flat inside an elevated admonition")
+    ```
 
 === "Python"
 
