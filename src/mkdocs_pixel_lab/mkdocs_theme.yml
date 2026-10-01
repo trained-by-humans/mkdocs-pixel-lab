@@ -1,4 +1,5 @@
 name: pixel-lab
+favicon: assets/favicon.png
 footer_text: ""
 background_color: "#f4f1df"
 surface_color: "#fffdf2"

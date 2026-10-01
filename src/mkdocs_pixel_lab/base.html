@@ -8,6 +8,9 @@
     {% if page and page.canonical_url %}
       <link rel="canonical" href="{{ page.canonical_url }}">
     {% endif %}
+    {% if config.theme.favicon %}
+      <link rel="icon" href="{{ config.theme.favicon | url }}">
+    {% endif %}
     <link rel="stylesheet" href="{{ 'assets/css/style.css' | url }}">
     <style id="pixel-lab-palette">
       :root {

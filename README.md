@@ -15,6 +15,14 @@ theme:
   name: pixel-lab
 ```
 
+Pixel Lab includes a default favicon. Override it for a site-specific mark:
+
+```yaml
+theme:
+  name: pixel-lab
+  favicon: assets/favicon.svg
+```
+
 ## Palette
 
 Every theme color is configured from the single `theme:` block in `mkdocs.yml`.
