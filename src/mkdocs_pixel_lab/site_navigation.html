@@ -1,0 +1,25 @@
+{% macro site_icon(item) -%}
+  {% if item.get("icon") %}
+    <img class="site-panel__icon" src="{{ item.icon | url | e }}" alt="" width="24" height="24" loading="lazy" decoding="async">
+  {% else %}
+    <svg class="site-panel__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" shape-rendering="crispEdges"><path fill="currentColor" d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/></svg>
+  {% endif %}
+{%- endmacro %}
+{% macro site_link(item, catalog=false) -%}
+  <a class="site-panel__link{% if item.get('active') %} active{% endif %}{% if catalog %} site-panel__link--catalog{% endif %}" href="{{ item.url | url | e }}"{% if item.get('active') %} aria-current="true"{% endif %}>
+    {{ site_icon(item) }}
+    <span class="site-panel__title">{{ item.title | e }}</span>
+  </a>
+{%- endmacro %}
+{% if site_navigation and site_navigation.get("header_mode", "dropdown") == "dropdown" and (site_navigation.get("items") or site_navigation.get("catalog")) %}
+  {% set dropdown_label = site_navigation.get("dropdown_label", "Sites") %}
+  <div class="site-switcher">
+    <button class="header-btn header-btn--sites" id="site-toggle" type="button" aria-label="{{ dropdown_label | e }}" aria-expanded="false" aria-controls="site-panel">
+      {{ site_icon({}) }}<span class="header-btn__label">{{ dropdown_label | e }}</span><span class="site-switcher__arrow" aria-hidden="true">▾</span>
+    </button>
+    <nav class="site-panel" id="site-panel" aria-label="{{ dropdown_label | e }}" hidden>
+      {% for item in site_navigation.get("items", []) %}{{ site_link(item) }}{% endfor %}
+      {% if site_navigation.get("catalog") %}{{ site_link(site_navigation.catalog, true) }}{% endif %}
+    </nav>
+  </div>
+{% endif %}

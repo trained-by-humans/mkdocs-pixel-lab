@@ -67,12 +67,14 @@ body {
   justify-content: center;
   margin-left: 3px;
   width: 16px;
+  flex-shrink: 0;
 }
+.brand__name { min-width: 0; }
 .brand-trademark__glyph { display: block; height: 7px; width: 12px; }
 .brand-trademark__outline { fill: var(--accent); }
 .brand-trademark__rim { fill: var(--accent-dark); }
 .brand-trademark__fill { fill: currentColor; }
-.header-right { align-items: center; display: flex; gap: 10px; margin-left: auto; }
+.header-right { align-items: center; display: flex; flex-shrink: 0; gap: 10px; margin-left: auto; position: relative; }
 .search-shell { position: relative; }
 .header-btn {
   background: var(--surface);
@@ -82,7 +84,8 @@ body {
   font: 700 12px "IBM Plex Mono", monospace;
   padding: 7px 12px;
 }
-.header-btn--search { align-items: center; appearance: none; color: var(--strong-text); display: inline-flex; gap: 6px; }
+.header-btn--search,
+.header-btn--sites { align-items: center; appearance: none; color: var(--strong-text); display: inline-flex; gap: 6px; }
 .header-btn__icon { font: 17px/0.8 system-ui, sans-serif; transform: translateY(-1px); }
 .header-btn--menu {
   display: none;
@@ -92,7 +95,10 @@ body {
 .header-btn--search:hover,
 .header-btn--search:focus-visible,
 .search-shell:focus-within .header-btn--search,
-.search-shell.is-open .header-btn--search { background: var(--highlight); outline: none; }
+.search-shell.is-open .header-btn--search,
+.header-btn--sites:hover,
+.header-btn--sites:focus-visible,
+.site-switcher.is-open .header-btn--sites { background: var(--highlight); outline: none; }
 .search-panel {
   background: var(--surface);
   border: 2px solid var(--border);
@@ -117,6 +123,8 @@ body {
   transform: translateY(0);
   visibility: visible;
 }
+/* Explicit opening makes the input focusable immediately; keep the visual fade. */
+.search-shell.is-open .search-panel { transition: opacity 150ms ease, transform 150ms ease; }
 .search-label { display: block; font: 700 10px "IBM Plex Mono", monospace; margin-bottom: 8px; }
 .search-input {
   background: var(--surface2);
@@ -135,6 +143,57 @@ body {
 .search-results h3 { font: 700 12px "IBM Plex Mono", monospace; margin: 0 0 4px; text-transform: uppercase; }
 .search-results h3 a { color: var(--accent-dark); text-decoration: none; }
 .search-results p { color: var(--muted); font-size: 12px; margin: 0; max-width: none; }
+
+.site-switcher { position: relative; }
+.header-btn--sites { text-transform: uppercase; }
+.header-btn--sites .site-panel__icon { color: inherit; height: 14px; width: 14px; }
+.site-switcher__arrow { font-size: 12px; }
+.site-panel {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  box-shadow: 5px 5px 0 var(--shadow);
+  display: flex;
+  flex-direction: column;
+  max-height: min(70dvh, 30rem);
+  overflow-y: auto;
+  padding: 0;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: min(14rem, calc(100vw - 3.5rem));
+  z-index: 20;
+}
+.site-panel[hidden] { display: none; }
+.site-panel__link {
+  align-items: center;
+  color: var(--ink);
+  display: flex;
+  font: 700 12px/1.4 "IBM Plex Mono", monospace;
+  gap: 10px;
+  min-height: 46px;
+  padding: 10px;
+  text-decoration: none;
+}
+.site-panel__link:not(.active):is(:hover, :focus-visible) {
+  background: color-mix(in srgb, var(--surface2) 50%, var(--surface));
+  color: var(--accent-dark);
+}
+.site-panel__link.active { background: var(--surface2); color: var(--accent-dark); }
+.site-panel__link:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.site-panel__link--catalog { border-top: 1px solid var(--subtle-border); }
+.site-panel__title { overflow-wrap: anywhere; }
+.site-panel__icon {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  color: var(--accent);
+  display: block;
+  flex-shrink: 0;
+  height: 24px;
+  margin: 0;
+  object-fit: contain;
+  width: 24px;
+}
 
 .tabs {
   align-items: center;
@@ -485,6 +544,7 @@ details > * { max-width: none; }
     justify-content: center;
     margin-right: 10px;
     padding: 8px;
+    flex-shrink: 0;
   }
   .search-panel { right: 0; width: min(26rem, calc(100vw - 2.25rem)); }
   .drawer-scrim {
@@ -554,4 +614,12 @@ details > * { max-width: none; }
     text-transform: uppercase;
   }
   body.drawer-open { overflow: hidden; }
+}
+
+@media (max-width: 600px) {
+  .header:has(.site-switcher) .brand { min-width: 0; }
+  .header:has(.site-switcher) .brand__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .header:has(.site-switcher) .header-btn__label,
+  .site-switcher__arrow { display: none; }
+  .site-switcher { position: static; }
 }

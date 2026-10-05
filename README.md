@@ -225,9 +225,9 @@ theme:
 
 ## Site navigation
 
-An optional compact navigation lane can link related documentation sites.
-Configure the displayed links, active site, catalog, and independent
-header/footer capacities in `extra.site_navigation`:
+Choose either inline links beside the site title or a dropdown beside Search,
+with an independent footer lane. All reuse `extra.site_navigation`; the dropdown
+shows every item, followed by the optional catalog link, without lane size limits.
 
 <details>
 <summary>Site navigation configuration</summary>
@@ -235,17 +235,20 @@ header/footer capacities in `extra.site_navigation`:
 ```yaml
 extra:
   site_navigation:
-    show_header: true
+    header_mode: dropdown # dropdown | inline | none
     show_footer: true
+    dropdown_label: Packages # defaults to Sites
     header_size: 4 # includes the catalog link
     footer_size: 7 # includes the catalog link
     footer_label: Packages
     items:
       - title: Core
         url: https://ml-pipes.com/
+        icon: assets/core.svg
       - title: Supervision
         url: https://supervision.ml-pipes.com/
         active: true
+        icon: assets/supervision.svg
       - title: Vision
         url: https://github.com/trained-by-humans/ml-pipes/tree/main/packages/vision
     catalog:
@@ -255,11 +258,23 @@ extra:
 
 </details>
 
-Omit `site_navigation` to render neither lane. When it is configured,
-`show_header` and `show_footer` independently control whether each lane is
-rendered (both default to `true`). The header renders up to `header_size` links
-and the footer up to `footer_size`; each capacity includes the catalog link. On
-narrow screens, the header lane hides and the footer links stack vertically.
+Omit `site_navigation` to render no related-site navigation. When configured,
+`header_mode` selects one toolbar presentation: `dropdown` (the default), `inline`,
+or `none`. Use it in place of the previous `show_header` / `show_dropdown` flags;
+the two toolbar presentations never render together. `show_footer` independently
+controls the footer lane and defaults to `true`.
+
+Inline header and footer lanes require a catalog link. The inline header renders
+up to `header_size` links and the footer up to `footer_size`; each capacity includes
+the catalog link. These sizes do not limit the dropdown. On narrow screens, the
+inline header hides and the footer links stack vertically.
+
+Set each item's optional `icon` to an SVG/PNG path relative to the documentation
+directory or an absolute URL. Missing icons use a themed pixel fallback; icons
+appear only in the dropdown. The catalog can also specify an icon. The dropdown
+works without a catalog and marks the configured active item. Use Tab or arrow
+keys to navigate, and Escape to close it. Clicking outside also closes it.
+On small screens, the header buttons use icons while keeping accessible labels.
 
 ## Analytics and privacy
 

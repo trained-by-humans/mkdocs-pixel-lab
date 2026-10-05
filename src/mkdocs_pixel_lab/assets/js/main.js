@@ -2,6 +2,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchShell = document.querySelector(".search-shell");
   const searchToggle = document.querySelector("#search-toggle");
   const searchInput = document.querySelector("#mkdocs-search-query");
+  const siteShell = document.querySelector(".site-switcher");
+  const siteToggle = document.querySelector("#site-toggle");
+  const sitePanel = document.querySelector("#site-panel");
   const navToggle = document.querySelector("#nav-toggle");
   const mobileNav = document.querySelector("#mobile-nav");
   const navClose = document.querySelector("#nav-close");
@@ -23,6 +26,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!searchShell || !searchToggle) return;
     searchShell.classList.toggle("is-open", open);
     searchToggle.setAttribute("aria-expanded", String(open));
+    if (open) setSiteOpen(false);
+  };
+
+  const setSiteOpen = (open) => {
+    if (!siteShell || !siteToggle || !sitePanel) return;
+    sitePanel.hidden = !open;
+    siteShell.classList.toggle("is-open", open);
+    siteToggle.setAttribute("aria-expanded", String(open));
+    if (open) setSearchOpen(false);
   };
 
   const setNavOpen = (open) => {
@@ -32,31 +44,71 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.toggle("drawer-open", open);
     mobileNav.setAttribute("aria-hidden", String(!open));
     navToggle.setAttribute("aria-expanded", String(open));
+    if (open) {
+      setSiteOpen(false);
+      setSearchOpen(false);
+    }
   };
 
   if (searchShell && searchToggle && searchInput) {
     searchToggle.addEventListener("click", () => {
       const open = !searchShell.classList.contains("is-open");
       setSearchOpen(open);
-      if (open) searchInput.focus();
+      if (open) window.requestAnimationFrame(() => {
+        if (searchShell.classList.contains("is-open")) searchInput.focus();
+      });
     });
 
     document.addEventListener("click", (event) => {
       if (!searchShell.contains(event.target)) setSearchOpen(false);
     });
 
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") {
-        if (mobileNav?.classList.contains("is-open")) {
-          setNavOpen(false);
-          navToggle?.focus();
-        } else {
-          setSearchOpen(false);
-          searchToggle.focus();
-        }
-      }
+    searchShell.addEventListener("pointerenter", () => setSiteOpen(false));
+    searchShell.addEventListener("focusin", () => setSiteOpen(false));
+  }
+
+  if (siteShell && siteToggle && sitePanel) {
+    const links = Array.from(sitePanel.querySelectorAll("a"));
+    siteToggle.addEventListener("click", () => setSiteOpen(sitePanel.hidden));
+    siteToggle.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+      event.preventDefault();
+      setSiteOpen(true);
+      (event.key === "ArrowDown" ? links[0] : links.at(-1))?.focus();
+    });
+    sitePanel.addEventListener("keydown", (event) => {
+      if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+      event.preventDefault();
+      const index = links.indexOf(document.activeElement);
+      const next = event.key === "Home" ? 0
+        : event.key === "End" ? links.length - 1
+        : (index + (event.key === "ArrowDown" ? 1 : -1) + links.length) % links.length;
+      links[next]?.focus();
+    });
+    sitePanel.addEventListener("click", (event) => {
+      if (event.target.closest("a")) setSiteOpen(false);
+    });
+    siteShell.addEventListener("focusout", (event) => {
+      if (!siteShell.contains(event.relatedTarget)) setSiteOpen(false);
+    });
+    document.addEventListener("click", (event) => {
+      if (!siteShell.contains(event.target)) setSiteOpen(false);
     });
   }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    if (sitePanel && !sitePanel.hidden) {
+      setSiteOpen(false);
+      siteToggle.focus();
+    } else if (mobileNav?.classList.contains("is-open")) {
+      setNavOpen(false);
+      navToggle?.focus();
+    } else if (searchShell?.contains(document.activeElement) || searchShell?.classList.contains("is-open")) {
+      setSearchOpen(false);
+      searchToggle?.focus();
+    }
+  });
 
   if (navToggle && mobileNav && drawerScrim) {
     navToggle.addEventListener("click", () => {
