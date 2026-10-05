@@ -2,6 +2,7 @@
 
 import copy
 import mimetypes
+import re
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -21,7 +22,8 @@ NAVIGATION = {
         {"title": "Core", "url": "guide/nested/", "icon": "assets/pixel-lab-preview.svg"},
         {
             "title": "Supervision", "url": "https://supervision.ml-pipes.com/",
-            "icon": "assets/pixel-lab-preview.svg", "active": True,
+            "icon": "assets/site-navigation-hover.svg", "active": True,
+            "icon_hover": "assets/site-navigation-hover.svg#icon-hover",
         },
         {"title": "Vision", "url": "https://example.org/vision/"},
     ],
@@ -109,6 +111,9 @@ def test_dropdown_items_and_icons(navigation_page, path):
     expect(panel.locator(".site-panel__icon")).to_have_count(4)
     expect(panel.get_by_role("link", name="Supervision")).to_have_attribute("aria-current", "true")
     expect(panel.get_by_role("link", name="Supervision")).to_have_text("Supervision")
+    expect(panel.get_by_role("link", name="Supervision").locator("img")).to_have_attribute(
+        "data-hover-src", "../../assets/site-navigation-hover.svg#icon-hover" if path != "/" else "assets/site-navigation-hover.svg#icon-hover",
+    )
     image = panel.get_by_role("link", name="Core").locator("img")
     expect(image).to_have_attribute("alt", "")
     assert image.evaluate("e => e.src") == ORIGIN + "/assets/pixel-lab-preview.svg"
@@ -120,6 +125,10 @@ def test_dropdown_items_and_icons(navigation_page, path):
     expect(panel).to_have_css("box-shadow", "rgb(101, 67, 33) 5px 5px 0px 0px")
     expect(panel.get_by_role("link", name="Vision").locator("svg")).to_have_count(1)
     expect(panel).to_have_css("padding", "0px")
+    expect(image).to_have_css("height", "24px")
+    hover_image = panel.get_by_role("link", name="Supervision").locator("img")
+    expect(hover_image).to_have_css("height", "44px")
+    expect(hover_image).to_have_css("margin-top", "0px")
     bounds = panel.bounding_box()
     assert bounds["width"] == pytest.approx(224)
     previous_bottom = bounds["y"] + 2
@@ -128,6 +137,9 @@ def test_dropdown_items_and_icons(navigation_page, path):
         assert row["x"] == pytest.approx(bounds["x"] + 2)
         assert row["width"] == pytest.approx(bounds["width"] - 4)
         assert row["y"] == pytest.approx(previous_bottom)
+        assert row["height"] == pytest.approx(46)
+        expect(link).to_have_css("padding-top", "0px")
+        expect(link).to_have_css("padding-bottom", "0px")
         previous_bottom = row["y"] + row["height"]
     assert previous_bottom == pytest.approx(bounds["y"] + bounds["height"] - 2)
     core = panel.get_by_role("link", name="Core")
@@ -219,3 +231,118 @@ def test_dropdown_keyboard_and_search(navigation_page):
     page.keyboard.press("ArrowDown")
     page.keyboard.press("Enter")
     expect(page).to_have_url(ORIGIN + "/guide/nested/")
+
+
+def test_hover_icon_animation_replays_from_cached_asset(navigation_page):
+    page = navigation_page
+    fetches = []
+    page.on("request", lambda request: fetches.append(request.url) if request.resource_type == "fetch" and "site-navigation-hover.svg" in request.url else None)
+    page.goto(ORIGIN)
+    page.get_by_role("button", name="Packages", exact=True).click()
+    link = page.locator("#site-panel").get_by_role("link", name="Supervision")
+    icon = link.locator("img")
+    expect(icon).to_have_js_property("complete", True)
+    baseline = icon.screenshot()
+    previous_src = None
+    for _ in range(2):
+        link.hover()
+        expect(icon).to_have_attribute("src", re.compile(r"^blob:.*#icon-hover$"))
+        current_src = icon.get_attribute("src")
+        assert current_src != previous_src
+        previous_src = current_src
+        page.wait_for_timeout(120)
+        assert icon.screenshot() != baseline
+        page.wait_for_timeout(1200)
+        assert icon.screenshot() == baseline
+        page.mouse.move(5, 700)
+        expect(icon).to_have_attribute("src", "assets/site-navigation-hover.svg")
+    assert len(fetches) == 1
+
+
+def test_hover_icon_canvas_contains_entire_drop(navigation_page):
+    page = navigation_page
+    page.emulate_media(reduced_motion="no-preference")
+    page.goto(ORIGIN + "/assets/site-navigation-hover.svg#icon-hover")
+    for time in (0, 120, 530, 1120):
+        bounds = page.evaluate("""time => {
+            const svg = document.querySelector('svg');
+            svg.getAnimations({subtree: true}).forEach(animation => {
+                animation.pause();
+                animation.currentTime = time;
+            });
+            const block = svg.querySelector('.drop');
+            const box = block.getBBox();
+            const matrix = svg.getCTM().inverse().multiply(block.getCTM());
+            const points = [new DOMPoint(box.x, box.y),
+                            new DOMPoint(box.x + box.width, box.y + box.height)]
+                .map(point => point.matrixTransform(matrix));
+            const view = svg.viewBox.baseVal;
+            return {left: points[0].x, top: points[0].y,
+                    right: points[1].x, bottom: points[1].y,
+                    x: view.x, y: view.y, width: view.width, height: view.height};
+        }""", time)
+        assert bounds['left'] >= bounds['x']
+        assert bounds['top'] >= bounds['y']
+        assert bounds['right'] <= bounds['x'] + bounds['width']
+        assert bounds['bottom'] <= bounds['y'] + bounds['height']
+        assert bounds['width'] / bounds['height'] == pytest.approx(24 / 44)
+
+
+def test_hover_icon_keyboard_and_reduced_motion(navigation_page):
+    page = navigation_page
+    page.goto(ORIGIN)
+    toggle = page.get_by_role("button", name="Packages", exact=True)
+    icon = page.locator("#site-panel .active img")
+    toggle.focus()
+    page.keyboard.press("ArrowDown")
+    page.keyboard.press("ArrowDown")
+    expect(icon).to_have_attribute("src", re.compile(r"^blob:"))
+    page.keyboard.press("Escape")
+    expect(icon).to_have_attribute("src", "assets/site-navigation-hover.svg")
+    page.emulate_media(reduced_motion="reduce")
+    toggle.click()
+    page.locator("#site-panel").get_by_role("link", name="Supervision").hover()
+    page.wait_for_timeout(150)
+    expect(icon).to_have_attribute("src", "assets/site-navigation-hover.svg")
+    page.emulate_media(reduced_motion="no-preference")
+    page.mouse.move(5, 700)
+    page.locator("#site-panel").get_by_role("link", name="Supervision").hover()
+    expect(icon).to_have_attribute("src", re.compile(r"^blob:"))
+    page.emulate_media(reduced_motion="reduce")
+    expect(icon).to_have_attribute("src", "assets/site-navigation-hover.svg")
+
+
+def test_hover_icon_cancelled_while_asset_loads(navigation_page):
+    page = navigation_page
+    page.goto(ORIGIN)
+    page.get_by_role("button", name="Packages", exact=True).click()
+    link = page.locator("#site-panel").get_by_role("link", name="Supervision")
+    icon = link.locator("img")
+    expect(icon).to_have_js_property("complete", True)
+    held = []
+    page.route("**/assets/site-navigation-hover.svg", lambda route: held.append(route))
+    link.hover()
+    page.wait_for_timeout(150)
+    assert len(held) == 1
+    page.mouse.move(5, 700)
+    held[0].fulfill(path=str(FIXTURE.parent / "docs/assets/site-navigation-hover.svg"), content_type="image/svg+xml")
+    page.wait_for_timeout(150)
+    expect(icon).to_have_attribute("src", "assets/site-navigation-hover.svg")
+    link.hover()
+    expect(icon).to_have_attribute("src", re.compile(r"^blob:"))
+    assert len(held) == 1
+
+
+def test_hover_icon_fetch_failure_keeps_static_icon(navigation_page):
+    page = navigation_page
+    page.goto(ORIGIN)
+    page.get_by_role("button", name="Packages", exact=True).click()
+    link = page.locator("#site-panel").get_by_role("link", name="Supervision")
+    icon = link.locator("img")
+    expect(icon).to_have_js_property("complete", True)
+    page.route("**/assets/site-navigation-hover.svg", lambda route: route.fulfill(status=404))
+    link.hover()
+    page.wait_for_timeout(150)
+    expect(icon).to_have_attribute("src", "assets/site-navigation-hover.svg")
+    page.get_by_role("button", name="SEARCH", exact=True).click()
+    expect(page.locator("#mkdocs-search-query")).to_be_focused()

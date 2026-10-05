@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const navClose = document.querySelector("#nav-close");
   const drawerScrim = document.querySelector("#drawer-scrim");
   const skipLink = document.querySelector(".skip-link");
+  const resetSiteIcons = [];
 
   if (skipLink) {
     document.addEventListener("keydown", (event) => {
@@ -34,6 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     sitePanel.hidden = !open;
     siteShell.classList.toggle("is-open", open);
     siteToggle.setAttribute("aria-expanded", String(open));
+    if (!open) resetSiteIcons.forEach((reset) => reset());
     if (open) setSearchOpen(false);
   };
 
@@ -69,6 +71,67 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (siteShell && siteToggle && sitePanel) {
     const links = Array.from(sitePanel.querySelectorAll("a"));
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const hoverAssets = new Map();
+    links.forEach((link) => {
+      const icon = link.querySelector("img[data-hover-src]");
+      if (!icon) return;
+      const staticSrc = icon.getAttribute("src");
+      let hoverUrl;
+      try {
+        hoverUrl = new URL(icon.dataset.hoverSrc, document.baseURI);
+      } catch (error) {
+        return; // A malformed optional URL must not disable other theme controls.
+      }
+      let imageUrl = null;
+      let revision = 0;
+      const reset = () => {
+        revision += 1;
+        if (icon.getAttribute("src") !== staticSrc) icon.setAttribute("src", staticSrc);
+        if (imageUrl) URL.revokeObjectURL(imageUrl);
+        imageUrl = null;
+      };
+      const play = async () => {
+        reset();
+        if (reducedMotion.matches) return;
+        const currentRevision = revision;
+        try {
+          if (!hoverAssets.has(hoverUrl.href)) {
+            hoverAssets.set(hoverUrl.href, fetch(hoverUrl.href).then((response) => {
+              if (!response.ok) throw new Error("Hover icon unavailable");
+              return response.blob();
+            }));
+          }
+          const asset = await hoverAssets.get(hoverUrl.href);
+          if (currentRevision !== revision || reducedMotion.matches || sitePanel.hidden) return;
+          // A fresh image instance restarts SVG/GIF timelines; reuse the fetched bytes.
+          imageUrl = URL.createObjectURL(asset);
+          icon.src = imageUrl + hoverUrl.hash;
+        } catch (error) {
+          hoverAssets.delete(hoverUrl.href);
+          // Keep the static icon if fetching the optional hover image fails.
+        }
+      };
+      resetSiteIcons.push(reset);
+      link.addEventListener("pointerenter", (event) => {
+        if (event.pointerType !== "touch") play();
+      });
+      link.addEventListener("pointerleave", () => {
+        if (!link.matches(":focus-visible")) reset();
+      });
+      link.addEventListener("focus", () => {
+        if (link.matches(":focus-visible")) play();
+      });
+      link.addEventListener("blur", () => {
+        if (!link.matches(":hover")) reset();
+      });
+      icon.addEventListener("error", () => {
+        if (imageUrl) reset();
+      });
+    });
+    reducedMotion.addEventListener("change", () => {
+      if (reducedMotion.matches) resetSiteIcons.forEach((reset) => reset());
+    });
     siteToggle.addEventListener("click", () => setSiteOpen(sitePanel.hidden));
     siteToggle.addEventListener("keydown", (event) => {
       if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;

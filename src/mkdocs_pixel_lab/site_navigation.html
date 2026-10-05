@@ -1,6 +1,6 @@
 {% macro site_icon(item) -%}
   {% if item.get("icon") %}
-    <img class="site-panel__icon" src="{{ item.icon | url | e }}" alt="" width="24" height="24" loading="lazy" decoding="async">
+    <img class="site-panel__icon" src="{{ item.icon | url | e }}"{% if item.get("icon_hover") %} data-hover-src="{{ item.icon_hover | url | e }}"{% endif %} alt="" width="24" height="24" loading="lazy" decoding="async">
   {% else %}
     <svg class="site-panel__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" shape-rendering="crispEdges"><path fill="currentColor" d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/></svg>
   {% endif %}

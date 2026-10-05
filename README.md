@@ -249,6 +249,7 @@ extra:
         url: https://supervision.ml-pipes.com/
         active: true
         icon: assets/supervision.svg
+        icon_hover: assets/supervision.svg#icon-hover
       - title: Vision
         url: https://github.com/trained-by-humans/ml-pipes/tree/main/packages/vision
     catalog:
@@ -275,6 +276,18 @@ appear only in the dropdown. The catalog can also specify an icon. The dropdown
 works without a catalog and marks the configured active item. Use Tab or arrow
 keys to navigate, and Escape to close it. Clicking outside also closes it.
 On small screens, the header buttons use icons while keeping accessible labels.
+
+Optionally set `icon_hover` to an animated image URL. It replaces the resting
+`icon` on pointer hover or keyboard focus, restarts on each entry, and restores
+the static icon on exit or when the dropdown closes. Reduced-motion users retain
+the static icon. Hover images are fetched once and replayed from cached data;
+use a same-origin asset or an external URL that allows CORS. An SVG can use a
+fragment such as `#icon-hover` to activate its own `:target` animation, letting
+the same file supply both static and animated artwork. Hover-enabled icons have
+a 24 × 44 px image slot, including the row's vertical spacing. Add that breathing
+room inside both SVG canvases so the animation stays within the viewBox without
+shrinking the resting artwork. Missing or failed hover images leave the resting
+icon unchanged. Without `icon_hover`, icons stay static in a 24 × 24 px slot.
 
 ## Analytics and privacy
 
