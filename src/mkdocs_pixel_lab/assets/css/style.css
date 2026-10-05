@@ -234,13 +234,24 @@ p, li { max-width: 760px; }
   --permalink-fill-mask: url("../icons/heading-anchor-fill.svg");
   --permalink-outline-mask: url("../icons/heading-anchor.svg");
 }
+[data-permalink-icon="chain"] .headerlink {
+  --permalink-fill-mask: url("../icons/heading-chain-shadow.svg");
+  --permalink-outline-mask: url("../icons/heading-chain.svg");
+}
 .headerlink::before,
-.headerlink::after {
+.headerlink::after,
+.headerlink__fill {
   content: "";
   height: 100%;
   inset: 0;
   position: absolute;
   width: 100%;
+}
+.headerlink__fill {
+  background: var(--permalink-fill-color, var(--accent));
+  pointer-events: none;
+  -webkit-mask: url("../icons/heading-chain-fill.svg") center / contain no-repeat;
+  mask: url("../icons/heading-chain-fill.svg") center / contain no-repeat;
 }
 .headerlink::before {
   background: currentColor;
@@ -251,6 +262,14 @@ p, li { max-width: 760px; }
   background: #000;
   -webkit-mask: var(--permalink-outline-mask) center / contain no-repeat;
   mask: var(--permalink-outline-mask) center / contain no-repeat;
+}
+[data-permalink-icon="chain"] .headerlink::before {
+  background: var(--accent-dark);
+  opacity: 0;
+}
+[data-permalink-icon="chain"] .headerlink:hover::before,
+[data-permalink-icon="chain"] .headerlink:focus-visible::before {
+  opacity: 1;
 }
 .main h2[id],
 .main h3[id],

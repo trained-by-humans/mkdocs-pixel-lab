@@ -54,9 +54,9 @@ plugins:
 Section headings (H2–H6) show a permalink icon after the title. H1 page titles
 keep their IDs without an icon.
 
-Choose `link` (the default chain-link icon) or `hash` (the `#` icon) with
-`theme.permalink_icon`. Both use the accent color, dark-accent hover, and
-heading-relative sizing.
+Choose `chain` (the default filled chain icon), `link` (the original link
+icon), or `hash` (the `#` icon) with `theme.permalink_icon`.
+All three use heading-relative sizing.
 
 The URL fragment follows the current section as you scroll, without adding
 browser-history entries. Enable visible heading permalinks with:
@@ -64,11 +64,18 @@ browser-history entries. Enable visible heading permalinks with:
 ```yaml
 theme:
   name: pixel-lab
-  permalink_icon: link # or hash
+  permalink_icon: chain # default; or link, hash
+  permalink_fill_color: "var(--accent)" # light accent by default; transparent disables it
 markdown_extensions:
   - toc:
       permalink: true
 ```
+
+The chain's colored body uses `theme.permalink_fill_color` (the light accent by
+default); its openings remain transparent. The black outline stays visible,
+while the shadow appears in the dark accent only on hover or keyboard focus.
+The original `link` and `hash` icons keep their light-accent coloring and
+dark-accent hover; the chain's fill setting does not affect them.
 
 A skip-to-content link, visible focus styles, and labeled navigation regions
 support keyboard use. Escape closes the search panel or open navigation drawer

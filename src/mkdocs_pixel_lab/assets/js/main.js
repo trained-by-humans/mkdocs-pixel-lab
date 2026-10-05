@@ -123,6 +123,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  if (document.body.dataset.permalinkIcon === "chain") {
+    document.querySelectorAll(".main .headerlink").forEach((anchor) => {
+      if (anchor.querySelector(".headerlink__fill")) return;
+      const fill = document.createElement("span");
+      fill.className = "headerlink__fill";
+      fill.setAttribute("aria-hidden", "true");
+      anchor.prepend(fill);
+    });
+  }
+
   const trackedHeadings = Array.from(
     document.querySelectorAll(".main h2[id], .main h3[id], .main h4[id], .main h5[id], .main h6[id]"),
   );
