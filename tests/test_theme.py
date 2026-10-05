@@ -95,6 +95,93 @@ def test_desktop_experience(page, site_url: str, tmp_path: Path) -> None:
     expect(copy_button).to_have_text("COPIED")
 
 
+@pytest.mark.parametrize(("width", "gap", "inset"), [(1440, "14px", "14px"), (390, "8px", "58px")])
+def test_toolbar_hover_selector(page, site_url: str, width: int, gap: str, inset: str) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(site_url)
+    expect(page.locator(".tabs")).to_have_css("column-gap", gap)
+    expect(page.locator(".tabs")).to_have_css("padding-left", inset)
+    active = page.locator(".tab.active")
+    inactive = page.locator(".tabs .tab").filter(has_text="Guide")
+    selector = "e => getComputedStyle(e, '::before').opacity"
+    bounds = "e => [e.getBoundingClientRect().x, e.getBoundingClientRect().width]"
+    original_bounds = page.locator(".tab").evaluate_all(f"elements => elements.map({bounds})")
+    assert active.evaluate(selector) == "1"
+    assert inactive.evaluate(selector) == "0"
+
+    inactive.hover()
+    assert inactive.evaluate(selector) == "0.4"
+    for property_name in ("content", "color"):
+        computed = f"e => getComputedStyle(e, '::before').{property_name}"
+        assert inactive.evaluate(computed) == active.evaluate(computed)
+    assert active.evaluate(selector) == "1"
+    assert page.locator(".tab").evaluate_all(f"elements => elements.map({bounds})") == original_bounds
+
+    page.mouse.move(0, 0)
+    assert inactive.evaluate(selector) == "0"
+    page.keyboard.press("Tab")
+    inactive.focus()
+    assert inactive.evaluate(selector) == "0.4"
+    page.keyboard.press("Enter")
+    expect(inactive).to_have_class("tab active")
+    assert inactive.evaluate(selector) == "1"
+
+
+@pytest.mark.parametrize("path", ["/", "/guide/nested/"])
+def test_toolbar_start_aligns_with_website_name(page, site_url: str, path: str) -> None:
+    page.goto(site_url + path)
+    page.evaluate("document.fonts.ready")
+    for width in (1440, 1920, 1024, 851, 850, 390):
+        page.set_viewport_size({"width": width, "height": 900})
+        label_left = page.locator(".tab").first.evaluate("""element => {
+            const range = document.createRange();
+            range.selectNodeContents(element.firstChild);
+            return range.getBoundingClientRect().left;
+        }""")
+        brand_left = page.locator(".brand").bounding_box()["x"]
+        assert label_left == pytest.approx(brand_left, abs=1)
+
+
+def test_sidebar_hover_selector(page, site_url: str) -> None:
+    page.set_viewport_size({"width": 1440, "height": 900})
+    page.goto(f"{site_url}/guide/nested/")
+    active = page.locator(".sidebar .nav a.active")
+    inactive = page.locator(".sidebar .nav a").filter(has_text="Media gallery")
+    expect(page.locator(".sidebar")).to_have_css("padding-left", "6px")
+    expect(inactive).to_have_css("padding-left", "22px")
+    label_left = inactive.evaluate("""element => {
+        const range = document.createRange();
+        range.selectNodeContents(element.firstChild);
+        return range.getBoundingClientRect().left;
+    }""")
+    assert label_left == pytest.approx(page.locator(".brand").bounding_box()["x"], abs=1)
+    selector = "e => getComputedStyle(e, '::before').opacity"
+    original_bounds = inactive.bounding_box()
+    expect(inactive).to_have_css("background-color", "rgba(0, 0, 0, 0)")
+    assert inactive.evaluate(selector) == "0"
+    assert active.evaluate(selector) == "1"
+
+    inactive.hover()
+    assert inactive.evaluate(selector) == "0.4"
+    for property_name in ("content", "color"):
+        computed = f"e => getComputedStyle(e, '::before').{property_name}"
+        assert inactive.evaluate(computed) == page.locator(".tab.active").evaluate(computed)
+    expect(inactive).to_have_css("background-color", "rgba(0, 0, 0, 0)")
+    assert inactive.bounding_box() == original_bounds
+    active.hover()
+    assert active.evaluate(selector) == "1"
+    assert inactive.evaluate(selector) == "0"
+
+    page.mouse.move(0, 0)
+    page.keyboard.press("Tab")
+    inactive.focus()
+    assert inactive.evaluate(selector) == "0.4"
+    page.keyboard.press("Enter")
+    expect(page).to_have_url(f"{site_url}/guide/media/")
+    expect(inactive).to_have_class("active")
+    assert inactive.evaluate(selector) == "1"
+
+
 def test_mobile_navigation_and_skip_link(page, site_url: str, tmp_path: Path) -> None:
     page.set_viewport_size({"width": 390, "height": 844})
     page.goto(site_url)

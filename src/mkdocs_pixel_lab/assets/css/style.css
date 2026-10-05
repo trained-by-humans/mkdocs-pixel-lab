@@ -140,21 +140,37 @@ body {
   background: var(--surface);
   border-bottom: 2px solid var(--border);
   display: flex;
-  gap: 28px;
+  /* The reserved triangle slot supplies the rest of the label spacing. */
+  gap: 14px;
   height: 48px;
-  padding-left: 28px;
+  /* The 14px triangle slot places the first label at the header's 28px inset. */
+  padding-left: 14px;
 }
 .tab {
   color: var(--muted);
   font: 700 12px "IBM Plex Mono", monospace;
+  padding-left: 14px;
+  position: relative;
   text-decoration: none;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 .mobile-nav,
 .drawer-scrim { display: none; }
 .tab:hover { color: var(--ink); }
 .tab.active { color: var(--accent-dark); }
-.tab.active::before { color: var(--accent); content: "▶ "; }
+.tab::before,
+.nav a::before {
+  color: var(--accent);
+  content: "▶ ";
+  left: 0;
+  opacity: 0;
+  position: absolute;
+}
+.tab:not(.active):is(:hover, :focus-visible)::before,
+.nav a:not(.active):is(:hover, :focus-visible)::before { opacity: 0.4; }
+.tab.active::before,
+.nav a.active::before { opacity: 1; }
 .package-inline { align-items: center; display: flex; gap: 13px; margin-left: 28px; }
 .package-inline a { color: var(--accent-foreground); font: 700 10px "IBM Plex Mono", monospace; opacity: 0.76; text-decoration: none; text-transform: uppercase; }
 .package-inline__divider { color: var(--accent-foreground); font-size: 12px; opacity: 0.55; }
@@ -168,17 +184,17 @@ body {
   border-right: 2px solid var(--sidebar-border);
   flex: none;
   min-height: calc(100vh - 112px);
-  padding: 28px 12px 56px 20px;
+  /* Offset the links' reserved 14px triangle slot. */
+  padding: 28px 12px 56px 6px;
   width: var(--sidebar);
 }
-.side-title { color: var(--muted); font: 700 10px "IBM Plex Mono", monospace; margin: 0 0 12px; text-transform: uppercase; }
+.side-title { color: var(--muted); font: 700 10px "IBM Plex Mono", monospace; margin: 0 0 12px 14px; text-transform: uppercase; }
 .side-title--spaced { margin-top: 32px; }
 .nav { list-style: none; margin: 0; padding: 0; }
 .nav li { margin: 2px 0; }
-.nav a { color: var(--ink); display: block; font-size: 13px; padding: 6px 8px; text-decoration: none; }
-.nav a:hover { background: var(--surface2); }
+.nav a { color: var(--ink); display: block; font-size: 13px; padding: 6px 8px 6px 22px; position: relative; text-decoration: none; }
+.nav a::before { left: 8px; }
 .nav a.active { background: var(--surface); border: 2px solid var(--border); box-shadow: 3px 3px 0 var(--shadow); font-weight: 700; }
-.nav a.active::before { color: var(--accent-dark); content: "▶ "; }
 
 .main {
   flex: 1 1 auto;
@@ -437,7 +453,8 @@ details > * { max-width: none; }
 @media (max-width: 850px) {
   .sidebar { display: none; }
   .main { padding: 36px 24px 70px; width: 100%; }
-  .tabs { gap: 15px; overflow-x: auto; padding-left: 18px; }
+  /* Match the brand's 72px inset, including the menu button and its gap. */
+  .tabs { gap: 8px; overflow-x: auto; padding-left: 58px; }
   .package-inline { display: none; }
   .package-footer { align-items: flex-start; flex-direction: column; gap: 5px; }
   .package-footer__divider { display: none; }
