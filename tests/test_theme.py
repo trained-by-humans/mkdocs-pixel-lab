@@ -95,6 +95,36 @@ def test_desktop_experience(page, site_url: str, tmp_path: Path) -> None:
     expect(copy_button).to_have_text("COPIED")
 
 
+def test_trademark_glyph_uses_theme_colors(page, site_url: str) -> None:
+    page.goto(site_url)
+    badge = page.locator(".brand-trademark")
+    glyph = badge.locator("svg")
+    expect(badge).to_have_attribute("aria-hidden", "true")
+    expect(badge).to_have_css("width", "16px")
+    expect(badge).to_have_css("height", "16px")
+    expect(badge).to_have_css("border-top-style", "solid")
+    expect(badge).to_have_css("border-top-left-radius", "50%")
+    expect(glyph).to_have_attribute("viewBox", "0 0 928 536")
+    expect(glyph).to_have_attribute("focusable", "false")
+    expect(glyph.locator("path")).to_have_count(3)
+    expect(glyph.locator("image, filter")).to_have_count(0)
+    circle_bounds = badge.bounding_box()
+    glyph_bounds = glyph.bounding_box()
+    for axis, size in (("x", "width"), ("y", "height")):
+        assert glyph_bounds[axis] >= circle_bounds[axis] + 1.5
+        assert glyph_bounds[axis] + glyph_bounds[size] <= circle_bounds[axis] + circle_bounds[size] - 1.5
+
+    page.locator("html").evaluate("""element => {
+        element.style.setProperty('--accent-foreground', '#abcdef');
+        element.style.setProperty('--accent', '#fedcba');
+        element.style.setProperty('--accent-dark', '#123456');
+    }""")
+    expect(badge).to_have_css("border-top-color", "rgb(171, 205, 239)")
+    expect(glyph.locator(".brand-trademark__outline")).to_have_css("fill", "rgb(254, 220, 186)")
+    expect(glyph.locator(".brand-trademark__rim")).to_have_css("fill", "rgb(18, 52, 86)")
+    expect(glyph.locator(".brand-trademark__fill")).to_have_css("fill", "rgb(171, 205, 239)")
+
+
 @pytest.mark.parametrize(("width", "gap", "inset"), [(1440, "14px", "14px"), (390, "8px", "58px")])
 def test_toolbar_hover_selector(page, site_url: str, width: int, gap: str, inset: str) -> None:
     page.set_viewport_size({"width": width, "height": 900})

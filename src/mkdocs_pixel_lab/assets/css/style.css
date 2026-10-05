@@ -68,9 +68,10 @@ body {
   margin-left: 3px;
   width: 16px;
 }
-.brand-trademark__glyphs { display: inline-flex; gap: 1px; padding: 0 1px; transform: scale(0.8); }
-.brand-trademark__t,
-.brand-trademark__m { fill: currentColor; height: 7px; stroke: currentColor; stroke-width: 0.4; width: 6px; }
+.brand-trademark__glyph { display: block; height: 7px; width: 12px; }
+.brand-trademark__outline { fill: var(--accent); }
+.brand-trademark__rim { fill: var(--accent-dark); }
+.brand-trademark__fill { fill: currentColor; }
 .header-right { align-items: center; display: flex; gap: 10px; margin-left: auto; }
 .search-shell { position: relative; }
 .header-btn {

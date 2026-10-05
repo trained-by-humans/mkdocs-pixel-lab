@@ -204,8 +204,10 @@ favicons are supported.
 
 ### Footer and branding
 
-The site title includes a decorative pixel TM badge that follows its text
-color. Add a short footer message with `theme.footer_text`; the built-in Pixel
+The site title includes a decorative pixel TM badge. Its circle and letter
+fill follow the title's text color; the glyph's outer and inner borders use
+the light and dark theme accents. Add a short footer message with
+`theme.footer_text`; the built-in Pixel
 Lab and Trained-by-Humans attribution remains below any related-site links:
 
 ```yaml
