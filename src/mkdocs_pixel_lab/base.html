@@ -11,6 +11,12 @@
     {% if config.theme.favicon %}
       <link rel="icon" href="{{ config.theme.favicon | url }}">
     {% endif %}
+    {% set analytics = config.extra.get("analytics", {}) %}
+    {% set privacy_policy_url = ((analytics.get("privacy_policy") or "") | trim) if analytics else "" %}
+    {% set analytics_enabled = analytics and analytics.get("enabled", true) and analytics.get("provider") == "google" and analytics.get("measurement_id") and privacy_policy_url %}
+    {% if analytics_enabled %}
+      <link rel="stylesheet" href="{{ 'assets/css/analytics.css' | url }}">
+    {% endif %}
     <link rel="stylesheet" href="{{ 'assets/css/style.css' | url }}">
     <style id="pixel-lab-palette">
       :root {
@@ -139,9 +145,18 @@
             </nav>
           {% endif %}
           <span class="footer-credit">{% if config.theme.footer_text %}{{ config.theme.footer_text | upper }} · {% endif %}BUILT WITH <a href="https://github.com/trained-by-humans/mkdocs-pixel-lab">PIXEL LAB</a> BY <a href="https://github.com/trained-by-humans">TRAINED-BY-HUMANS</a></span>
+          {% if privacy_policy_url or analytics_enabled %}
+            <div class="footer-links">
+              {% if privacy_policy_url %}<a class="privacy-policy" href="{{ privacy_policy_url | url | e }}">Privacy policy</a>{% endif %}
+              {% if analytics_enabled %}<button class="analytics-settings" id="analytics-settings" type="button" hidden>Analytics settings</button>{% endif %}
+            </div>
+          {% endif %}
         </footer>
       </main>
     </div>
+    {% if analytics_enabled %}
+      {% include "analytics.html" %}
+    {% endif %}
     <script>var base_url = {{ base_url | tojson }};</script>
     <script src="{{ 'assets/js/main.js' | url }}"></script>
     {% for script in config.extra_javascript %}{{ script | script_tag }}{% endfor %}

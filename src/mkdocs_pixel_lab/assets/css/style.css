@@ -395,6 +395,8 @@ details > * { max-width: none; }
 .package-footer__divider { color: var(--muted); }
 .footer-credit { display: block; line-height: 1.5; }
 .package-footer + .footer-credit { margin-top: 12px; }
+.footer-links { align-items: center; display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+.footer-links a { color: var(--accent-dark); }
 
 /* A content card owns its elevation. Nested cards, media, and code stay flat. */
 :is(.gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example)

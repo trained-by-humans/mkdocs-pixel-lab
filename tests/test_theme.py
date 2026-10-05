@@ -77,7 +77,7 @@ def test_desktop_experience(page, site_url: str, tmp_path: Path) -> None:
         "href", "https://github.com/trained-by-humans"
     )
 
-    expect(page.locator("main img")).to_be_visible()
+    expect(page.get_by_role("img", name="An abstract Pixel Lab data-flow diagram", exact=True)).to_be_visible()
     expect(page.locator(".gh-alert--note")).to_have_count(1)
     expect(page.locator(".gh-alert__title")).to_have_text("◆NOTE")
     expect(page.locator(".sidebar")).to_have_count(0)
@@ -98,7 +98,7 @@ def test_desktop_experience(page, site_url: str, tmp_path: Path) -> None:
 def test_mobile_navigation_and_skip_link(page, site_url: str, tmp_path: Path) -> None:
     page.set_viewport_size({"width": 390, "height": 844})
     page.goto(site_url)
-    expect(page.locator("main img")).to_be_visible()
+    expect(page.get_by_role("img", name="An abstract Pixel Lab data-flow diagram", exact=True)).to_be_visible()
     capture_snapshot(page, "mobile.png", tmp_path)
     page.keyboard.press("Tab")
     expect(page.locator(".skip-link")).to_be_focused()
