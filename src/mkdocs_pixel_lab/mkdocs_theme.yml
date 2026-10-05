@@ -1,6 +1,7 @@
 name: pixel-lab
 favicon: assets/favicon.png
 footer_text: ""
+permalink_icon: link
 background_color: "#f4f1df"
 surface_color: "#fffdf2"
 surface_alt_color: "#e8e4cf"

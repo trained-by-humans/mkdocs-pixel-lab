@@ -191,20 +191,50 @@ body {
 h1, h2, h3 { font-family: "IBM Plex Mono", monospace; text-transform: uppercase; }
 h1 { font-size: clamp(28px, 4vw, 42px); letter-spacing: -0.06em; line-height: 1.1; margin: 0 0 14px; }
 h2 { border-bottom: 2px solid var(--border); font-size: 20px; letter-spacing: -0.04em; margin: 50px 0 18px; padding-bottom: 8px; }
-h2::before { color: var(--accent); content: "◆"; font-size: 0.65em; margin-right: 9px; }
 h3 { font-size: 15px; margin-top: 32px; }
 a { color: var(--accent-dark); }
 a:hover { color: var(--ink); }
 p, li { max-width: 760px; }
 .headerlink {
+  --permalink-fill-mask: url("../icons/heading-link-fill.svg");
+  --permalink-outline-mask: url("../icons/heading-link.svg");
+  color: var(--accent);
   display: inline-block;
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0;
+  font-size: inherit;
+  height: 0.7em;
   margin-left: 0.45rem;
+  overflow: hidden;
+  position: relative;
   text-decoration: none;
-  vertical-align: 0.12em;
+  text-indent: -9999px;
+  vertical-align: baseline;
+  width: 0.7em;
 }
-.headerlink::after { color: var(--accent-dark); content: "#"; font-size: 1rem; }
+.headerlink:hover { color: var(--accent-dark); }
+.main h1 > .headerlink { display: none; }
+[data-permalink-icon="hash"] .headerlink {
+  --permalink-fill-mask: url("../icons/heading-anchor-fill.svg");
+  --permalink-outline-mask: url("../icons/heading-anchor.svg");
+}
+.headerlink::before,
+.headerlink::after {
+  content: "";
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  width: 100%;
+}
+.headerlink::before {
+  background: currentColor;
+  -webkit-mask: var(--permalink-fill-mask) center / contain no-repeat;
+  mask: var(--permalink-fill-mask) center / contain no-repeat;
+}
+.headerlink::after {
+  background: #000;
+  -webkit-mask: var(--permalink-outline-mask) center / contain no-repeat;
+  mask: var(--permalink-outline-mask) center / contain no-repeat;
+}
 .main h2[id],
 .main h3[id],
 .main h4[id],

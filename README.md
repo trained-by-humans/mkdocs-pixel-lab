@@ -51,10 +51,20 @@ plugins:
 
 ### Heading links and keyboard access
 
+Section headings (H2–H6) show a permalink icon after the title. H1 page titles
+keep their IDs without an icon.
+
+Choose `link` (the default chain-link icon) or `hash` (the `#` icon) with
+`theme.permalink_icon`. Both use the accent color, dark-accent hover, and
+heading-relative sizing.
+
 The URL fragment follows the current section as you scroll, without adding
 browser-history entries. Enable visible heading permalinks with:
 
 ```yaml
+theme:
+  name: pixel-lab
+  permalink_icon: link # or hash
 markdown_extensions:
   - toc:
       permalink: true
