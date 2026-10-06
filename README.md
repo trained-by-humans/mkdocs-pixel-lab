@@ -3,6 +3,13 @@
 </p>
 
 <p align="center">
+  <a href="https://pypi.org/project/mkdocs-pixel-lab/"><img src="https://img.shields.io/pypi/v/mkdocs-pixel-lab?style=flat-square&amp;logo=pypi&amp;logoColor=white&amp;label=PyPI&amp;color=C48800" alt="Latest PyPI release"></a>
+  <a href="https://pypi.org/project/mkdocs-pixel-lab/"><img src="https://img.shields.io/badge/Python-3.10%2B-2377C8?style=flat-square&amp;logo=python&amp;logoColor=white" alt="Python 3.10 or newer"></a>
+  <a href="https://github.com/trained-by-humans/mkdocs-pixel-lab/blob/main/LICENSE"><img src="https://img.shields.io/pypi/l/mkdocs-pixel-lab?style=flat-square&amp;label=License&amp;color=287C35" alt="Apache 2.0 license"></a>
+  <a href="https://www.mkdocs.org/"><img src="https://img.shields.io/badge/MkDocs-%3E%3D1.6%2C%20%3C2-7E46B6?style=flat-square" alt="MkDocs &gt;=1.6, &lt;2"></a>
+</p>
+
+<p align="center">
   A retro-inspired theme for <a href="https://www.mkdocs.org/">MkDocs</a>, with pixel borders, bold colors, and arcade-style shadows.<br>
   Built for modern documentation with responsive navigation, search, and rich Markdown components.
 </p>
