@@ -8,21 +8,86 @@
     {% if page and page.canonical_url %}
       <link rel="canonical" href="{{ page.canonical_url }}">
     {% endif %}
+    {% if config.theme.favicon %}
+      <link rel="icon" href="{{ config.theme.favicon | url }}">
+    {% endif %}
+    {% set analytics = config.extra.get("analytics", {}) %}
+    {% set privacy_policy_url = ((analytics.get("privacy_policy") or "") | trim) if analytics else "" %}
+    {% set analytics_enabled = analytics and analytics.get("enabled", true) and analytics.get("provider") == "google" and analytics.get("measurement_id") and privacy_policy_url %}
+    {% if analytics_enabled %}
+      <link rel="stylesheet" href="{{ 'assets/css/analytics.css' | url }}">
+    {% endif %}
     <link rel="stylesheet" href="{{ 'assets/css/style.css' | url }}">
+    <style id="pixel-lab-palette">
+      :root {
+        --bg: {{ config.theme.background_color }};
+        --surface: {{ config.theme.surface_color }};
+        --surface2: {{ config.theme.surface_alt_color }};
+        --ink: {{ config.theme.text_color }};
+        --strong-text: {{ config.theme.strong_text_color }};
+        --muted: {{ config.theme.muted_text_color }};
+        --border: {{ config.theme.border_color }};
+        --shadow: {{ config.theme.shadow_color }};
+        --subtle-border: {{ config.theme.subtle_border_color }};
+        --sidebar-border: {{ config.theme.sidebar_border_color }};
+        --grid: {{ config.theme.grid_color }};
+        --overlay: {{ config.theme.overlay_color }};
+        --accent: {{ config.theme.accent_color }};
+        --accent-dark: {{ config.theme.accent_dark_color }};
+        --accent-foreground: {{ config.theme.accent_foreground_color }};
+        --permalink-fill-color: {{ config.theme.permalink_fill_color }};
+        --header-background: {{ config.theme.header_background }};
+        --header-border: {{ config.theme.header_border_color }};
+        --header-shadow: {{ config.theme.header_shadow_color }};
+        --highlight: {{ config.theme.highlight_color }};
+        --secondary: {{ config.theme.secondary_color }};
+        --input-focus-background: {{ config.theme.input_focus_background_color }};
+        --inline-code-border: {{ config.theme.inline_code_border_color }};
+        --tab-hover: {{ config.theme.tab_hover_color }};
+        --code: {{ config.theme.code_background_color }};
+        --code-text: {{ config.theme.code_text_color }};
+        --code-keyword: {{ config.theme.code_keyword_color }};
+        --code-string: {{ config.theme.code_string_color }};
+        --code-function: {{ config.theme.code_function_color }};
+        --code-comment: {{ config.theme.code_comment_color }};
+        --alert-note: {{ config.theme.alert_note_color }};
+        --alert-note-surface: {{ config.theme.alert_note_surface_color }};
+        --alert-tip: {{ config.theme.alert_tip_color }};
+        --alert-tip-surface: {{ config.theme.alert_tip_surface_color }};
+        --alert-important: {{ config.theme.alert_important_color }};
+        --alert-important-surface: {{ config.theme.alert_important_surface_color }};
+        --alert-warning: {{ config.theme.alert_warning_color }};
+        --alert-warning-surface: {{ config.theme.alert_warning_surface_color }};
+        --alert-caution: {{ config.theme.alert_caution_color }};
+        --alert-caution-surface: {{ config.theme.alert_caution_surface_color }};
+      }
+    </style>
     {% for style in config.extra_css %}
       <link rel="stylesheet" href="{{ style | url }}">
     {% endfor %}
   </head>
-  <body>
+  <body data-permalink-icon="{{ config.theme.permalink_icon if config.theme.permalink_icon in ['link', 'hash', 'chain'] else 'chain' }}">
     <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="header">
       <button class="header-btn header-btn--menu" id="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-nav">
         <span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span>
       </button>
-      <a class="brand" href="{{ nav.homepage.url | url }}">{{ config.site_name | upper }}</a>
+      <a class="brand" href="{{ nav.homepage.url | url }}"><span class="brand__name">{{ config.site_name | upper }}</span><sup class="brand-trademark" aria-hidden="true"><svg class="brand-trademark__glyph" viewBox="0 0 928 536" shape-rendering="crispEdges" focusable="false"><g transform="translate(-358 -192)"><path class="brand-trademark__outline" d="M358 192H839V229H871V259H902V287H930V314H958V342H985V314H1013V287H1040V259H1069V229H1099V192H1286V728H1034V614H1015V644H930V614H911V728H498V410H358Z"/><path class="brand-trademark__rim" d="M399 234H815V261H844V288H873V316H901V343H929V370H957V398H985V370H1013V343H1040V316H1068V288H1097V261H1125V234H1243V687H1068V529H1040V557H1013V583H986V610H959V583H932V557H905V529H878V687H722V371H690V687H540V371H399Z"/><path class="brand-trademark__fill" d="M430 267H787V343H662V659H569V343H430ZM815 289H844V316H873V343H901V370H929V398H957V426H985V398H1013V370H1040V343H1068V316H1097V289H1126V267H1214V659H1096V475H1068V502H1040V529H1013V556H986V583H959V556H932V529H905V502H878V475H849V659H750V371H815Z"/></g></svg></sup></a>
+      {% set site_navigation = config.extra.get("site_navigation") %}
+      {% if site_navigation and site_navigation.get("header_mode", "dropdown") == "inline" and site_navigation.get("catalog") %}
+        <nav class="package-inline" aria-label="Related sites">
+          {% for item in site_navigation.get("items", [])[:site_navigation.get("header_size", 1) - 1] %}
+            {% if not loop.first %}<span class="package-inline__divider" aria-hidden="true">·</span>{% endif %}
+            <a{% if item.active %} class="active"{% endif %} href="{{ item.url }}">{{ item.title }}</a>
+          {% endfor %}
+          <span class="package-inline__divider" aria-hidden="true">·</span>
+          <a href="{{ site_navigation.catalog.url }}">{{ site_navigation.catalog.title }}</a>
+        </nav>
+      {% endif %}
       <div class="header-right">
+        {% include "site_navigation.html" %}
         <div class="search-shell">
-          <button class="header-btn header-btn--search" id="search-toggle" type="button" aria-expanded="false" aria-controls="search-panel">⌕ SEARCH</button>
+          <button class="header-btn header-btn--search" id="search-toggle" type="button" aria-label="SEARCH" aria-expanded="false" aria-controls="search-panel"><span class="header-btn__icon" aria-hidden="true">⌕</span><span class="header-btn__label">SEARCH</span></button>
           <div class="search-panel" id="search-panel">
             <div class="search-panel__controls">
               <label class="search-label" for="mkdocs-search-query">SEARCH DOCUMENTATION</label>
@@ -69,9 +134,31 @@
       <main class="main" id="main-content" tabindex="-1">
         {% if page and page.meta and page.meta.crumb %}<div class="crumb">{{ page.meta.crumb | upper }}</div>{% endif %}
         {% if page %}{{ page.content }}{% endif %}
-        <footer class="footer">{% if config.theme.footer_text %}<span>{{ config.theme.footer_text | upper }}</span> · {% endif %}BUILT WITH <a href="https://github.com/trained-by-humans/mkdocs-pixel-lab">PIXEL LAB</a> BY <a href="https://github.com/trained-by-humans">TRAINED-BY-HUMANS</a></footer>
+        <footer class="footer">
+          {% if site_navigation and site_navigation.get("show_footer", true) and site_navigation.get("catalog") %}
+            <nav class="package-footer" aria-label="Related sites">
+              <span class="package-footer__label">{{ site_navigation.get("footer_label", "Related sites") | upper }}</span>
+              {% for item in site_navigation.get("items", [])[:site_navigation.get("footer_size", 1) - 1] %}
+                {% if not loop.first %}<span class="package-footer__divider" aria-hidden="true">·</span>{% endif %}
+                <a{% if item.active %} class="active"{% endif %} href="{{ item.url }}">{{ item.title }}</a>
+              {% endfor %}
+              <span class="package-footer__divider" aria-hidden="true">·</span>
+              <a href="{{ site_navigation.catalog.url }}">{{ site_navigation.catalog.title }}</a>
+            </nav>
+          {% endif %}
+          <span class="footer-credit">{% if config.theme.footer_text %}{{ config.theme.footer_text | upper }} · {% endif %}BUILT WITH <a href="https://github.com/trained-by-humans/mkdocs-pixel-lab">PIXEL LAB</a> BY <a href="https://github.com/trained-by-humans">TRAINED-BY-HUMANS</a></span>
+          {% if privacy_policy_url or analytics_enabled %}
+            <div class="footer-links">
+              {% if privacy_policy_url %}<a class="privacy-policy" href="{{ privacy_policy_url | url | e }}">Privacy policy</a>{% endif %}
+              {% if analytics_enabled %}<button class="analytics-settings" id="analytics-settings" type="button" hidden>Analytics settings</button>{% endif %}
+            </div>
+          {% endif %}
+        </footer>
       </main>
     </div>
+    {% if analytics_enabled %}
+      {% include "analytics.html" %}
+    {% endif %}
     <script>var base_url = {{ base_url | tojson }};</script>
     <script src="{{ 'assets/js/main.js' | url }}"></script>
     {% for script in config.extra_javascript %}{{ script | script_tag }}{% endfor %}

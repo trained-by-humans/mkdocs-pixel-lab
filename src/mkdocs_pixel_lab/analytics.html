@@ -1,0 +1,11 @@
+<section class="analytics-consent" id="analytics-consent" aria-label="Analytics preferences" hidden>
+  <p>Allow Google Analytics cookies to help us understand documentation usage? You can decline or change your choice in the footer.
+    {% if analytics.get("consent_domain") %}Your choice applies to {{ analytics.consent_domain | e }} and its subdomains.{% endif %}
+    {% if privacy_policy_url %}<a href="{{ privacy_policy_url | url | e }}">Privacy policy</a>{% endif %}
+  </p>
+  <div class="analytics-consent__actions">
+    <button class="analytics-choice analytics-choice--accept" id="analytics-accept" type="button">Allow analytics</button>
+    <button class="analytics-choice" id="analytics-decline" type="button">Decline</button>
+  </div>
+</section>
+<script defer src="{{ 'assets/js/analytics.js' | url }}" data-measurement-id="{{ analytics.measurement_id | e }}" data-site-url="{{ (config.site_url or '') | e }}" data-consent-domain="{{ (analytics.get('consent_domain') or '') | e }}"></script>

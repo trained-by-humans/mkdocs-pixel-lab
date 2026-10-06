@@ -4,6 +4,8 @@ site_url: https://example.invalid/
 theme:
   name: pixel-lab
   footer_text: Fixture documentation
+  border_color: "#123456"
+  shadow_color: "#654321"
 nav:
   - Home: index.md
   - Guide:
@@ -12,6 +14,7 @@ nav:
 plugins:
   - search
 markdown_extensions:
+  - mkdocs_pixel_lab.github_alerts
   - admonition
   - pymdownx.details
   - pymdownx.superfences

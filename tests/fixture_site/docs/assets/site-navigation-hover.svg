@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="icon-hover" viewBox="0 -12.5 30 55">
+  <style>
+    @keyframes drop { from { transform: translateY(-16px); } to { transform: translateY(0); } }
+    @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+    @media (prefers-reduced-motion: no-preference) {
+      :root:target .drop { animation: drop 1.12s cubic-bezier(0, .55, .45, 1) both, fade .53s linear both; }
+    }
+  </style>
+  <rect x="4" y="19" width="22" height="9" fill="#ffd43b"/>
+  <rect x="5" y="10" width="10" height="10" fill="#3776ab"/>
+  <g class="drop"><rect x="16" y="13" width="10" height="10" fill="#8315f9"/></g>
+</svg>
