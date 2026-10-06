@@ -1,6 +1,11 @@
-# Pixel Lab
+<p align="center">
+  <img src="assets/pixel-lab-logo.svg" alt="Pixel Lab retro logo" width="480">
+</p>
 
-Pixel Lab is a vibrant, accessible theme for [MkDocs](https://www.mkdocs.org/).
+<p align="center">
+  A retro-inspired theme for <a href="https://www.mkdocs.org/">MkDocs</a>, with pixel borders, bold colors, and arcade-style shadows.<br>
+  Built for modern documentation with responsive navigation, search, and rich Markdown components.
+</p>
 
 ## Preview
 
