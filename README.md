@@ -400,11 +400,3 @@ Unrelated or malformed domains disable analytics, and browsers reject
 public-suffix cookies. No parent domain is inferred automatically. Changing
 the consent scope requires a new choice; previous site-only choices are not
 silently promoted to domain-wide permission.
-
-## Development
-
-```bash
-python -m pip install -e '.[test]'
-playwright install chromium
-pytest
-```
