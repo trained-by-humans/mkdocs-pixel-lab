@@ -339,7 +339,8 @@ p, li { max-width: 760px; }
 .main h5[id],
 .main h6[id] { scroll-margin-top: 136px; }
 
-code { background: var(--surface2); border: 1px solid var(--inline-code-border); font-family: "IBM Plex Mono", monospace; font-size: 0.9em; padding: 2px 5px; }
+/* Optically align smaller inline monospace text with the surrounding prose. */
+code { background: var(--surface2); border: 1px solid var(--inline-code-border); font-family: "IBM Plex Mono", monospace; font-size: 0.9em; padding: 2px 5px; vertical-align: 0.04em; }
 pre, .highlight pre {
   background: var(--code);
   border: 2px solid var(--border);
@@ -351,7 +352,7 @@ pre, .highlight pre {
   padding: 20px 84px 20px 20px;
   max-width: calc(100% - 5px);
 }
-pre code, .highlight pre code { background: transparent; border: 0; color: inherit; padding: 0; }
+pre code, .highlight pre code { background: transparent; border: 0; color: inherit; padding: 0; vertical-align: baseline; }
 .highlight { position: relative; }
 .code-copy {
   background: var(--surface);

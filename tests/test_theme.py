@@ -95,6 +95,21 @@ def test_desktop_experience(page, site_url: str, tmp_path: Path) -> None:
     expect(copy_button).to_have_text("COPIED")
 
 
+@pytest.mark.parametrize("width", [1440, 390])
+def test_inline_code_optical_alignment(page, site_url: str, width: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(site_url)
+    inline_code = page.locator(".tabbed-content code").first
+    expect(inline_code).to_be_visible()
+    metrics = inline_code.evaluate("""element => {
+        const style = getComputedStyle(element);
+        return {fontSize: parseFloat(style.fontSize), lift: parseFloat(style.verticalAlign)};
+    }""")
+    assert metrics["lift"] == pytest.approx(metrics["fontSize"] * 0.04)
+    for code in page.locator("pre code").all():
+        expect(code).to_have_css("vertical-align", "baseline")
+
+
 def test_trademark_glyph_uses_theme_colors(page, site_url: str) -> None:
     page.goto(site_url)
     badge = page.locator(".brand-trademark")
