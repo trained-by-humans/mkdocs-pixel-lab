@@ -498,7 +498,29 @@ details > * { max-width: none; }
 .tabbed-set > input:nth-child(6):checked ~ .tabbed-content > .tabbed-block:nth-child(6),
 .tabbed-set > input:nth-child(7):checked ~ .tabbed-content > .tabbed-block:nth-child(7),
 .tabbed-set > input:nth-child(8):checked ~ .tabbed-content > .tabbed-block:nth-child(8) { display: block; }
-.tabbed-content { padding: 0 20px; }
+.tabbed-content { padding: 0; }
+.tabbed-content > .tabbed-block { padding: 0 20px; }
+/* Flush panels share the tab container's frame; their content keeps its padding. */
+.tabbed-block[data-tab-layout="flush"] { padding: 0; }
+.tabbed-block[data-tab-layout="flush"] > pre,
+.tabbed-block[data-tab-layout="flush"] > .highlight > pre {
+  border: 0;
+  margin: 0;
+  max-width: 100%;
+}
+.tabbed-block[data-tab-layout="flush"] > .table-shell {
+  margin: 0;
+  max-width: 100%;
+  width: 100%;
+}
+.tabbed-block[data-tab-layout="flush"] > .table-shell > .table-scroll { border: 0; }
+.tabbed-block[data-tab-layout="flush"] > .table-shell > .table-scroll > table {
+  min-width: 100%;
+}
+.tabbed-block[data-tab-layout="flush"] > .table-shell > .table-scroll > table > :first-child > tr:first-child > * { border-top: 0; }
+.tabbed-block[data-tab-layout="flush"] > .table-shell > .table-scroll > table > :last-child > tr:last-child > * { border-bottom: 0; }
+.tabbed-block[data-tab-layout="flush"] > .table-shell > .table-scroll > table > * > tr > :first-child { border-left: 0; }
+.tabbed-block[data-tab-layout="flush"] > .table-shell > .table-scroll > table > * > tr > :last-child { border-right: 0; }
 
 .lead { color: var(--muted); font-size: 17px; max-width: 760px; }
 .pixel-panel, .example { background: var(--surface); border: 2px solid var(--border); box-shadow: 5px 5px 0 var(--shadow); }

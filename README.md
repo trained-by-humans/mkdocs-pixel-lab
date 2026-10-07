@@ -153,6 +153,37 @@ markdown_extensions:
 
 Content tabs are separate from the primary navigation tabs below the toolbar.
 
+Each content tab automatically chooses its layout: a single code block or
+table fills the panel **flush**, while prose, multiple blocks, and mixed
+content retain the **padded** layout. Code keeps its internal padding, tables
+keep their cell padding and horizontal scrolling, and the tab container owns
+the outer border and shadow. Nested tabs are evaluated independently.
+
+To force a layout, wrap a tab group in `.tabs-padded` or `.tabs-flush` and
+enable `md_in_html` in `markdown_extensions`:
+
+````markdown
+<div class="tabs-padded" markdown="1">
+
+=== "Python"
+
+    ```python
+    print("Keep the surrounding inset")
+    ```
+
+=== "Shell"
+
+    ```bash
+    echo "This tab is padded too"
+    ```
+
+</div>
+````
+
+Use `.tabs-flush` instead to remove the surrounding inset. The closest
+layout wrapper wins for nested groups. Layout detection runs in the theme's
+script; with JavaScript disabled, tabs retain the padded presentation.
+
 ## Customize your site
 
 ### Palette
