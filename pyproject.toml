@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mkdocs-pixel-lab"
-version = "0.1.1"
+version = "0.1.2"
 description = "A vibrant, accessible MkDocs documentation theme by Trained-by-Humans."
 readme = "README.md"
 requires-python = ">=3.10"
