@@ -153,6 +153,151 @@ markdown_extensions:
 
 Content tabs are separate from the primary navigation tabs below the toolbar.
 
+Each content tab automatically chooses its layout: a single code block or
+table fills the panel **flush**, while prose, multiple blocks, and mixed
+content retain the **padded** layout. Code keeps its internal padding, tables
+keep their cell padding and horizontal scrolling, and the tab container owns
+the outer border and shadow. Nested tabs are evaluated independently.
+
+To force a layout, wrap a tab group in `.tabs-padded` or `.tabs-flush` and
+enable `md_in_html` in `markdown_extensions`:
+
+````markdown
+<div class="tabs-padded" markdown="1">
+
+=== "Python"
+
+    ```python
+    print("Keep the surrounding inset")
+    ```
+
+=== "Shell"
+
+    ```bash
+    echo "This tab is padded too"
+    ```
+
+</div>
+````
+
+Use `.tabs-flush` instead to remove the surrounding inset. The closest
+layout wrapper wins for nested groups. Layout detection runs in the theme's
+script; with JavaScript disabled, tabs retain the padded presentation.
+
+## Page metadata
+
+Define browser/search titles and descriptions using standard Markdown front
+matter. Visible headings and explicitly configured navigation labels stay
+unchanged:
+
+```markdown
+---
+title: Detect and Annotate with Supervision
+description: Load predictions and annotate images with boxes, labels, and masks.
+---
+
+# Detect and Annotate
+```
+
+The theme honors these fields without another plugin. To also generate
+defaults for pages without metadata, enable the build-time plugin bundled
+with Pixel Lab (no additional package is needed):
+
+```yaml
+plugins:
+  - search
+  - pixel-lab/metadata
+```
+
+Titles use `title` → first H1 → MkDocs page title → site name. The site name
+is appended once. Descriptions use `description` → first introductory
+paragraph → `site_description`, and the tag is omitted if none is available.
+Blank or non-text front-matter fields are ignored by the plugin.
+
+Generated excerpts retain plain text, including inline code and link text,
+but skip code blocks, tables, alerts, lists, images, and navigation. They are
+shortened at a word boundary to at most 160 characters, including an ellipsis;
+explicit descriptions are not shortened. Extraction runs during the build,
+so metadata is in the HTML without JavaScript. It does not edit Markdown
+files or replace MkDocs' canonical URLs. Google may choose a different search
+title or snippet.
+This plugin does not use Git or change sitemap modification dates.
+
+## Sitemap modification dates
+
+The optional `pixel-lab/git-lastmod` plugin sets sitemap `lastmod` to the
+date of each Markdown source file's last committed Git change, rather than
+the build date. MkDocs continues to generate `sitemap.xml` and `sitemap.xml.gz` using
+your `site_url`; no separate sitemap generator is required.
+
+Enable this separately bundled plugin in `mkdocs.yml` (no additional package
+is needed):
+
+```yaml
+plugins:
+  - search
+  - pixel-lab/git-lastmod
+```
+
+It is independent of `pixel-lab/metadata`: enable either plugin or both.
+Without `pixel-lab/git-lastmod`, the theme preserves MkDocs' default sitemap
+dates and does not run Git commands.
+
+Git must be installed and the documentation repository must have complete
+history. For GitHub Actions documentation builds, use:
+
+```yaml
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 0
+```
+
+An unrelated commit or rebuild does not change a page's date. Dates use the
+last commit's committer date; local uncommitted edits and front-matter display
+dates do not override Git history. Untracked or generated pages, files
+outside the documentation repository, missing Git history, and shallow
+clones omit `lastmod` instead of falling back to today's date. Renamed files
+use their Git history. Dates are cached within each build and refreshed on
+the next rebuild.
+
+## Robots.txt
+
+Enable the optional `pixel-lab/robots` plugin to generate a public-crawling
+default at `robots.txt` in the built site:
+
+```yaml
+site_url: https://example.com/
+plugins:
+  - search
+  - pixel-lab/robots
+```
+
+The generated file allows crawling and points to MkDocs' sitemap:
+
+```text
+User-agent: *
+Allow: /
+
+Sitemap: https://example.com/sitemap.xml
+```
+
+The sitemap URL comes from `site_url`, including any deployment path. If
+`site_url` is not set, the sitemap directive is omitted. This plugin is
+independent of metadata and Git dates and does not require Git or another
+package. Without it, the theme does not generate `robots.txt`.
+
+To customize crawl rules, add your own `docs/robots.txt`; an existing file
+always takes priority and is copied unchanged. The published file is static:
+page additions and edits do not require changing it. Update it when crawl
+rules or the domain/sitemap location changes; the generated default follows
+`site_url` automatically on rebuild.
+
+Crawlers only consult `robots.txt` at the domain root. For sites hosted under
+a path such as `example.com/project/`, the generated project file must be
+published or incorporated at `example.com/robots.txt` by the hosting owner.
+Robots rules are not access control and do not guarantee removal from search
+results; protect private content through authentication.
+
 ## Customize your site
 
 ### Palette
@@ -400,11 +545,3 @@ Unrelated or malformed domains disable analytics, and browsers reject
 public-suffix cookies. No parent domain is inferred automatically. Changing
 the consent scope requires a new choice; previous site-only choices are not
 silently promoted to domain-wide permission.
-
-## Development
-
-```bash
-python -m pip install -e '.[test]'
-playwright install chromium
-pytest
-```

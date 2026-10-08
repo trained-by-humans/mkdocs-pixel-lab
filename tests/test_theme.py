@@ -95,6 +95,90 @@ def test_desktop_experience(page, site_url: str, tmp_path: Path) -> None:
     expect(copy_button).to_have_text("COPIED")
 
 
+@pytest.mark.parametrize("width", [1440, 390])
+def test_inline_code_optical_alignment(page, site_url: str, width: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(site_url)
+    inline_code = page.locator(".tabbed-content code").first
+    expect(inline_code).to_be_visible()
+    metrics = inline_code.evaluate("""element => {
+        const style = getComputedStyle(element);
+        return {fontSize: parseFloat(style.fontSize), lift: parseFloat(style.verticalAlign)};
+    }""")
+    assert metrics["lift"] == pytest.approx(metrics["fontSize"] * 0.04)
+    for code in page.locator("pre code").all():
+        expect(code).to_have_css("vertical-align", "baseline")
+
+
+@pytest.mark.parametrize("width", [1440, 390])
+def test_tab_content_layouts(page, site_url: str, width: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(f"{site_url}/guide/tabs/")
+    group = page.locator("#automatic-tabs > .tabbed-set")
+    panels = group.locator(":scope > .tabbed-content > .tabbed-block")
+    assert panels.count() == 4
+    for index, layout in enumerate(("flush", "flush", "padded", "padded")):
+        group.locator(":scope > .tabbed-labels > label").nth(index).click()
+        panel = panels.nth(index)
+        expect(panel).to_be_visible()
+        expect(panel).to_have_attribute("data-tab-layout", layout)
+        expect(panel).to_have_css("padding-left", "0px" if layout == "flush" else "20px")
+        panel_box = panel.bounding_box()
+        child_box = panel.locator(":scope > *").first.bounding_box()
+        assert child_box["x"] - panel_box["x"] == pytest.approx(0 if layout == "flush" else 20)
+
+    group.locator(":scope > .tabbed-labels > label").first.click()
+    pre = panels.first.locator("pre")
+    expect(pre).to_have_css("margin-top", "0px")
+    expect(pre).to_have_css("border-top-width", "0px")
+    expect(pre).to_have_css("padding-left", "20px")
+    expect(pre).to_have_css("box-shadow", "none")
+    expect(panels.first.get_by_role("button", name="Copy code to clipboard")).to_be_visible()
+
+    group.locator(":scope > .tabbed-labels > label").nth(1).click()
+    table_panel = panels.nth(1)
+    shell = table_panel.locator(".table-shell")
+    scroll = table_panel.locator(".table-scroll")
+    expect(shell).to_have_css("margin-top", "0px")
+    expect(scroll).to_have_css("border-top-width", "0px")
+    expect(scroll).to_have_css("box-shadow", "none")
+    expect(scroll).to_have_css("overflow-x", "auto")
+    expect(table_panel.locator("img")).to_have_css("box-shadow", "none")
+    assert shell.bounding_box()["width"] == pytest.approx(table_panel.bounding_box()["width"], abs=1)
+    if width == 390:
+        assert scroll.evaluate("el => el.scrollWidth > el.clientWidth")
+        scroll.evaluate("el => el.scrollLeft = 100")
+        assert scroll.evaluate("el => el.scrollLeft") > 0
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+
+def test_tab_content_overrides_and_nesting(page, site_url: str) -> None:
+    page.goto(f"{site_url}/guide/tabs/")
+    padded = page.locator("#padded-tabs .tabbed-block")
+    expect(padded).to_have_attribute("data-tab-layout", "padded")
+    expect(padded).to_have_css("padding-left", "20px")
+    flush = page.locator("#flush-tabs .tabbed-block")
+    expect(flush).to_have_attribute("data-tab-layout", "flush")
+    expect(flush).to_have_css("padding-left", "0px")
+    outer = page.locator("#nested-tabs > .tabbed-set > .tabbed-content > .tabbed-block")
+    expect(outer).to_have_attribute("data-tab-layout", "padded")
+    inner = outer.locator(".tabbed-block")
+    expect(inner).to_have_attribute("data-tab-layout", "flush")
+    expect(inner).to_have_css("padding-left", "0px")
+
+
+def test_tabs_keep_padded_fallback_without_javascript(browser, site_url: str) -> None:
+    context = browser.new_context(java_script_enabled=False)
+    try:
+        page = context.new_page()
+        page.goto(f"{site_url}/guide/tabs/")
+        panel = page.locator("#automatic-tabs .tabbed-block").first
+        expect(panel).to_be_visible()
+        expect(panel).to_have_css("padding-left", "20px")
+    finally:
+        context.close()
+
+
 def test_trademark_glyph_uses_theme_colors(page, site_url: str) -> None:
     page.goto(site_url)
     badge = page.locator(".brand-trademark")

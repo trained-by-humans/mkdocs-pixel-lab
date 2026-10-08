@@ -3,8 +3,15 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="{{ config.site_description }}">
-    <title>{% if page and page.title %}{{ page.title }} — {% endif %}{{ config.site_name }}</title>
+    {% set metadata = pixel_lab_metadata | default({}) %}
+    {% set explicit_title = page.meta.get("title") if page and page.meta else none %}
+    {% set explicit_description = page.meta.get("description") if page and page.meta else none %}
+    {% set metadata_title = metadata.get("title") or (explicit_title | trim if explicit_title is string else "") or (page.title if page else "") %}
+    {% set metadata_description = metadata.get("description") or (explicit_description | trim if explicit_description is string else "") or (config.site_description | trim if config.site_description is string else "") %}
+    {% if metadata_description %}
+      <meta name="description" content="{{ metadata_description | e }}">
+    {% endif %}
+    <title>{% if metadata_title %}{{ metadata_title | e }}{% if metadata_title | lower != config.site_name | lower and not metadata_title.lower().endswith((" — " ~ config.site_name).lower()) %} — {{ config.site_name | e }}{% endif %}{% else %}{{ config.site_name | e }}{% endif %}</title>
     {% if page and page.canonical_url %}
       <link rel="canonical" href="{{ page.canonical_url }}">
     {% endif %}
