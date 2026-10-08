@@ -260,6 +260,44 @@ clones omit `lastmod` instead of falling back to today's date. Renamed files
 use their Git history. Dates are cached within each build and refreshed on
 the next rebuild.
 
+## Robots.txt
+
+Enable the optional `pixel-lab/robots` plugin to generate a public-crawling
+default at `robots.txt` in the built site:
+
+```yaml
+site_url: https://example.com/
+plugins:
+  - search
+  - pixel-lab/robots
+```
+
+The generated file allows crawling and points to MkDocs' sitemap:
+
+```text
+User-agent: *
+Allow: /
+
+Sitemap: https://example.com/sitemap.xml
+```
+
+The sitemap URL comes from `site_url`, including any deployment path. If
+`site_url` is not set, the sitemap directive is omitted. This plugin is
+independent of metadata and Git dates and does not require Git or another
+package. Without it, the theme does not generate `robots.txt`.
+
+To customize crawl rules, add your own `docs/robots.txt`; an existing file
+always takes priority and is copied unchanged. The published file is static:
+page additions and edits do not require changing it. Update it when crawl
+rules or the domain/sitemap location changes; the generated default follows
+`site_url` automatically on rebuild.
+
+Crawlers only consult `robots.txt` at the domain root. For sites hosted under
+a path such as `example.com/project/`, the generated project file must be
+published or incorporated at `example.com/robots.txt` by the hosting owner.
+Robots rules are not access control and do not guarantee removal from search
+results; protect private content through authentication.
+
 ## Customize your site
 
 ### Palette

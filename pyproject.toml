@@ -39,6 +39,7 @@ pixel-lab = "mkdocs_pixel_lab"
 [project.entry-points."mkdocs.plugins"]
 "pixel-lab/metadata" = "mkdocs_pixel_lab.metadata:MetadataPlugin"
 "pixel-lab/git-lastmod" = "mkdocs_pixel_lab.git_lastmod:GitLastmodPlugin"
+"pixel-lab/robots" = "mkdocs_pixel_lab.robots:RobotsPlugin"
 
 [project.optional-dependencies]
 test = [
