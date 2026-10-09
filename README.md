@@ -121,6 +121,16 @@ markdown_extensions:
 Code and inline-code colors follow the theme palette; long blocks scroll
 horizontally.
 
+Pygments is installed with the theme, so syntax coloring works in clean build
+environments. Emphasize individual lines with `hl_lines`:
+
+````markdown
+```{ .python hl_lines="2" }
+import math
+print(math.pi)
+```
+````
+
 ### GitHub Alerts
 
 Enable GitHub-style Markdown alerts explicitly when a site uses them:

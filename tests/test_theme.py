@@ -65,6 +65,77 @@ def test_strict_fixture_build(site_dir: Path) -> None:
     assert (site_dir / "assets" / "css" / "style.css").is_file()
 
 
+def test_code_highlighting_is_bundled_and_rendered(site_dir: Path) -> None:
+    from importlib.metadata import requires
+    from packaging.requirements import Requirement
+
+    dependencies = [Requirement(value) for value in requires("mkdocs-pixel-lab")]
+    assert any(dependency.name.lower() == "pygments" and dependency.marker is None for dependency in dependencies)
+    html = (site_dir / "guide" / "code" / "index.html").read_text(encoding="utf-8")
+    for token in ('class="kn"', 'class="s2"', 'class="nf"', 'class="c1"'):
+        assert token in html
+    assert html.count('class="hll"') == 2
+    assert re.search(r'class="[^"]*\blanguage-python\b', html)
+    assert re.search(r'class="[^"]*\blanguage-json\b', html)
+
+
+@pytest.mark.parametrize("width", [1440, 390])
+def test_code_highlighting_colors_and_line_emphasis(page, site_url: str, width: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(f"{site_url}/guide/code/")
+    code = page.locator(".highlight code").first
+    expect(code).to_be_visible()
+    for selector, variable in ((".kn", "--code-keyword"), (".s2", "--code-string"),
+                               (".nf", "--code-function"), (".c1", "--code-comment")):
+        assert code.locator(selector).first.evaluate("""(element, variable) => {
+            const expected = document.createElement('span');
+            expected.style.color = `var(${variable})`;
+            element.appendChild(expected);
+            const matches = getComputedStyle(element).color === getComputedStyle(expected).color;
+            expected.remove();
+            return matches;
+        }""", variable)
+    expect(code.locator(".hll")).to_have_count(2)
+    for line in code.locator(".hll").all():
+        assert line.evaluate("e => getComputedStyle(e).backgroundColor") != "rgba(0, 0, 0, 0)"
+    geometry = code.evaluate("""element => {
+        const pre = element.closest('pre');
+        const bounds = element.getBoundingClientRect();
+        const rows = Array.from(element.querySelectorAll('.hll')).map(line => {
+            const row = line.getBoundingClientRect();
+            return {top: row.top, bottom: row.bottom, height: row.height, width: row.width};
+        });
+        return {height: bounds.height, lineHeight: parseFloat(getComputedStyle(element).lineHeight),
+                scrollWidth: pre.scrollWidth, rows};
+    }""")
+    first, second = geometry["rows"]
+    assert second["top"] == pytest.approx(first["bottom"], abs=0.1)
+    for row in geometry["rows"]:
+        assert row["height"] == pytest.approx(geometry["lineHeight"], abs=0.1)
+        assert row["width"] == pytest.approx(geometry["scrollWidth"], abs=1)
+    expected_code = "\n".join([
+        "import math", "", "def greet(name):", "    # Return a greeting.",
+        '    return "Hello, " + name', 'print(greet("Pixel Lab"))',
+    ]) + "\n"
+    assert code.text_content() == expected_code
+    assert geometry["height"] == pytest.approx(6 * geometry["lineHeight"], abs=1)
+    page.evaluate("""() => {
+        Object.defineProperty(navigator, 'clipboard', {configurable: true, value: {
+            writeText: async text => { window.copiedCode = text; }
+        }});
+    }""")
+    copy_button = page.get_by_role("button", name="Copy code to clipboard").first
+    copy_button.click()
+    expect(copy_button).to_have_text("COPIED")
+    assert page.evaluate("window.copiedCode") == expected_code
+    if width == 390:
+        wide_block = page.locator(".language-json pre")
+        assert wide_block.evaluate("e => e.scrollWidth > e.clientWidth")
+        wide_block.evaluate("e => e.scrollLeft = 40")
+        assert wide_block.evaluate("e => e.scrollLeft") > 0
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+
 def test_desktop_experience(page, site_url: str, tmp_path: Path) -> None:
     page.set_viewport_size({"width": 1440, "height": 900})
     page.goto(site_url)
