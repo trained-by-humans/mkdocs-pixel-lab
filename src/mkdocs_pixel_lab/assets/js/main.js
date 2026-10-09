@@ -224,7 +224,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     button.addEventListener("click", async () => {
       try {
-        await copyText(code.innerText);
+        // Use source text: block-level highlighted lines add layout-only breaks to innerText.
+        await copyText(code.textContent);
         button.textContent = "COPIED";
         button.classList.add("is-copied");
       } catch (error) {

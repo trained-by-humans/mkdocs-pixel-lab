@@ -12,6 +12,7 @@ nav:
       - Overview: guide/nested.md
       - Media gallery: guide/media.md
       - Tab layouts: guide/tabs.md
+      - Code highlighting: guide/code.md
 plugins:
   - search
 markdown_extensions:
