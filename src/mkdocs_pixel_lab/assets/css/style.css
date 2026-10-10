@@ -70,6 +70,18 @@ body {
   flex-shrink: 0;
 }
 .brand__name { min-width: 0; }
+.stacked-text { display: block; max-width: 100%; position: relative; width: fit-content; }
+.stacked-text__svg { display: block; height: auto; max-width: 100%; }
+.stacked-text__label {
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+.brand:has([data-stacked-text]) { min-width: 0; }
+.brand__name.stacked-text .stacked-text__svg { height: 40px; width: auto; }
 .brand-trademark__glyph { display: block; height: 7px; width: 12px; }
 .brand-trademark__outline { fill: var(--accent); }
 .brand-trademark__rim { fill: var(--accent-dark); }

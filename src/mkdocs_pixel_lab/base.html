@@ -79,7 +79,7 @@
       <button class="header-btn header-btn--menu" id="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-nav">
         <span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span>
       </button>
-      <a class="brand" href="{{ nav.homepage.url | url }}"><span class="brand__name">{{ config.site_name | upper }}</span><sup class="brand-trademark" aria-hidden="true"><svg class="brand-trademark__glyph" viewBox="0 0 928 536" shape-rendering="crispEdges" focusable="false"><g transform="translate(-358 -192)"><path class="brand-trademark__outline" d="M358 192H839V229H871V259H902V287H930V314H958V342H985V314H1013V287H1040V259H1069V229H1099V192H1286V728H1034V614H1015V644H930V614H911V728H498V410H358Z"/><path class="brand-trademark__rim" d="M399 234H815V261H844V288H873V316H901V343H929V370H957V398H985V370H1013V343H1040V316H1068V288H1097V261H1125V234H1243V687H1068V529H1040V557H1013V583H986V610H959V583H932V557H905V529H878V687H722V371H690V687H540V371H399Z"/><path class="brand-trademark__fill" d="M430 267H787V343H662V659H569V343H430ZM815 289H844V316H873V343H901V370H929V398H957V426H985V398H1013V370H1040V343H1068V316H1097V289H1126V267H1214V659H1096V475H1068V502H1040V529H1013V556H986V583H959V556H932V529H905V502H878V475H849V659H750V371H815Z"/></g></svg></sup></a>
+      <a class="brand" href="{{ nav.homepage.url | url }}"><span class="brand__name"{% if config.theme.stacked_title %} data-stacked-text="{{ config.theme.stacked_title | tojson | forceescape }}"{% endif %}>{{ config.site_name | upper }}</span><sup class="brand-trademark" aria-hidden="true"><svg class="brand-trademark__glyph" viewBox="0 0 928 536" shape-rendering="crispEdges" focusable="false"><g transform="translate(-358 -192)"><path class="brand-trademark__outline" d="M358 192H839V229H871V259H902V287H930V314H958V342H985V314H1013V287H1040V259H1069V229H1099V192H1286V728H1034V614H1015V644H930V614H911V728H498V410H358Z"/><path class="brand-trademark__rim" d="M399 234H815V261H844V288H873V316H901V343H929V370H957V398H985V370H1013V343H1040V316H1068V288H1097V261H1125V234H1243V687H1068V529H1040V557H1013V583H986V610H959V583H932V557H905V529H878V687H722V371H690V687H540V371H399Z"/><path class="brand-trademark__fill" d="M430 267H787V343H662V659H569V343H430ZM815 289H844V316H873V343H901V370H929V398H957V426H985V398H1013V370H1040V343H1068V316H1097V289H1126V267H1214V659H1096V475H1068V502H1040V529H1013V556H986V583H959V556H932V529H905V502H878V475H849V659H750V371H815Z"/></g></svg></sup></a>
       {% set site_navigation = config.extra.get("site_navigation") %}
       {% if site_navigation and site_navigation.get("header_mode", "dropdown") == "inline" and site_navigation.get("catalog") %}
         <nav class="package-inline" aria-label="Related sites">
@@ -168,6 +168,7 @@
     {% endif %}
     <script>var base_url = {{ base_url | tojson }};</script>
     <script src="{{ 'assets/js/main.js' | url }}"></script>
+    <script src="{{ 'assets/js/stacked-text.js' | url }}"></script>
     {% for script in config.extra_javascript %}{{ script | script_tag }}{% endfor %}
   </body>
 </html>
