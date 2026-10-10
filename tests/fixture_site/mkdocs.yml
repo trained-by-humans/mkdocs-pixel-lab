@@ -13,6 +13,9 @@ nav:
       - Media gallery: guide/media.md
       - Tab layouts: guide/tabs.md
       - Code highlighting: guide/code.md
+      - Stacked lettering: guide/stacked-text.md
+extra_javascript:
+  - assets/stacked-text-preview.js
 plugins:
   - search
 markdown_extensions:

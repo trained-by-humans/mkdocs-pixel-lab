@@ -1,6 +1,7 @@
 name: pixel-lab
 favicon: assets/favicon.png
 footer_text: ""
+stacked_title: false
 permalink_icon: chain
 permalink_fill_color: "var(--accent)"
 background_color: "#f4f1df"

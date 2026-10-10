@@ -390,6 +390,65 @@ theme:
   footer_text: Build something useful
 ```
 
+### Stacked title lettering
+
+Opt into retro SVG lettering for the website title; the default header stays
+plain. The TM badge and accessible link name are preserved:
+
+```yaml
+theme:
+  name: pixel-lab
+  stacked_title:
+    tilt_angle: -10
+    shadow_angle: 90
+    shadow_thickness: 6
+    shadow_spacing: 0
+    shadow_colors_set: rainbow
+    text_color: "#fffbe6"
+    shadow_layers: 6
+```
+
+Options:
+
+- `stacked_title`: `true` uses default settings, an object customizes them, and `false` disables lettering (default).
+- `tilt_angle`: text rotation in degrees; negative values raise the right end (default: `-10`).
+- `shadow_angle`: direction independent of text tilt; `0` right, `90` down, `180` left, `270` up (default: `90`).
+- `shadow_thickness`: extrusion per layer in SVG units, greater than `0` and at most `32` (default: `6`).
+- `shadow_spacing`: extra distance between layers in SVG units, `0`–`32`; `0` gives a continuous stack (default: `0`).
+- `shadow_colors_set`: `rainbow` (default), `rainbow-inverted`, `rainbow-muted`, or 1–64 CSS colors ordered nearest to farthest.
+- `text_color`: CSS face color; omitted, `null`, or blank uses the first palette color and reserves the rest for shadows.
+  An explicit color leaves the entire palette available for shadows.
+- `shadow_layers`: integer from `0` to the available shadow-color count; omitted or `null` uses all, and `0` renders only text.
+  The maximum is the palette length with an explicit `text_color`, or one fewer without it.
+- `font_size`: base lettering size in SVG units, `1`–`512` (default: `80`); the SVG scales to fit, with a 40px header-height cap.
+- `font_family`: CSS font-family list (default: Impact, Arial Black, Inter, sans-serif); glyphs depend on available local/bundled fonts.
+- `font_weight`: numeric font weight, `1`–`1000` (default: `900`).
+
+The included `assets/js/stacked-text.js` also works with arbitrary plain-text
+elements in Markdown (no additional script configuration):
+
+```html
+<div data-stacked-text='{"tilt_angle": -10, "shadow_angle": 90,
+  "shadow_colors_set": "rainbow-muted"}'>BUILD SOMETHING</div>
+```
+
+For dynamic text or settings, call the browser API after the element exists:
+
+```javascript
+await PixelLabStackedText.render(document.querySelector("#my-title"), {
+  text: "PIXEL LAB",
+  tilt_angle: -8,
+  shadow_angle: 90,
+  shadow_colors_set: ["#ffcf54", "#e88932", "#d85d79"]
+});
+```
+
+`render` returns the SVG (or `null` if superseded); `PixelLabStackedText.init(container)`
+initializes newly added elements. Automatic titles retain accessible plain text
+without JavaScript or with invalid settings. Try the fixture site's **Guide →
+Stacked lettering** for editable controls and SVG downloads; exported text requires
+the chosen font to be available.
+
 ## Site navigation
 
 Choose either inline links beside the site title or a dropdown beside Search,
