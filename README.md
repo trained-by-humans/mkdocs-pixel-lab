@@ -421,7 +421,7 @@ extra:
         url: https://github.com/trained-by-humans/ml-pipes/tree/main/packages/vision
     catalog:
       title: All Packages →
-      url: https://ml-pipes.com/PACKAGES/
+      url: https://ml-pipes.com/packages/
 ```
 
 </details>
