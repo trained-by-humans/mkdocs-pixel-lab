@@ -68,6 +68,22 @@ def test_strict_fixture_build(site_dir: Path) -> None:
     assert "<path " in icon and "<image" not in icon
 
 
+def test_page_source_icon_has_one_pixel_gap(page, site_url: str) -> None:
+    page.goto(site_url)
+    pixels = page.evaluate("""async () => {
+        const icon = new Image();
+        icon.src = new URL('assets/icons/page-source.svg', document.baseURI).href;
+        await icon.decode();
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 24;
+        const context = canvas.getContext('2d');
+        context.drawImage(icon, 0, 0, 24, 24);
+        // Slash, transparent gap, and right bracket at their closest point.
+        return [13, 14, 15].map(x => context.getImageData(x, 5, 1, 1).data[3]);
+    }""")
+    assert pixels == [255, 0, 255]
+
+
 @pytest.mark.parametrize("width", [1440, 390, 320])
 @pytest.mark.parametrize("long_title", [False, True])
 def test_page_source_icon_trails_title(page, site_url: str, width: int, long_title: bool) -> None:
@@ -109,6 +125,11 @@ def test_page_source_icon_trails_title(page, site_url: str, width: int, long_tit
     assert source.evaluate("element => getComputedStyle(element, '::before').opacity") == "0"
     source.hover()
     assert source.evaluate("element => getComputedStyle(element, '::before').opacity") == "1"
+    shadow_offset = source.evaluate("""element => {
+        const matrix = new DOMMatrix(getComputedStyle(element, '::before').transform);
+        return [matrix.m41, matrix.m42];
+    }""")
+    assert shadow_offset == pytest.approx([font_size * 0.07] * 2, abs=0.01)
     assert source.bounding_box() == source_bounds
     expect(source).to_have_css("background-color", "rgba(0, 0, 0, 0)")
     page.mouse.move(0, 0)
