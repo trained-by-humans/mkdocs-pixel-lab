@@ -96,6 +96,124 @@ def test_navigation_placements(tmp_path, navigation, dropdown, inline, footer):
 
 
 @pytest.mark.parametrize("width", [1440, 390])
+def test_toolbar_shadows_follow_highlights(navigation_page, width):
+    page = navigation_page
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(ORIGIN)
+    header = page.locator(".header")
+    expect(header).to_have_css("box-shadow", "rgb(40, 124, 53) 0px 4px 0px 0px")
+    for button in header.locator(".header-btn").all():
+        expect(button).to_have_css("box-shadow", "none")
+        expect(button).to_have_css("border-top-width", "2px")
+        expect(button).to_have_css("transform", "none")
+
+    def expect_highlighted(button):
+        expect(button).to_have_css("background-color", "rgb(245, 200, 66)")
+        expect(button).to_have_css("box-shadow", "rgb(101, 67, 33) 3px 3px 0px 0px")
+        expect(button).to_have_css("transform", "matrix(1, 0, 0, 1, -3, -3)")
+
+    def expect_lifted(button, idle_bounds):
+        bounds = button.bounding_box()
+        assert bounds == pytest.approx({
+            **idle_bounds, "x": idle_bounds["x"] - 3, "y": idle_bounds["y"] - 3,
+        })
+
+    packages = page.get_by_role("button", name="Packages", exact=True)
+    package_bounds = packages.bounding_box()
+    packages.hover()
+    expect_highlighted(packages)
+    expect_lifted(packages, package_bounds)
+    panel = page.locator("#site-panel")
+    panel.locator("a").first.hover()
+    expect_highlighted(packages)
+    expect(panel).to_have_css("box-shadow", "rgb(101, 67, 33) 5px 5px 0px 0px")
+    page.mouse.move(5, 800)
+    expect(packages).to_have_css("box-shadow", "none")
+    expect(packages).to_have_css("transform", "none")
+    packages.click()
+    page.mouse.move(5, 800)
+    expect_highlighted(packages)
+
+    search = page.get_by_role("button", name="SEARCH", exact=True)
+    search_bounds = search.bounding_box()
+    search.hover()
+    # Even when its preview is blocked, a hovered button is highlighted.
+    expect(search).to_have_attribute("aria-expanded", "false")
+    expect_highlighted(search)
+    expect_lifted(search, search_bounds)
+    search.click()
+    page.locator("#mkdocs-search-query").hover()
+    expect_highlighted(search)
+    expect(packages).to_have_css("box-shadow", "none")
+    expect(page.locator("#search-panel")).to_have_css("box-shadow", "rgb(101, 67, 33) 5px 5px 0px 0px")
+    page.mouse.move(5, 800)
+    expect_highlighted(search)
+    search.click()
+    page.mouse.move(5, 800)
+    expect(search).to_have_css("box-shadow", "none")
+    expect(search).to_have_css("transform", "none")
+
+    packages.focus()
+    page.keyboard.press("ArrowDown")
+    page.keyboard.press("Escape")
+    expect(packages).to_be_focused()
+    expect(packages).to_have_attribute("aria-expanded", "false")
+    expect_highlighted(packages)
+    page.locator(".main h1").click()
+    expect(packages).to_have_css("box-shadow", "none")
+
+    if width == 390:
+        menu = page.get_by_role("button", name="Open navigation", exact=True)
+        expect(menu).to_have_css("box-shadow", "none")
+        menu.hover()
+        expect_highlighted(menu)
+        menu.click()
+        page.locator("#nav-close").hover()
+        expect_highlighted(menu)
+        expect(page.locator("#nav-close")).to_have_css("box-shadow", "none")
+        expect(page.locator("#nav-close")).to_have_css("transform", "none")
+        page.locator("#nav-close").click()
+        page.locator(".main h1").click()
+        expect(menu).to_have_css("box-shadow", "none")
+    expect(header).to_have_css("box-shadow", "rgb(40, 124, 53) 0px 4px 0px 0px")
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+
+@pytest.mark.parametrize(("width", "button_id"), [
+    (1440, "search-toggle"), (390, "search-toggle"),
+    (1440, "site-toggle"), (390, "site-toggle"), (390, "nav-toggle"),
+])
+def test_lifted_toolbar_button_original_corner_remains_clickable(navigation_page, width, button_id):
+    page = navigation_page
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(ORIGIN)
+    button = page.locator(f"#{button_id}")
+    bounds = button.bounding_box()
+    x = bounds["x"] + bounds["width"] - 1
+    y = bounds["y"] + bounds["height"] - 1
+    # Enter the original bottom-right corner, now outside the lifted face.
+    page.mouse.move(x, y)
+    expect(button).to_have_css("transform", "matrix(1, 0, 0, 1, -3, -3)")
+    assert button.evaluate("element => element.matches(':hover')")
+    page.mouse.click(x, y)
+    expect(button).to_have_attribute("aria-expanded", "true")
+    if button_id == "search-toggle":
+        expect(page.locator(".search-shell")).to_have_class(re.compile(r"\bis-open\b"))
+        expect(page.locator("#mkdocs-search-query")).to_be_focused()
+    elif button_id == "site-toggle":
+        expect(page.locator(".site-switcher")).to_have_class(re.compile(r"\bis-open\b"))
+    else:
+        expect(page.locator("#nav-close")).to_be_visible()
+        return
+    # A pinned button must retain that hit area even after the mouse leaves.
+    page.mouse.move(5, 800)
+    page.mouse.click(x, y)
+    shell = page.locator(".search-shell" if button_id == "search-toggle" else ".site-switcher")
+    expect(shell).not_to_have_class(re.compile(r"\bis-open\b"))
+    expect(shell).to_have_class(re.compile(r"\bis-preview\b"))
+
+
+@pytest.mark.parametrize("width", [1440, 390])
 def test_search_hover_bridge_and_input_activation(navigation_page, width):
     page = navigation_page
     page.set_viewport_size({"width": width, "height": 900})
@@ -118,7 +236,7 @@ def test_search_hover_bridge_and_input_activation(navigation_page, width):
     panel_bounds = panel.bounding_box()
     button_bottom = button_bounds["y"] + button_bounds["height"]
     gap = panel_bounds["y"] - button_bottom
-    assert gap == pytest.approx(10)
+    assert gap == pytest.approx(13)
     x = button_bounds["x"] + button_bounds["width"] / 2
     for fraction in [0.1, 0.5, 0.9]:
         page.mouse.move(x, button_bottom + gap * fraction)
@@ -265,9 +383,9 @@ def test_packages_hover_bridge_and_pinning(navigation_page, width):
     button_bounds = toggle.bounding_box()
     panel_bounds = panel.bounding_box()
     button_bottom = button_bounds["y"] + button_bounds["height"]
-    assert panel_bounds["y"] - button_bottom == pytest.approx(10)
+    assert panel_bounds["y"] - button_bottom == pytest.approx(13)
     x = button_bounds["x"] + button_bounds["width"] / 2
-    for offset in [1, 5, 9]:
+    for offset in [1, 5, 9, 12]:
         page.mouse.move(x, button_bottom + offset)
         expect(panel).to_be_visible()
         expect(toggle).to_have_attribute("aria-expanded", "true")

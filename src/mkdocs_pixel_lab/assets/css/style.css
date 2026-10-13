@@ -79,10 +79,11 @@ body {
 .header-btn {
   background: var(--surface);
   border: 2px solid var(--border);
-  box-shadow: 3px 3px 0 var(--shadow);
+  box-shadow: none;
   cursor: pointer;
   font: 700 12px "IBM Plex Mono", monospace;
   padding: 7px 12px;
+  position: relative;
 }
 .header-btn--search,
 .header-btn--sites { align-items: center; appearance: none; color: var(--strong-text); display: inline-flex; gap: 6px; }
@@ -99,7 +100,25 @@ body {
 .header-btn--sites:hover,
 .header-btn--sites:focus-visible,
 .site-switcher.is-preview .header-btn--sites,
-.site-switcher.is-open .header-btn--sites { background: var(--highlight); outline: none; }
+.site-switcher.is-open .header-btn--sites,
+.header-btn--menu:hover,
+.header-btn--menu:focus-visible,
+.header-btn--menu[aria-expanded="true"] {
+  --button-hit-offset: 3px;
+  background: var(--highlight);
+  box-shadow: 3px 3px 0 var(--shadow);
+  outline: none;
+  transform: translate(-3px, -3px);
+  /* Keep the hit area above the search panel's animated hover bridge. */
+  z-index: 21;
+}
+/* Keep the original button footprint clickable after it lifts. */
+.header .header-btn::after {
+  content: "";
+  inset: -2px;
+  position: absolute;
+  transform: translate(var(--button-hit-offset, 0px), var(--button-hit-offset, 0px));
+}
 .search-panel {
   background: var(--surface);
   border: 2px solid var(--border);
