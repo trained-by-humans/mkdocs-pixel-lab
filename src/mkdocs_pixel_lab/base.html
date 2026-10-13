@@ -140,6 +140,7 @@
       {% endif %}
       <main class="main" id="main-content" tabindex="-1">
         {% if page and page.meta and page.meta.crumb %}<div class="crumb">{{ page.meta.crumb | upper }}</div>{% endif %}
+        {% include "page_source.html" %}
         {% if page %}{{ page.content }}{% endif %}
         <footer class="footer">
           {% if site_navigation and site_navigation.get("show_footer", true) and site_navigation.get("catalog") %}

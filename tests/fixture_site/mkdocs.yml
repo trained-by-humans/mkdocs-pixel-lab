@@ -1,6 +1,8 @@
 site_name: Pixel Lab Fixture
 site_description: Theme validation fixture.
 site_url: https://example.invalid/
+repo_url: https://github.com/trained-by-humans/pixel-lab-fixture
+edit_uri: edit/main/docs/
 theme:
   name: pixel-lab
   footer_text: Fixture documentation

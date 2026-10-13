@@ -61,10 +61,46 @@ plugins:
   - search
 ```
 
+### Page source
+
+GitHub-backed sites show a pixelated **View source** icon immediately after the
+main page title, with no box or background. Like heading anchors, it scales
+with the title and reveals an accent-dark shadow on hover or keyboard focus.
+The icon has an accessible label and hover tooltip. Set MkDocs'
+repository URL and the branch/directory containing your Markdown files:
+
+```yaml
+repo_url: https://github.com/OWNER/REPO
+edit_uri: blob/main/docs/
+```
+
+For `docs/guide/setup.md`, the link opens GitHub's `blob/main/docs/guide/setup.md`
+file view. Set the branch and directory explicitly; MkDocs' GitHub default is
+`edit/master/docs/`. Existing `edit_uri: edit/main/docs/` configurations work
+too: the theme converts the resolved GitHub editor URL to its file view.
+
+The link is enabled by default when available. Hide it with:
+
+```yaml
+theme:
+  name: pixel-lab
+  show_source: false
+```
+
+The theme uses MkDocs' `page.edit_url`, honoring `edit_uri_template` and source
+mappings provided by generators. No plugin, Git checkout, or GitHub API request
+is needed. The link is present in built HTML and remains usable with JavaScript
+disabled; the theme's script appends it to the authored H1 without changing
+the heading's text or ID. Generated pages without a source mapping have no
+source link. Set `edit_uri: ""` to disable source links entirely (also remove
+`edit_uri_template` if configured). File-view URLs are inferred only for
+standard `github.com` URLs; other hosts do not display a source link.
+
 ### Heading links and keyboard access
 
 Section headings (H2–H6) show a permalink icon after the title. H1 page titles
-keep their IDs without an icon.
+keep their IDs without a heading-permalink icon; the optional source icon is
+separate.
 
 Choose `chain` (the default filled chain icon), `link` (the original link
 icon), or `hash` (the `#` icon) with `theme.permalink_icon`.

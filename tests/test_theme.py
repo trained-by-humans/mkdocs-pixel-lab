@@ -63,6 +63,79 @@ def site_url(site_dir: Path):
 def test_strict_fixture_build(site_dir: Path) -> None:
     assert (site_dir / "index.html").is_file()
     assert (site_dir / "assets" / "css" / "style.css").is_file()
+    icon = (site_dir / "assets/icons/page-source.svg").read_text()
+    assert 'shape-rendering="crispEdges"' in icon
+    assert "<path " in icon and "<image" not in icon
+
+
+@pytest.mark.parametrize("width", [1440, 390, 320])
+@pytest.mark.parametrize("long_title", [False, True])
+def test_page_source_icon_trails_title(page, site_url: str, width: int, long_title: bool) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(f"{site_url}/guide/nested/")
+    page.evaluate("document.fonts.ready")
+    title = page.locator(".main h1")
+    expect(title).to_have_count(1)
+    expect(title).to_have_attribute("id", "nested-page")
+    if long_title:
+        title.evaluate("element => { element.firstChild.textContent = 'A very long documentation title that wraps across several lines'; }")
+    source = page.get_by_role("link", name="View source", exact=True)
+    expect(source).to_be_visible()
+    expect(source).to_have_attribute(
+        "href", "https://github.com/trained-by-humans/pixel-lab-fixture/blob/main/docs/guide/nested.md",
+    )
+    expect(source).to_have_attribute("title", "View source on GitHub")
+    assert source.text_content().strip() == ""
+    expect(page.get_by_role("link", name="Edit this page", exact=True)).to_have_count(0)
+    expect(page.locator(".footer .page-source")).to_have_count(0)
+    assert source.evaluate("element => element.parentElement.tagName === 'H1' && element.parentElement.lastChild === element")
+    font_size = title.evaluate("element => parseFloat(getComputedStyle(element).fontSize)")
+    last_line = title.evaluate("""element => {
+        const range = document.createRange();
+        range.selectNodeContents(element.firstChild);
+        const rectangle = Array.from(range.getClientRects()).at(-1);
+        return {right: rectangle.right, top: rectangle.top, bottom: rectangle.bottom};
+    }""")
+    source_bounds = source.bounding_box()
+    assert source_bounds["height"] == pytest.approx(font_size * 0.7, abs=0.1)
+    assert source_bounds["width"] == pytest.approx(font_size * 0.7, abs=0.1)
+    assert source_bounds["x"] == pytest.approx(last_line["right"] + 7.2, abs=1)
+    assert source_bounds["y"] >= last_line["top"] - 1
+    assert source_bounds["y"] + source_bounds["height"] <= last_line["bottom"] + 1
+    expect(source).to_have_css("background-color", "rgba(0, 0, 0, 0)")
+    expect(source).to_have_css("border-top-width", "0px")
+    expect(source).to_have_css("box-shadow", "none")
+    expect(source).to_have_css("vertical-align", "baseline")
+    assert source.evaluate("element => getComputedStyle(element, '::before').opacity") == "0"
+    source.hover()
+    assert source.evaluate("element => getComputedStyle(element, '::before').opacity") == "1"
+    assert source.bounding_box() == source_bounds
+    expect(source).to_have_css("background-color", "rgba(0, 0, 0, 0)")
+    page.mouse.move(0, 0)
+    assert source.evaluate("element => getComputedStyle(element, '::before').opacity") == "0"
+    page.keyboard.press("Tab")
+    source.focus()
+    expect(source).to_be_focused()
+    expect(source).to_have_css("outline-style", "solid")
+    assert source.evaluate("element => getComputedStyle(element, '::before').opacity") == "1"
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+
+@pytest.mark.parametrize("width", [1440, 390])
+def test_page_source_link_works_without_javascript(browser, site_url: str, width: int) -> None:
+    context = browser.new_context(java_script_enabled=False, viewport={"width": width, "height": 900})
+    try:
+        page = context.new_page()
+        page.goto(f"{site_url}/guide/nested/")
+        source = page.get_by_role("link", name="View source", exact=True)
+        expect(source).to_be_visible()
+        expect(source).to_have_attribute(
+            "href", "https://github.com/trained-by-humans/pixel-lab-fixture/blob/main/docs/guide/nested.md",
+        )
+        assert source.bounding_box()["y"] == pytest.approx(page.locator(".main h1").bounding_box()["y"], abs=1)
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+    finally:
+        context.close()
 
 
 def test_code_highlighting_is_bundled_and_rendered(site_dir: Path) -> None:

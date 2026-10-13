@@ -1,4 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const sourceLink = document.querySelector(".main > .page-source");
+  const pageTitle = document.querySelector(".main h1");
+  if (sourceLink && pageTitle) {
+    // Preserve the authored title and its ID, including any inline markup.
+    pageTitle.append(sourceLink);
+  }
+
   const searchShell = document.querySelector(".search-shell");
   const searchToggle = document.querySelector("#search-toggle");
   const searchInput = document.querySelector("#mkdocs-search-query");

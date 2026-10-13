@@ -1,0 +1,13 @@
+{# Use MkDocs' resolved URL so templates and generator source mappings survive. #}
+{% set edit_url = page.edit_url if page else none %}
+{% set source_url = none %}
+{% if edit_url %}
+  {% set parts = edit_url.split("/", 6) %}
+  {% if parts | length == 7 and parts[0] in ["https:", "http:"] and parts[2] | lower == "github.com" and parts[5] in ["edit", "blob"] %}
+    {% set repository_url = parts[:5] | join("/") %}
+    {% set source_url = repository_url ~ "/blob/" ~ parts[6] %}
+  {% endif %}
+{% endif %}
+{% if source_url and config.theme.show_source %}
+  <a class="page-source" href="{{ source_url | e }}" aria-label="View source" title="View source on GitHub"></a>
+{% endif %}
