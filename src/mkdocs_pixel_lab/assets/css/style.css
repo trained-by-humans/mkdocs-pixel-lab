@@ -94,7 +94,7 @@ body {
 .hamburger span { background: currentColor; display: block; height: 2px; width: 100%; }
 .header-btn--search:hover,
 .header-btn--search:focus-visible,
-.search-shell:focus-within .header-btn--search,
+.search-shell.is-preview .header-btn--search,
 .search-shell.is-open .header-btn--search,
 .header-btn--sites:hover,
 .header-btn--sites:focus-visible,
@@ -114,9 +114,17 @@ body {
   width: min(30rem, calc(100vw - 2.25rem));
   z-index: 20;
 }
+/* Bridge the gap so a hover preview survives moving into the search panel. */
+.search-panel::before {
+  bottom: calc(100% + 2px);
+  content: "";
+  height: 10px;
+  left: -2px;
+  position: absolute;
+  right: -2px;
+}
 .search-panel__controls { padding: 14px; }
-.search-shell:hover .search-panel,
-.search-shell:focus-within .search-panel,
+.search-shell.is-preview .search-panel,
 .search-shell.is-open .search-panel {
   opacity: 1;
   pointer-events: auto;

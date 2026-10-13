@@ -30,10 +30,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const setSearchPreview = (open) => {
+    if (!searchShell || !searchToggle) return;
+    searchShell.classList.toggle("is-preview", open);
+    searchToggle.setAttribute("aria-expanded", String(open || searchShell.classList.contains("is-open")));
+    if (open) setSiteOpen(false);
+  };
+
   const setSearchOpen = (open) => {
     if (!searchShell || !searchToggle) return;
     searchShell.classList.toggle("is-open", open);
-    searchToggle.setAttribute("aria-expanded", String(open));
+    setSearchPreview(false);
     if (open) setSiteOpen(false);
   };
 
@@ -60,20 +67,41 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   if (searchShell && searchToggle && searchInput) {
-    searchToggle.addEventListener("click", () => {
+    let searchHovered = false;
+    searchToggle.addEventListener("click", (event) => {
       const open = !searchShell.classList.contains("is-open");
       setSearchOpen(open);
-      if (open) window.requestAnimationFrame(() => {
-        if (searchShell.classList.contains("is-open")) searchInput.focus();
-      });
+      if (open) {
+        window.requestAnimationFrame(() => {
+          if (searchShell.classList.contains("is-open")) searchInput.focus();
+        });
+      } else {
+        searchToggle.focus();
+        // A second mouse click deactivates typing but keeps the hover preview.
+        // Keyboard activation and touch still dismiss explicitly.
+        if (event.detail > 0 && searchHovered) setSearchPreview(true);
+      }
     });
 
     document.addEventListener("click", (event) => {
       if (!searchShell.contains(event.target)) setSearchOpen(false);
     });
 
-    searchShell.addEventListener("pointerenter", () => setSiteOpen(false));
-    searchShell.addEventListener("focusin", () => setSiteOpen(false));
+    searchShell.addEventListener("pointerenter", (event) => {
+      // Touch uses explicit activation; hovering never steals keyboard focus.
+      searchHovered = event.pointerType !== "touch";
+      if (searchHovered && !searchShell.classList.contains("is-open")) {
+        setSearchPreview(true);
+      }
+    });
+    searchShell.addEventListener("pointerleave", () => {
+      searchHovered = false;
+      setSearchPreview(false);
+    });
+    searchInput.addEventListener("focus", () => setSearchOpen(true));
+    searchShell.addEventListener("focusout", (event) => {
+      if (!searchShell.contains(event.relatedTarget)) setSearchOpen(false);
+    });
   }
 
   if (siteShell && siteToggle && sitePanel) {
@@ -174,9 +202,10 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (mobileNav?.classList.contains("is-open")) {
       setNavOpen(false);
       navToggle?.focus();
-    } else if (searchShell?.contains(document.activeElement) || searchShell?.classList.contains("is-open")) {
+    } else if (searchShell?.contains(document.activeElement) || searchToggle?.getAttribute("aria-expanded") === "true") {
+      const hadSearchFocus = searchShell?.contains(document.activeElement);
       setSearchOpen(false);
-      searchToggle?.focus();
+      if (hadSearchFocus) searchToggle?.focus();
     }
   });
 
