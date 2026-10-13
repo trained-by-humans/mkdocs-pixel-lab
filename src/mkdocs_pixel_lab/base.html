@@ -92,6 +92,13 @@
         </nav>
       {% endif %}
       <div class="header-right">
+        {% if config.repo_url and config.theme.show_repo %}
+          {% set repo_label = config.repo_name or "Repository" %}
+          <a class="header-btn header-btn--repo" href="{{ config.repo_url | e }}" aria-label="Open repository: {{ repo_label | e }}" title="Open repository: {{ repo_label | e }}">
+            <span class="header-btn__icon header-btn__icon--repo" aria-hidden="true"></span>
+            <span class="header-btn__label">{{ repo_label | e }}</span>
+          </a>
+        {% endif %}
         {% include "site_navigation.html" %}
         <div class="search-shell">
           <button class="header-btn header-btn--search" id="search-toggle" type="button" aria-label="SEARCH" aria-expanded="false" aria-controls="search-panel"><span class="header-btn__icon" aria-hidden="true">⌕</span><span class="header-btn__label">SEARCH</span></button>

@@ -505,6 +505,54 @@ def test_trademark_glyph_uses_theme_colors(page, site_url: str) -> None:
     expect(glyph.locator(".brand-trademark__fill")).to_have_css("fill", "rgb(171, 205, 239)")
 
 
+@pytest.mark.parametrize("width", [1440, 850, 600, 390, 320])
+@pytest.mark.parametrize("javascript", [True, False])
+def test_repository_button_in_toolbar(browser, site_url: str, width: int, javascript: bool) -> None:
+    context = browser.new_context(java_script_enabled=javascript, viewport={"width": width, "height": 900})
+    try:
+        page = context.new_page()
+        page.goto(site_url)
+        page.evaluate("document.fonts.ready")
+        repo = page.get_by_role("link", name="Open repository: GitHub", exact=True)
+        expect(repo).to_be_visible()
+        expect(repo).to_have_attribute("href", "https://github.com/trained-by-humans/pixel-lab-fixture")
+        expect(repo).to_have_attribute("title", "Open repository: GitHub")
+        expect(repo.locator(".header-btn__label")).to_have_text("GitHub")
+        expect(repo.locator(".header-btn__icon")).to_have_attribute("aria-hidden", "true")
+        expect(repo.locator(".header-btn__icon")).to_have_css("height", "14px")
+        expect(repo).to_have_css("box-shadow", "none")
+        expect(repo).to_have_css("transform", "none")
+        label = repo.locator(".header-btn__label")
+        if width <= 600:
+            expect(label).to_be_hidden()
+        else:
+            expect(label).to_be_visible()
+        bounds = repo.bounding_box()
+        brand = page.locator(".brand").bounding_box()
+        search = page.locator("#search-toggle").bounding_box()
+        assert bounds["x"] >= brand["x"] + brand["width"]
+        assert bounds["x"] + bounds["width"] <= search["x"]
+        assert search["x"] + search["width"] <= width - 2
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+        repo.hover()
+        expect(repo).to_have_css("background-color", "rgb(245, 200, 66)")
+        expect(repo).to_have_css("box-shadow", "rgb(101, 67, 33) 3px 3px 0px 0px")
+        expect(repo).to_have_css("transform", "matrix(1, 0, 0, 1, -3, -3)")
+        page.mouse.move(0, 800)
+        expect(repo).to_have_css("box-shadow", "none")
+        page.keyboard.press("Tab")
+        repo.focus()
+        expect(repo).to_be_focused()
+        expect(repo).to_have_css("box-shadow", "rgb(101, 67, 33) 3px 3px 0px 0px")
+        page.route("https://github.com/trained-by-humans/pixel-lab-fixture",
+                   lambda route: route.fulfill(content_type="text/html", body="<h1>Repository</h1>"))
+        page.keyboard.press("Enter")
+        expect(page).to_have_url("https://github.com/trained-by-humans/pixel-lab-fixture")
+    finally:
+        context.close()
+
+
 @pytest.mark.parametrize(("width", "gap", "inset"), [(1440, "14px", "14px"), (390, "8px", "58px")])
 def test_toolbar_hover_selector(page, site_url: str, width: int, gap: str, inset: str) -> None:
     page.set_viewport_size({"width": width, "height": 900})

@@ -1,6 +1,7 @@
 name: pixel-lab
 favicon: assets/favicon.png
 footer_text: ""
+show_repo: true
 show_source: true
 show_edit: true
 permalink_icon: chain

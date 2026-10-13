@@ -61,6 +61,32 @@ plugins:
   - search
 ```
 
+### Repository button
+
+Set MkDocs' `repo_url` to show a repository button in the toolbar:
+
+```yaml
+repo_url: https://github.com/OWNER/REPO
+```
+
+The button opens that URL directly and uses `repo_name` as its label (MkDocs
+normally infers GitHub, GitLab, or Bitbucket), falling back to **Repository**.
+It has a pixelated Git branch icon and the same hover/focus highlight, shadow,
+and lift as the other toolbar buttons. On small screens, only the icon is shown,
+with its accessible label and tooltip preserved. It works without JavaScript.
+
+`show_repo` is enabled by default. Hide the button without affecting page
+source/edit actions:
+
+```yaml
+theme:
+  name: pixel-lab
+  show_repo: false
+```
+
+The repository button is independent of `edit_uri`, `show_source`, and
+`show_edit`. An absolute edit URL without `repo_url` does not enable it.
+
 ### Page source
 
 GitHub-backed sites show a pixelated **View source** icon immediately after the

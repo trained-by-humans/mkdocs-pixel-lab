@@ -95,6 +95,31 @@ def test_navigation_placements(tmp_path, navigation, dropdown, inline, footer):
     assert ('class="package-footer"' in html) is footer
 
 
+@pytest.mark.parametrize("width", [1440, 390, 320])
+def test_repository_precedes_packages(navigation_page, width):
+    page = navigation_page
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(ORIGIN)
+    page.evaluate("document.fonts.ready")
+    repo = page.get_by_role("link", name="Open repository: GitHub", exact=True)
+    packages = page.get_by_role("button", name="Packages", exact=True)
+    search = page.get_by_role("button", name="SEARCH", exact=True)
+    expect(repo).to_be_visible()
+    assert repo.evaluate("element => element.nextElementSibling.classList.contains('site-switcher')")
+    repo_bounds = repo.bounding_box()
+    package_bounds = packages.bounding_box()
+    search_bounds = search.bounding_box()
+    assert repo_bounds["x"] + repo_bounds["width"] <= package_bounds["x"]
+    assert package_bounds["x"] + package_bounds["width"] <= search_bounds["x"]
+    assert search_bounds["x"] + search_bounds["width"] <= width - 2
+    repo.focus()
+    page.keyboard.press("Tab")
+    expect(packages).to_be_focused()
+    page.keyboard.press("Tab")
+    expect(search).to_be_focused()
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+
 @pytest.mark.parametrize("width", [1440, 390])
 def test_toolbar_shadows_follow_highlights(navigation_page, width):
     page = navigation_page
