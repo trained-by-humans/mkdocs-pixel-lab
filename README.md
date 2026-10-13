@@ -476,8 +476,12 @@ inline header hides and the footer links stack vertically.
 Set each item's optional `icon` to an SVG/PNG path relative to the documentation
 directory or an absolute URL. Missing icons use a themed pixel fallback; icons
 appear only in the dropdown. The catalog can also specify an icon. The dropdown
-works without a catalog and marks the configured active item. Use Tab or arrow
-keys to navigate, and Escape to close it. Clicking outside also closes it.
+works without a catalog and marks the configured active item. Mouse hover previews
+the menu; moving into it keeps the preview open, while leaving closes it. Click
+the button to pin it open. A second mouse click returns to the hover preview;
+touch and keyboard activation toggle it open or closed. Pinned Packages and
+active Search take priority over the other button's hover preview.
+Use Tab or arrow keys to navigate, and Escape to close it. Clicking outside also closes it.
 On small screens, the header buttons use icons while keeping accessible labels.
 
 Optionally set `icon_hover` to an animated image URL. It replaces the resting

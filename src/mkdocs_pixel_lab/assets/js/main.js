@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const setSearchPreview = (open) => {
     if (!searchShell || !searchToggle) return;
+    if (open && (siteShell?.classList.contains("is-open") || mobileNav?.classList.contains("is-open"))) return;
     searchShell.classList.toggle("is-preview", open);
     searchToggle.setAttribute("aria-expanded", String(open || searchShell.classList.contains("is-open")));
     if (open) setSiteOpen(false);
@@ -44,12 +45,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (open) setSiteOpen(false);
   };
 
+  const setSitePreview = (open) => {
+    if (!siteShell || !siteToggle || !sitePanel) return;
+    if (open && (searchShell?.classList.contains("is-open") || mobileNav?.classList.contains("is-open"))) return;
+    siteShell.classList.toggle("is-preview", open);
+    const expanded = open || siteShell.classList.contains("is-open");
+    sitePanel.hidden = !expanded;
+    siteToggle.setAttribute("aria-expanded", String(expanded));
+    if (!expanded) resetSiteIcons.forEach((reset) => reset());
+    if (open) setSearchOpen(false);
+  };
+
   const setSiteOpen = (open) => {
     if (!siteShell || !siteToggle || !sitePanel) return;
-    sitePanel.hidden = !open;
     siteShell.classList.toggle("is-open", open);
-    siteToggle.setAttribute("aria-expanded", String(open));
-    if (!open) resetSiteIcons.forEach((reset) => reset());
+    setSitePreview(false);
     if (open) setSearchOpen(false);
   };
 
@@ -105,6 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (siteShell && siteToggle && sitePanel) {
+    let siteHovered = false;
     const links = Array.from(sitePanel.querySelectorAll("a"));
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const hoverAssets = new Map();
@@ -167,7 +178,23 @@ document.addEventListener("DOMContentLoaded", () => {
     reducedMotion.addEventListener("change", () => {
       if (reducedMotion.matches) resetSiteIcons.forEach((reset) => reset());
     });
-    siteToggle.addEventListener("click", () => setSiteOpen(sitePanel.hidden));
+    siteToggle.addEventListener("click", (event) => {
+      const open = !siteShell.classList.contains("is-open");
+      setSiteOpen(open);
+      if (!open) {
+        siteToggle.focus();
+        if (event.detail > 0 && siteHovered) setSitePreview(true);
+      }
+    });
+    siteShell.addEventListener("pointerenter", (event) => {
+      siteHovered = event.pointerType !== "touch";
+      if (siteHovered && !siteShell.classList.contains("is-open")) setSitePreview(true);
+    });
+    siteShell.addEventListener("pointerleave", () => {
+      siteHovered = false;
+      setSitePreview(false);
+    });
+    sitePanel.addEventListener("focusin", () => setSiteOpen(true));
     siteToggle.addEventListener("keydown", (event) => {
       if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
       event.preventDefault();
@@ -197,8 +224,9 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
     if (sitePanel && !sitePanel.hidden) {
+      const hadSiteFocus = siteShell?.contains(document.activeElement);
       setSiteOpen(false);
-      siteToggle.focus();
+      if (hadSiteFocus) siteToggle.focus();
     } else if (mobileNav?.classList.contains("is-open")) {
       setNavOpen(false);
       navToggle?.focus();

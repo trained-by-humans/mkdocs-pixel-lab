@@ -98,6 +98,7 @@ body {
 .search-shell.is-open .header-btn--search,
 .header-btn--sites:hover,
 .header-btn--sites:focus-visible,
+.site-switcher.is-preview .header-btn--sites,
 .site-switcher.is-open .header-btn--sites { background: var(--highlight); outline: none; }
 .search-panel {
   background: var(--surface);
@@ -153,6 +154,17 @@ body {
 .search-results p { color: var(--muted); font-size: 12px; margin: 0; max-width: none; }
 
 .site-switcher { position: relative; }
+/* Keep this bridge outside the scrollable panel so it cannot be clipped. */
+.site-switcher.is-preview::after,
+.site-switcher.is-open::after {
+  content: "";
+  height: 10px;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  width: min(14rem, calc(100vw - 3.5rem));
+  z-index: 20;
+}
 .header-btn--sites { text-transform: uppercase; }
 .header-btn--sites .site-panel__icon { color: inherit; height: 14px; width: 14px; }
 .site-switcher__arrow { font-size: 12px; }
