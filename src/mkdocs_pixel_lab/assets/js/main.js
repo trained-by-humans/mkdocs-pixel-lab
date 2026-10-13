@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const sourceLink = document.querySelector(".main > .page-source");
+  const pageActions = document.querySelectorAll(".main > .page-source, .main > .page-edit");
   const pageTitle = document.querySelector(".main h1");
-  if (sourceLink && pageTitle) {
+  if (pageTitle) {
     // Preserve the authored title and its ID, including any inline markup.
-    pageTitle.append(sourceLink);
+    pageTitle.append(...pageActions);
   }
 
   const searchShell = document.querySelector(".search-shell");

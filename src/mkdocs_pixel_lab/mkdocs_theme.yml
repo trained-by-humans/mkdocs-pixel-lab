@@ -2,6 +2,7 @@ name: pixel-lab
 favicon: assets/favicon.png
 footer_text: ""
 show_source: true
+show_edit: true
 permalink_icon: chain
 permalink_fill_color: "var(--accent)"
 background_color: "#f4f1df"

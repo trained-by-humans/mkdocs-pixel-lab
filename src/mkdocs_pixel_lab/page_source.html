@@ -11,3 +11,6 @@
 {% if source_url and config.theme.show_source %}
   <a class="page-source" href="{{ source_url | e }}" aria-label="View source" title="View source on GitHub"></a>
 {% endif %}
+{% if edit_url and config.theme.show_edit %}
+  <a class="page-edit" href="{{ edit_url | e }}" aria-label="Edit this page" title="Edit this page"></a>
+{% endif %}

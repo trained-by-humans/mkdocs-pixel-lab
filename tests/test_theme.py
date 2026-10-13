@@ -12,6 +12,8 @@ import threading
 from pathlib import Path
 
 import pytest
+from mkdocs.commands.build import build
+from mkdocs.config import load_config
 from playwright.sync_api import expect
 
 
@@ -47,8 +49,17 @@ def site_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
     return destination
 
 
-@pytest.fixture()
-def site_url(site_dir: Path):
+@pytest.fixture(scope="session")
+def edit_site_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    destination = tmp_path_factory.mktemp("edit-site")
+    config = load_config(
+        config_file=str(FIXTURE / "mkdocs.yml"), site_dir=str(destination), strict=True,
+    )
+    build(config)
+    return destination
+
+
+def serve_site(site_dir: Path):
     handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(site_dir))
     server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -60,12 +71,25 @@ def site_url(site_dir: Path):
         thread.join()
 
 
+@pytest.fixture()
+def site_url(site_dir: Path):
+    yield from serve_site(site_dir)
+
+
+@pytest.fixture()
+def edit_site_url(edit_site_dir: Path):
+    yield from serve_site(edit_site_dir)
+
+
 def test_strict_fixture_build(site_dir: Path) -> None:
     assert (site_dir / "index.html").is_file()
     assert (site_dir / "assets" / "css" / "style.css").is_file()
     icon = (site_dir / "assets/icons/page-source.svg").read_text()
     assert 'shape-rendering="crispEdges"' in icon
     assert "<path " in icon and "<image" not in icon
+    edit_icon = (site_dir / "assets/icons/page-edit.svg").read_text()
+    assert 'shape-rendering="crispEdges"' in edit_icon
+    assert 'id="edit-pixel"' in edit_icon and "<path " in edit_icon
 
 
 def test_page_source_icon_has_one_pixel_gap(page, site_url: str) -> None:
@@ -102,9 +126,9 @@ def test_page_source_icon_trails_title(page, site_url: str, width: int, long_tit
     )
     expect(source).to_have_attribute("title", "View source on GitHub")
     assert source.text_content().strip() == ""
-    expect(page.get_by_role("link", name="Edit this page", exact=True)).to_have_count(0)
+    expect(page.get_by_role("link", name="Edit this page", exact=True)).to_have_count(1)
     expect(page.locator(".footer .page-source")).to_have_count(0)
-    assert source.evaluate("element => element.parentElement.tagName === 'H1' && element.parentElement.lastChild === element")
+    assert source.evaluate("element => element.parentElement.tagName === 'H1' && element.nextElementSibling.classList.contains('page-edit')")
     font_size = title.evaluate("element => parseFloat(getComputedStyle(element).fontSize)")
     last_line = title.evaluate("""element => {
         const range = document.createRange();
@@ -154,6 +178,113 @@ def test_page_source_link_works_without_javascript(browser, site_url: str, width
             "href", "https://github.com/trained-by-humans/pixel-lab-fixture/blob/main/docs/guide/nested.md",
         )
         assert source.bounding_box()["y"] == pytest.approx(page.locator(".main h1").bounding_box()["y"], abs=1)
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+    finally:
+        context.close()
+
+
+def test_page_edit_icon_combines_supplied_pen_and_reference_line(page, edit_site_url: str) -> None:
+    page.goto(edit_site_url)
+    pixels = page.evaluate("""async () => {
+        const icon = new Image();
+        icon.src = new URL('assets/icons/page-edit.svg', document.baseURI).href;
+        await icon.decode();
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 36;
+        const context = canvas.getContext('2d');
+        context.drawImage(icon, 0, 0, 36, 36);
+        // Sample the composite SVG's 18×18 grid at twice its native resolution.
+        return Array.from({length: 18}, (_, y) =>
+            Array.from({length: 18}, (_, x) =>
+                context.getImageData(x * 2 + 1, y * 2 + 1, 1, 1).data[3] === 255 ? '#' : '.'
+            ).join(''));
+    }""")
+    assert pixels == [
+        "..................",
+        "............###...",
+        "...........##.##..",
+        "............#..#..",
+        ".........##..###..",
+        "........####..#...",
+        ".......##..##.....",
+        "......##...##.....",
+        ".....##...##......",
+        "....##...##.......",
+        "...##...##........",
+        "..##...##.........",
+        ".##...##..........",
+        ".#...##...........",
+        ".#..##........##..",
+        ".####......#####..",
+        "..................",
+        "..................",
+    ]
+
+
+@pytest.mark.parametrize("width", [1440, 390, 320])
+@pytest.mark.parametrize("long_title", [False, True])
+def test_page_edit_icon_trails_source(page, edit_site_url: str, width: int, long_title: bool) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(f"{edit_site_url}/guide/nested/")
+    page.evaluate("document.fonts.ready")
+    title = page.locator(".main h1")
+    if long_title:
+        title.evaluate("element => { element.firstChild.textContent = 'A very long documentation title that wraps across several lines'; }")
+    expect(title).to_have_attribute("id", "nested-page")
+    source = page.get_by_role("link", name="View source", exact=True)
+    edit = page.get_by_role("link", name="Edit this page", exact=True)
+    expect(edit).to_be_visible()
+    expect(edit).to_have_attribute(
+        "href", "https://github.com/trained-by-humans/pixel-lab-fixture/edit/main/docs/guide/nested.md",
+    )
+    expect(edit).to_have_attribute("title", "Edit this page")
+    assert edit.evaluate("element => element.parentElement.tagName === 'H1' && element.previousElementSibling.classList.contains('page-source') && element.parentElement.lastChild === element")
+    assert edit.text_content().strip() == ""
+    font_size = title.evaluate("element => parseFloat(getComputedStyle(element).fontSize)")
+    bounds = edit.bounding_box()
+    assert bounds["width"] == pytest.approx(font_size * 0.7, abs=0.1)
+    assert bounds["height"] == pytest.approx(font_size * 0.7, abs=0.1)
+    source_bounds = source.bounding_box()
+    # Either trails View source on the same line, or wraps without overlapping.
+    assert bounds["y"] > source_bounds["y"] or bounds["x"] >= source_bounds["x"] + source_bounds["width"]
+    expect(edit).to_have_css("background-color", "rgba(0, 0, 0, 0)")
+    expect(edit).to_have_css("border-top-width", "0px")
+    expect(edit).to_have_css("box-shadow", "none")
+    mask = edit.evaluate("element => getComputedStyle(element, '::after').maskImage")
+    assert mask.endswith('/assets/icons/page-edit.svg")')
+    assert edit.evaluate("element => getComputedStyle(element, '::before').opacity") == "0"
+    edit.hover()
+    assert edit.evaluate("element => getComputedStyle(element, '::before').opacity") == "1"
+    shadow_offset = edit.evaluate("""element => {
+        const matrix = new DOMMatrix(getComputedStyle(element, '::before').transform);
+        return [matrix.m41, matrix.m42];
+    }""")
+    assert shadow_offset == pytest.approx([font_size * 0.07] * 2, abs=0.01)
+    assert edit.bounding_box() == bounds
+    page.mouse.move(0, 0)
+    assert edit.evaluate("element => getComputedStyle(element, '::before').opacity") == "0"
+    source.focus()
+    page.keyboard.press("Tab")
+    expect(edit).to_be_focused()
+    expect(edit).to_have_css("outline-style", "solid")
+    assert edit.evaluate("element => getComputedStyle(element, '::before').opacity") == "1"
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+
+@pytest.mark.parametrize("width", [1440, 390, 320])
+def test_page_edit_link_works_without_javascript(browser, edit_site_url: str, width: int) -> None:
+    context = browser.new_context(java_script_enabled=False, viewport={"width": width, "height": 900})
+    try:
+        page = context.new_page()
+        page.goto(f"{edit_site_url}/guide/nested/")
+        source = page.get_by_role("link", name="View source", exact=True)
+        edit = page.get_by_role("link", name="Edit this page", exact=True)
+        expect(source).to_be_visible()
+        expect(edit).to_be_visible()
+        expect(edit).to_have_attribute(
+            "href", "https://github.com/trained-by-humans/pixel-lab-fixture/edit/main/docs/guide/nested.md",
+        )
+        assert edit.bounding_box()["x"] + edit.bounding_box()["width"] <= source.bounding_box()["x"]
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
     finally:
         context.close()

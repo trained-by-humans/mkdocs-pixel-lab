@@ -71,13 +71,13 @@ repository URL and the branch/directory containing your Markdown files:
 
 ```yaml
 repo_url: https://github.com/OWNER/REPO
-edit_uri: blob/main/docs/
+edit_uri: edit/main/docs/
 ```
 
 For `docs/guide/setup.md`, the link opens GitHub's `blob/main/docs/guide/setup.md`
 file view. Set the branch and directory explicitly; MkDocs' GitHub default is
-`edit/master/docs/`. Existing `edit_uri: edit/main/docs/` configurations work
-too: the theme converts the resolved GitHub editor URL to its file view.
+`edit/master/docs/`. The theme converts the resolved GitHub editor URL to its
+file view for View source, while the Edit this page icon keeps the editor URL.
 
 The link is enabled by default when available. Hide it with:
 
@@ -95,6 +95,41 @@ the heading's text or ID. Generated pages without a source mapping have no
 source link. Set `edit_uri: ""` to disable source links entirely (also remove
 `edit_uri_template` if configured). File-view URLs are inferred only for
 standard `github.com` URLs; other hosts do not display a source link.
+
+#### Edit action
+
+Like MkDocs' built-in themes, Pixel Lab shows an edit action whenever MkDocs
+provides `page.edit_url`. A pixelated pencil icon appears beside the
+source icon; no opt-in theme setting is required:
+
+```yaml
+repo_url: https://github.com/OWNER/REPO
+edit_uri: edit/main/docs/
+theme:
+  name: pixel-lab
+```
+
+`show_edit` is enabled by default and independent of `show_source`. Hide only
+the edit icon with:
+
+```yaml
+theme:
+  name: pixel-lab
+  show_edit: false
+```
+
+To disable MkDocs' edit URLs instead, set `edit_uri: ""` and remove any
+`edit_uri_template`. This also removes the inferred View source link.
+
+The edit icon uses the same title-relative sizing, transparent background, hover shadow,
+and keyboard focus styling as the source icon. Its accessible label and tooltip
+are **Edit this page**.
+
+The edit link uses MkDocs' resolved `page.edit_url` unchanged, including
+non-GitHub repositories, custom `edit_uri_template` URLs, and generator source
+mappings. Use your provider's editor path (`edit/main/docs/` for GitHub), not a
+file-view path such as `blob/main/docs/`, when enabling editing. Missing or
+disabled edit URLs omit the icon. No additional plugin or API request is needed.
 
 ### Heading links and keyboard access
 
