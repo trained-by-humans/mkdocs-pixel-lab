@@ -183,10 +183,12 @@ def test_component_and_scoped_overrides_render(
     source = DOCS / section / f"{name}.md"
     heading = "Further customization" if section == "setup" else "Customization"
     customization = guide_section(source, heading)
-    component_scope, scoped_overrides = customization.split("### Scoped overrides\n", 1)
+    theme_settings, overrides = customization.split("### Component-wide overrides\n", 1)
+    component_scope, scoped_overrides = overrides.split("### Scoped overrides\n", 1)
     assert "### Customize the component\n" not in customization
     assert "### Override an instance" not in customization
-    assert PARAMETER_HEADER in component_scope
+    assert PARAMETER_HEADER in theme_settings
+    assert "```css\n" not in theme_settings
     assert "index.md#load-custom-css" in component_scope
     assert "index.md#scope-selected-instances" in scoped_overrides
     all_css = re.findall(r"```css\n(.*?)\n```", component_scope, re.DOTALL)
@@ -211,6 +213,7 @@ def test_component_and_scoped_overrides_render(
     anchor = heading.lower().replace(" ", "-")
     assert f'<h2 id="{anchor}">{heading}' in rendered
     assert 'id="customize-the-component"' not in rendered
+    assert '<h3 id="component-wide-overrides">Component-wide overrides' in rendered
     assert '<h3 id="scoped-overrides">Scoped overrides' in rendered
     assert 'id="override-an-instance"' not in rendered
 
@@ -264,6 +267,7 @@ def test_common_stylesheet_and_wrapper_setup_is_centralized() -> None:
     scopes = guide_section(overview, "Customization scopes")
     assert "extra_css:" in scopes
     assert "  - md_in_html\n" in scopes
+    assert "**Component-wide overrides**" in scopes
     assert "**Scoped overrides**" in scopes
     assert "one or several instances" in scopes
     assert "### Scope selected instances\n" in scopes

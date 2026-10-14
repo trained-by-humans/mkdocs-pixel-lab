@@ -65,6 +65,8 @@ These Pixel Lab parameters belong under `theme`:
 
 See [Common attributes](../reference/configuration.md#common-attributes).
 
+### Component-wide overrides
+
 To customize only admonitions, add this to your
 [custom stylesheet](index.md#load-custom-css). It changes every admonition's
 title fill without changing other component types:

@@ -92,6 +92,8 @@ These Pixel Lab parameters belong under `theme`:
 
 See [Common attributes](../reference/configuration.md#common-attributes).
 
+### Component-wide overrides
+
 To customize the summary fill for all collapsible blocks without changing
 admonitions, add this to your [custom stylesheet](index.md#load-custom-css):
 

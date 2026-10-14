@@ -99,6 +99,8 @@ every possible token independently.
 Inline code has separate surface/border styling: see [Text and lists](text.md#customization).
 See [Common attributes](../reference/configuration.md#common-attributes).
 
+### Component-wide overrides
+
 To customize all highlighted code blocks without changing other component
 types, use their selector in a [custom stylesheet](index.md#load-custom-css):
 

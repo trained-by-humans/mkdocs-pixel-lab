@@ -118,8 +118,9 @@ Customization section:
 - [Images and video](../components/media.md#customization)
 - [Text and lists](../components/text.md#customization)
 
-Component guides distinguish **Customization** (all instances)
-from **Scoped overrides** (selected instances). Both can use `extra_css`;
+Under Customization, component guides distinguish theme settings,
+**Component-wide overrides** (CSS for all instances), and
+**Scoped overrides** (CSS for selected instances). Both CSS scopes use `extra_css`;
 a wrapper class scopes the selector rather than replacing the component's
 HTML. See [Customization scopes](../components/index.md#customization-scopes).
 

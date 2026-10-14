@@ -35,12 +35,13 @@ values to customize your own site.
 
 ## Customization scopes
 
-**Customization** means changing all instances of a component across
-the site. To style only one component type, load CSS through `extra_css`
-and use its component selector, such as `.admonition` or `.tabbed-set`.
+**Customization** groups the component's theme settings and CSS overrides.
 
 See [Common attributes](../reference/configuration.md#common-attributes) for
 theme settings, and the component guide for the specific mapping.
+
+**Component-wide overrides** style all instances of a component using CSS
+selectors such as `.admonition` or `.tabbed-set`, loaded through `extra_css`.
 
 **Scoped overrides** change selected instances while leaving the component's
 defaults and unselected instances unchanged. Use a wrapper class to limit

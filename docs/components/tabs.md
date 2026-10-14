@@ -155,6 +155,8 @@ These Pixel Lab parameters belong under `theme`:
 
 See [Common attributes](../reference/configuration.md#common-attributes).
 
+### Component-wide overrides
+
 To customize all tab groups without changing other component types, use a
 [custom stylesheet](index.md#load-custom-css). The `.tabbed-set` selector
 targets every group, rather than only groups inside a wrapper class:

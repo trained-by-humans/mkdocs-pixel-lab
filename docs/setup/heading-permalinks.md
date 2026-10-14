@@ -85,6 +85,8 @@ See [Common attributes](../reference/configuration.md#common-attributes) and the
 for extension options. Enabling `toc` doesn't add a visible page-contents
 sidebar in Pixel Lab.
 
+### Component-wide overrides
+
 To customize the hover/focus shadow for all heading links without changing
 navigation colors, use a [custom stylesheet](../components/index.md#load-custom-css):
 

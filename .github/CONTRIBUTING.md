@@ -63,9 +63,9 @@ explanations of shared theme settings. Distinguish native MkDocs settings and
 CSS from theme options.
 Configuration defaults in Reference are checked against the theme by tests.
 
-In visible component guides, use Customization for all instances and add only
-the Scoped overrides subheading for selected instances. Show component-scoped
-CSS for all instances, and use a wrapper-scoped selector for selected instances.
+In visible component guides, keep theme settings first under Customization.
+Use Component-wide overrides for CSS targeting all instances, and Scoped
+overrides for wrapper-scoped CSS targeting selected instances.
 Explain that the wrapper class can be reused for one or several instances.
 Both CSS scopes use `extra_css`;
 don't describe an HTML wrapper or native HTML authoring as a different styling

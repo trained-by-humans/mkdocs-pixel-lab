@@ -91,6 +91,8 @@ For the body text, outline, and shadow:
 
 See [Common attributes](../reference/configuration.md#common-attributes).
 
+### Component-wide overrides
+
 To customize all tip alerts through a [custom stylesheet](index.md#load-custom-css),
 target their component class:
 
