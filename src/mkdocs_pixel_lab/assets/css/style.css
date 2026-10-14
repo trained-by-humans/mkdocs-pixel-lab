@@ -55,6 +55,7 @@ body {
   display: inline-flex;
   font: 700 17px/1 "IBM Plex Mono", monospace;
   letter-spacing: -0.04em;
+  min-width: 0;
   text-decoration: none;
   text-transform: uppercase;
 }
@@ -69,7 +70,7 @@ body {
   width: 16px;
   flex-shrink: 0;
 }
-.brand__name { min-width: 0; }
+.brand__name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .brand-trademark__glyph { display: block; height: 7px; width: 12px; }
 .brand-trademark__outline { fill: var(--accent); }
 .brand-trademark__rim { fill: var(--accent-dark); }
@@ -668,6 +669,17 @@ details > * { max-width: none; }
   .package-inline { display: none; }
   .package-footer { align-items: flex-start; flex-direction: column; gap: 5px; }
   .package-footer__divider { display: none; }
+  /* Use the same compact layout as navigation, regardless of optional buttons. */
+  .brand { margin-right: 10px; }
+  .header-right .header-btn__label,
+  .site-switcher__arrow { display: none; }
+  .header-right .header-btn {
+    gap: 0;
+    height: 34px;
+    justify-content: center;
+    padding: 8px;
+    width: 34px;
+  }
   .header-btn--menu {
     align-items: center;
     cursor: pointer;
@@ -749,9 +761,5 @@ details > * { max-width: none; }
 }
 
 @media (max-width: 600px) {
-  .header:has(.site-switcher, .header-btn--repo) .brand { min-width: 0; }
-  .header:has(.site-switcher, .header-btn--repo) .brand__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .header:has(.site-switcher, .header-btn--repo) .header-btn__label,
-  .site-switcher__arrow { display: none; }
   .site-switcher { position: static; }
 }

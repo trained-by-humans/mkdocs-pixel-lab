@@ -66,7 +66,7 @@ def custom_icons_page(request, browser, custom_icons_site):
     context.close()
 
 
-@pytest.mark.parametrize("width", [1440, 390, 320])
+@pytest.mark.parametrize("width", [1440, 851, 850, 700, 390, 320])
 def test_custom_toolbar_icons_keep_controls_and_layout(custom_icons_page, width):
     page, icons, javascript = custom_icons_page
     page.set_viewport_size({"width": width, "height": 900})
@@ -87,7 +87,7 @@ def test_custom_toolbar_icons_keep_controls_and_layout(custom_icons_page, width)
         expect(image).to_have_count(1)
         expect(image).to_have_attribute("alt", "")
         expect(image).to_have_attribute("aria-hidden", "true")
-        if key == "close" or (key == "menu" and width > 850) or (key == "dropdown" and width <= 600):
+        if key == "close" or (key == "menu" and width > 850) or (key == "dropdown" and width <= 850):
             expect(image).to_be_hidden()
             continue
         expect(image).to_be_visible()

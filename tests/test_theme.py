@@ -564,7 +564,7 @@ def test_default_search_icon_in_toolbar(browser, site_url: str, width: int, java
         context.close()
 
 
-@pytest.mark.parametrize("width", [1440, 850, 600, 390, 320])
+@pytest.mark.parametrize("width", [1440, 851, 850, 700, 600, 390, 320])
 @pytest.mark.parametrize("javascript", [True, False])
 def test_repository_button_in_toolbar(browser, site_url: str, width: int, javascript: bool) -> None:
     context = browser.new_context(java_script_enabled=javascript, viewport={"width": width, "height": 900})
@@ -582,7 +582,7 @@ def test_repository_button_in_toolbar(browser, site_url: str, width: int, javasc
         expect(repo).to_have_css("box-shadow", "none")
         expect(repo).to_have_css("transform", "none")
         label = repo.locator(".header-btn__label")
-        if width <= 600:
+        if width <= 850:
             expect(label).to_be_hidden()
         else:
             expect(label).to_be_visible()

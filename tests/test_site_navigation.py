@@ -608,7 +608,7 @@ def test_dropdown_items_and_icons(navigation_page, path):
     expect(toggle).to_have_attribute("aria-expanded", "false")
 
 
-@pytest.mark.parametrize("width", [1440, 850, 600, 390, 320])
+@pytest.mark.parametrize("width", [1440, 851, 850, 700, 601, 600, 390, 320])
 def test_dropdown_responsive_layout(navigation_page, width):
     page = navigation_page
     page.set_viewport_size({"width": width, "height": 900})
@@ -626,11 +626,54 @@ def test_dropdown_responsive_layout(navigation_page, width):
     assert bounds["x"] + bounds["width"] <= width
     assert bounds["width"] <= 224
     assert page.locator(".header").evaluate("e => e.scrollWidth") <= width
-    if width <= 600:
-        expect(toggle.locator(".header-btn__label")).to_be_hidden()
+    for button in [page.locator(".header-btn--repo"), toggle, search]:
+        label = button.locator(".header-btn__label")
+        if width <= 850:
+            expect(label).to_be_hidden()
+            expect(button).to_have_css("width", "34px")
+            expect(button).to_have_css("height", "34px")
+        else:
+            expect(label).to_be_visible()
+    arrow = toggle.locator(".site-switcher__arrow")
+    if width <= 850:
+        expect(arrow).to_be_hidden()
+    else:
+        expect(arrow).to_be_visible()
+    expect(page.locator(".brand__name")).to_have_css("white-space", "nowrap")
+    assert page.locator(".brand").bounding_box()["height"] == pytest.approx(17, abs=1)
     page.mouse.click(5, 500)
     expect(panel).to_be_hidden()
     expect(toggle).to_have_attribute("aria-expanded", "false")
+
+
+@pytest.mark.parametrize("width", [850, 700, 390, 320])
+@pytest.mark.parametrize("repo,packages", [(False, False), (True, False), (False, True), (True, True)])
+def test_compact_toolbar_does_not_depend_on_optional_buttons(navigation_page, width, repo, packages):
+    page = navigation_page
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(ORIGIN)
+    page.evaluate("document.fonts.ready")
+    # Exercise each optional-control combination against the same built page.
+    if not repo:
+        page.locator(".header-btn--repo").evaluate("element => element.remove()")
+    if not packages:
+        page.locator(".site-switcher").evaluate("element => element.remove()")
+    brand = page.locator(".brand")
+    expect(brand).to_have_text("ML-PIPES-SUPERVISION")
+    assert brand.bounding_box()["height"] == pytest.approx(17, abs=1)
+    for label in page.locator(".header-right .header-btn__label").all():
+        expect(label).to_be_hidden()
+    search = page.get_by_role("button", name="SEARCH", exact=True)
+    expect(search).to_be_visible()
+    expect(search).to_have_attribute("title", "Search documentation")
+    expect(search).to_have_css("width", "34px")
+    expect(search).to_have_css("height", "34px")
+    toolbar = page.locator(".header-right").bounding_box()
+    brand_bounds = brand.bounding_box()
+    assert brand_bounds["x"] + brand_bounds["width"] + 10 <= toolbar["x"] + 0.1
+    assert toolbar["x"] + toolbar["width"] <= width - 2
+    assert page.locator(".header").evaluate("element => element.scrollWidth <= element.clientWidth")
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
 
 
 def test_dropdown_keyboard_and_search(navigation_page):

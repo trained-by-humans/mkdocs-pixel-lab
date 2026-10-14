@@ -61,6 +61,11 @@ plugins:
   - search
 ```
 
+At 850px and below, the toolbar switches to icon-only buttons alongside the
+navigation toggle. Accessible labels and tooltips remain available. The site
+name stays on one line and truncates with an ellipsis only if space runs out.
+This responsive layout works without JavaScript.
+
 ### Repository button
 
 Set MkDocs' `repo_url` to show a repository button in the toolbar:
