@@ -91,14 +91,24 @@ body {
 .header-btn__icon { font: 17px/0.8 system-ui, sans-serif; transform: translateY(-1px); }
 .header-btn--repo { text-decoration: none; text-transform: uppercase; white-space: nowrap; }
 .header-btn--repo .header-btn__label { max-width: 12rem; overflow: hidden; text-overflow: ellipsis; }
-.header-btn__icon--repo {
-  background: currentColor;
+.header-btn__icon--repo,
+.header-btn__icon--custom {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  display: block;
   flex-shrink: 0;
   height: 14px;
-  -webkit-mask: url("../icons/repository.svg") center / contain no-repeat;
-  mask: url("../icons/repository.svg") center / contain no-repeat;
+  margin: 0;
+  max-width: none;
+  object-fit: contain;
   transform: none;
   width: 14px;
+}
+span.header-btn__icon--repo {
+  background: currentColor;
+  -webkit-mask: url("../icons/repository.svg") center / contain no-repeat;
+  mask: url("../icons/repository.svg") center / contain no-repeat;
 }
 .header-btn--menu {
   display: none;
@@ -426,6 +436,24 @@ p, li { max-width: 760px; }
 [data-permalink-icon="chain"] .headerlink:focus-visible::before {
   opacity: 1;
 }
+[data-permalink-icon="custom"] .headerlink { overflow: visible; }
+[data-permalink-icon="custom"] .headerlink::before {
+  background: var(--accent-dark);
+  opacity: 0;
+  transform: translate(0.07em, 0.07em);
+}
+[data-permalink-icon="custom"] .headerlink:hover::before,
+[data-permalink-icon="custom"] .headerlink:focus-visible::before { opacity: 1; }
+/* A TOC-supplied symbol is text, not a replacement theme mask. */
+[data-permalink-icon="text"] .headerlink {
+  height: auto;
+  overflow: visible;
+  text-indent: 0;
+  width: auto;
+}
+[data-permalink-icon="text"] .headerlink::before,
+[data-permalink-icon="text"] .headerlink::after { content: none; }
+[data-permalink-leading="true"] .headerlink { margin-left: 0; margin-right: 0.45rem; }
 .main h2[id],
 .main h3[id],
 .main h4[id],
@@ -721,6 +749,7 @@ details > * { max-width: none; }
     text-transform: uppercase;
   }
   .mobile-nav__close { padding: 5px 7px; }
+  .mobile-nav__close:has(img) { align-items: center; display: inline-flex; gap: 6px; }
   .mobile-nav__content { padding: 18px 0 32px; }
   .mobile-nav__top {
     color: var(--ink);

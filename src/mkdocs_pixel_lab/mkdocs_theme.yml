@@ -4,6 +4,16 @@ footer_text: ""
 show_repo: true
 show_source: true
 show_edit: true
+icon:
+  repo: null
+  search: null
+  menu: null
+  close: null
+  sites: null
+  dropdown: null
+  view: null
+  edit: null
+  permalink: null
 permalink_icon: chain
 permalink_fill_color: "var(--accent)"
 background_color: "#f4f1df"

@@ -73,3 +73,43 @@ def test_repository_button_supports_providers_and_custom_labels(tmp_path, repo_u
     label_match = re.search(r'<span class="header-btn__label">([^<]*)</span>', link[4])
     assert label_match is not None
     assert unescape(label_match[1]) == label
+
+
+@pytest.mark.parametrize("icons", [None, {}, {"repo": None}, {"repo": ""}, {"repo": "  "}, {"menu": "other.svg"}])
+def test_repository_icon_defaults_to_theme_artwork(tmp_path, icons):
+    config = load_config(config_file=str(FIXTURE), site_dir=str(tmp_path), strict=True)
+    assert config.theme["icon"]["repo"] is None
+    config.theme["icon"] = icons
+    build(config)
+    html = (tmp_path / "guide/nested/index.html").read_text()
+    assert '<span class="header-btn__icon header-btn__icon--repo" aria-hidden="true"></span>' in html
+    assert '<img class="header-btn__icon header-btn__icon--repo"' not in html
+
+
+@pytest.mark.parametrize("directory_urls", [True, False])
+@pytest.mark.parametrize("icon", [
+    "assets/site-navigation-hover.svg#icon-hover",
+    "assets/favicon.png",
+    "https://icons.example.org/repo.svg?color=green&version=1",
+])
+def test_custom_repository_icon_urls(tmp_path, directory_urls, icon):
+    config = load_config(
+        config_file=str(FIXTURE), site_dir=str(tmp_path), strict=True,
+        use_directory_urls=directory_urls,
+    )
+    config.theme["icon"] = {"repo": icon}
+    build(config)
+    for path, prefix in [
+        ("index.html", ""),
+        ("guide/nested/index.html" if directory_urls else "guide/nested.html",
+         "../../" if directory_urls else "../"),
+    ]:
+        html = (tmp_path / path).read_text()
+        image = re.search(
+            r'<img class="header-btn__icon header-btn__icon--repo" src="([^"]*)" alt="" aria-hidden="true" width="14" height="14"',
+            html,
+        )
+        assert image is not None
+        assert unescape(image[1]) == (icon if icon.startswith("https://") else prefix + icon)
+        assert '<span class="header-btn__icon header-btn__icon--repo"' not in html
+        assert f'href="{REPOSITORY}" aria-label="Open repository: GitHub"' in html

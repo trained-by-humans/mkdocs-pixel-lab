@@ -81,6 +81,24 @@ def edit_site_url(edit_site_dir: Path):
     yield from serve_site(edit_site_dir)
 
 
+@pytest.fixture(scope="session", params=["assets/site-navigation-hover.svg#icon-hover", "assets/favicon.png"])
+def custom_repo_site_dir(request, tmp_path_factory):
+    destination = tmp_path_factory.mktemp("custom-repo-site")
+    config = load_config(
+        config_file=str(FIXTURE / "mkdocs.yml"), site_dir=str(destination), strict=True,
+    )
+    config.theme["icon"] = {"repo": request.param}
+    build(config)
+    return destination, request.param
+
+
+@pytest.fixture()
+def custom_repo_site_url(custom_repo_site_dir):
+    destination, icon = custom_repo_site_dir
+    for url in serve_site(destination):
+        yield url, icon
+
+
 def test_strict_fixture_build(site_dir: Path) -> None:
     assert (site_dir / "index.html").is_file()
     assert (site_dir / "assets" / "css" / "style.css").is_file()
@@ -545,6 +563,52 @@ def test_repository_button_in_toolbar(browser, site_url: str, width: int, javasc
         repo.focus()
         expect(repo).to_be_focused()
         expect(repo).to_have_css("box-shadow", "rgb(101, 67, 33) 3px 3px 0px 0px")
+        page.route("https://github.com/trained-by-humans/pixel-lab-fixture",
+                   lambda route: route.fulfill(content_type="text/html", body="<h1>Repository</h1>"))
+        page.keyboard.press("Enter")
+        expect(page).to_have_url("https://github.com/trained-by-humans/pixel-lab-fixture")
+    finally:
+        context.close()
+
+
+@pytest.mark.parametrize("width", [1440, 390, 320])
+@pytest.mark.parametrize("javascript", [True, False])
+def test_custom_repository_icon_in_toolbar(browser, custom_repo_site_url, width, javascript):
+    site_url, icon_path = custom_repo_site_url
+    context = browser.new_context(java_script_enabled=javascript, viewport={"width": width, "height": 900})
+    try:
+        page = context.new_page()
+        page.goto(f"{site_url}/guide/nested/")
+        page.evaluate("document.fonts.ready")
+        repo = page.get_by_role("link", name="Open repository: GitHub", exact=True)
+        expect(repo).to_be_visible()
+        icon = repo.locator("img.header-btn__icon--repo")
+        expect(icon).to_be_visible()
+        expect(icon).to_have_attribute("src", "../../" + icon_path)
+        expect(icon).to_have_attribute("alt", "")
+        expect(icon).to_have_attribute("aria-hidden", "true")
+        icon.evaluate("image => image.decode()")
+        assert icon.evaluate("image => image.naturalWidth > 0")
+        for dimension in ("width", "height"):
+            expect(icon).to_have_css(dimension, "14px")
+        expect(icon).to_have_css("background-color", "rgba(0, 0, 0, 0)")
+        expect(icon).to_have_css("border-top-width", "0px")
+        expect(icon).to_have_css("box-shadow", "none")
+        expect(icon).to_have_css("mask-image", "none")
+        expect(icon).to_have_css("margin-top", "0px")
+        expect(icon).to_have_css("object-fit", "contain")
+        expect(icon).to_have_css("max-width", "none")
+        expect(repo).to_have_css("box-shadow", "none")
+        repo.hover()
+        expect(repo).to_have_css("transform", "matrix(1, 0, 0, 1, -3, -3)")
+        expect(repo).to_have_css("box-shadow", "rgb(101, 67, 33) 3px 3px 0px 0px")
+        expect(icon).to_have_css("box-shadow", "none")
+        page.mouse.move(0, 800)
+        page.keyboard.press("Tab")
+        repo.focus()
+        expect(repo).to_be_focused()
+        expect(repo).to_have_css("box-shadow", "rgb(101, 67, 33) 3px 3px 0px 0px")
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
         page.route("https://github.com/trained-by-humans/pixel-lab-fixture",
                    lambda route: route.fulfill(content_type="text/html", body="<h1>Repository</h1>"))
         page.keyboard.press("Enter")
