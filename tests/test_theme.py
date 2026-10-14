@@ -203,41 +203,45 @@ def test_page_source_link_works_without_javascript(browser, site_url: str, width
         context.close()
 
 
-def test_page_edit_icon_combines_supplied_pen_and_reference_line(page, edit_site_url: str) -> None:
+def test_page_edit_icon_uses_pen_nib_and_stepped_underline(page, edit_site_url: str) -> None:
     page.goto(edit_site_url)
     pixels = page.evaluate("""async () => {
         const icon = new Image();
         icon.src = new URL('assets/icons/page-edit.svg', document.baseURI).href;
         await icon.decode();
         const canvas = document.createElement('canvas');
-        canvas.width = canvas.height = 36;
+        canvas.width = canvas.height = 44;
         const context = canvas.getContext('2d');
-        context.drawImage(icon, 0, 0, 36, 36);
-        // Sample the composite SVG's 18×18 grid at twice its native resolution.
-        return Array.from({length: 18}, (_, y) =>
-            Array.from({length: 18}, (_, x) =>
+        context.drawImage(icon, 0, 0, 44, 44);
+        // Sample the selected pen-nib silhouette and its stepped underline.
+        return Array.from({length: 22}, (_, y) =>
+            Array.from({length: 22}, (_, x) =>
                 context.getImageData(x * 2 + 1, y * 2 + 1, 1, 1).data[3] === 255 ? '#' : '.'
             ).join(''));
     }""")
     assert pixels == [
-        "..................",
-        "............###...",
-        "...........##.##..",
-        "............#..#..",
-        ".........##..###..",
-        "........####..#...",
-        ".......##..##.....",
-        "......##...##.....",
-        ".....##...##......",
-        "....##...##.......",
-        "...##...##........",
-        "..##...##.........",
-        ".##...##..........",
-        ".#...##...........",
-        ".#..##........##..",
-        ".####......#####..",
-        "..................",
-        "..................",
+        "................###...",
+        "...............#####..",
+        "..............#######.",
+        ".............#########",
+        "...........###########",
+        "........##############",
+        ".....######...#######.",
+        "....####.......#####..",
+        "....##..........###...",
+        "...##...........##....",
+        "...##...........##....",
+        "...##..###.....##.....",
+        "..##...####....##.....",
+        "..##...####....##.....",
+        "..##..#####...##......",
+        ".##..###......##......",
+        ".##.###......###......",
+        ".#####....#####.......",
+        "#####..######.........",
+        "##########.........###",
+        "#######........#######",
+        ".###...........#######",
     ]
 
 

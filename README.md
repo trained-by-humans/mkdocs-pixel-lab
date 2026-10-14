@@ -195,7 +195,7 @@ standard `github.com` URLs; other hosts do not display a source link.
 #### Edit action
 
 Like MkDocs' built-in themes, Pixel Lab shows an edit action whenever MkDocs
-provides `page.edit_url`. A pixelated pencil icon appears beside the
+provides `page.edit_url`. A pixelated pen-nib icon appears beside the
 source icon; no opt-in theme setting is required:
 
 ```yaml
