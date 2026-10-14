@@ -99,6 +99,28 @@ def custom_repo_site_url(custom_repo_site_dir):
         yield url, icon
 
 
+@pytest.fixture(scope="session", params=[None, "assets/site-navigation-hover.svg#icon-hover", "assets/favicon.png"], ids=["default", "svg", "png"])
+def icon_only_repo_site_dir(request, tmp_path_factory):
+    destination = tmp_path_factory.mktemp("icon-only-repo-site")
+    config = load_config(
+        config_file=str(FIXTURE / "mkdocs.yml"), site_dir=str(destination), strict=True,
+    )
+    config.theme["show_repo_name"] = False
+    config.theme["icon"] = {"repo": request.param}
+    config.repo_name = 'Fixture "source" & code'
+    config.extra["site_navigation"] = {
+        "dropdown_label": "Packages",
+        "items": [{"title": "Guide", "url": "guide/nested/"}],
+    }
+    build(config)
+    return destination
+
+
+@pytest.fixture()
+def icon_only_repo_site_url(icon_only_repo_site_dir):
+    yield from serve_site(icon_only_repo_site_dir)
+
+
 def test_strict_fixture_build(site_dir: Path) -> None:
     assert (site_dir / "index.html").is_file()
     assert (site_dir / "assets" / "css" / "style.css").is_file()
@@ -649,6 +671,50 @@ def test_custom_repository_icon_in_toolbar(browser, custom_repo_site_url, width,
         repo.focus()
         expect(repo).to_be_focused()
         expect(repo).to_have_css("box-shadow", "rgb(101, 67, 33) 3px 3px 0px 0px")
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+        page.route("https://github.com/trained-by-humans/pixel-lab-fixture",
+                   lambda route: route.fulfill(content_type="text/html", body="<h1>Repository</h1>"))
+        page.keyboard.press("Enter")
+        expect(page).to_have_url("https://github.com/trained-by-humans/pixel-lab-fixture")
+    finally:
+        context.close()
+
+
+@pytest.mark.parametrize("width", [1440, 850, 390, 320])
+@pytest.mark.parametrize("javascript", [True, False])
+def test_icon_only_repository_button(browser, icon_only_repo_site_url, width, javascript):
+    context = browser.new_context(java_script_enabled=javascript, viewport={"width": width, "height": 900})
+    try:
+        page = context.new_page()
+        page.goto(f"{icon_only_repo_site_url}/guide/nested/")
+        page.evaluate("document.fonts.ready")
+        repo = page.get_by_role("link", name='Open repository: Fixture "source" & code', exact=True)
+        expect(repo).to_be_visible()
+        expect(repo).to_have_attribute("title", 'Open repository: Fixture "source" & code')
+        expect(repo).to_have_attribute("href", "https://github.com/trained-by-humans/pixel-lab-fixture")
+        expect(repo.locator(".header-btn__label")).to_have_count(0)
+        assert repo.text_content().strip() == ""
+        icon = repo.locator(".header-btn__icon--repo")
+        expect(icon).to_be_visible()
+        expect(icon).to_have_attribute("aria-hidden", "true")
+        expect(icon).to_have_css("width", "14px")
+        expect(icon).to_have_css("height", "14px")
+        if icon.evaluate("element => element.tagName") == "IMG":
+            icon.evaluate("image => image.decode()")
+            assert icon.evaluate("image => image.naturalWidth > 0")
+        expect(repo).to_have_css("width", "34px" if width <= 850 else "42px")
+        search = page.get_by_role("button", name="SEARCH", exact=True)
+        search_bounds, repo_bounds = search.bounding_box(), repo.bounding_box()
+        assert search_bounds["height"] == pytest.approx(repo_bounds["height"], abs=1)
+        assert search_bounds["x"] + search_bounds["width"] <= repo_bounds["x"]
+        assert repo_bounds["x"] + repo_bounds["width"] <= width
+        search.focus()
+        page.keyboard.press("Tab")
+        expect(repo).to_be_focused()
+        expect(repo).to_have_css("box-shadow", "rgb(101, 67, 33) 3px 3px 0px 0px")
+        repo.hover()
+        expect(repo).to_have_css("transform", "matrix(1, 0, 0, 1, -3, -3)")
+        expect(icon).to_have_css("box-shadow", "none")
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
         page.route("https://github.com/trained-by-humans/pixel-lab-fixture",
                    lambda route: route.fulfill(content_type="text/html", body="<h1>Repository</h1>"))

@@ -120,7 +120,7 @@
           {% set repo_label = config.repo_name or "Repository" %}
           <a class="header-btn header-btn--repo" href="{{ config.repo_url | e }}" aria-label="Open repository: {{ repo_label | e }}" title="Open repository: {{ repo_label | e }}">
             {% call icon_image("repo", "header-btn__icon header-btn__icon--repo") %}<span class="header-btn__icon header-btn__icon--repo" aria-hidden="true"></span>{% endcall %}
-            <span class="header-btn__label">{{ repo_label | e }}</span>
+            {% if config.theme.show_repo_name %}<span class="header-btn__label">{{ repo_label | e }}</span>{% endif %}
           </a>
         {% endif %}
       </div>

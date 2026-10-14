@@ -82,6 +82,18 @@ It has a pixelated Git branch icon and the same hover/focus highlight, shadow,
 and lift as the other toolbar buttons. On small screens, only the icon is shown,
 with its accessible label and tooltip preserved. It works without JavaScript.
 
+To show only the repository icon at every screen size, set `show_repo_name`
+to `false` (the default is `true`):
+
+```yaml
+theme:
+  name: pixel-lab
+  show_repo_name: false
+```
+
+The link, custom icon, accessible label, and tooltip are unchanged. This setting
+only hides the visible name; it does not enable or disable the repository button.
+
 `show_repo` is enabled by default. Hide the button without affecting page
 source/edit actions:
 
