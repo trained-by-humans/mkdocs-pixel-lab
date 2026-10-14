@@ -110,9 +110,9 @@ def test_custom_toolbar_icons_keep_controls_and_layout(custom_icons_page, width)
     expect(search).to_have_attribute("aria-label", "SEARCH")
     expect(search.locator(".header-btn__icon--search")).to_have_count(0)
     repo_bounds, package_bounds, search_bounds = (element.bounding_box() for element in (repo, packages, search))
-    assert repo_bounds["x"] + repo_bounds["width"] <= package_bounds["x"]
     assert package_bounds["x"] + package_bounds["width"] <= search_bounds["x"]
-    assert search_bounds["x"] + search_bounds["width"] <= width - 2
+    assert search_bounds["x"] + search_bounds["width"] <= repo_bounds["x"]
+    assert repo_bounds["x"] + repo_bounds["width"] <= width - 2
     search.hover()
     expect(search).to_have_css("transform", "matrix(1, 0, 0, 1, -3, -3)")
     page.mouse.move(0, 800)

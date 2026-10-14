@@ -38,7 +38,7 @@ def test_repository_button_visibility(tmp_path, repo_url, show_repo, edit_uri, s
         assert html.count('class="header-btn header-btn--repo"') == int(enabled)
         if enabled:
             assert f'href="{repo_url}" aria-label="Open repository:' in html
-            assert html.index('class="header-btn header-btn--repo"') < html.index('id="search-toggle"')
+            assert html.index('id="search-toggle"') < html.index('class="header-btn header-btn--repo"')
         if repo_url and edit_uri and show_actions:
             assert 'class="page-edit"' in html
         if not repo_url and edit_uri and show_actions:

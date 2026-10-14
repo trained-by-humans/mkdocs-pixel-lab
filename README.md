@@ -61,8 +61,10 @@ plugins:
   - search
 ```
 
-At 850px and below, the toolbar switches to icon-only buttons alongside the
-navigation toggle. Accessible labels and tooltips remain available. The site
+Toolbar actions appear in the order **Packages → Search → Repository**, with
+optional actions omitted when not configured. At 850px and below, the toolbar
+switches to icon-only buttons alongside the navigation toggle. Accessible
+labels and tooltips remain available. The site
 name stays on one line and truncates with an ellipsis only if space runs out.
 This responsive layout works without JavaScript.
 

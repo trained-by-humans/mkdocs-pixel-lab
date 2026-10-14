@@ -105,13 +105,6 @@
         </nav>
       {% endif %}
       <div class="header-right">
-        {% if config.repo_url and config.theme.show_repo %}
-          {% set repo_label = config.repo_name or "Repository" %}
-          <a class="header-btn header-btn--repo" href="{{ config.repo_url | e }}" aria-label="Open repository: {{ repo_label | e }}" title="Open repository: {{ repo_label | e }}">
-            {% call icon_image("repo", "header-btn__icon header-btn__icon--repo") %}<span class="header-btn__icon header-btn__icon--repo" aria-hidden="true"></span>{% endcall %}
-            <span class="header-btn__label">{{ repo_label | e }}</span>
-          </a>
-        {% endif %}
         {% include "site_navigation.html" %}
         <div class="search-shell">
           <button class="header-btn header-btn--search" id="search-toggle" type="button" aria-label="SEARCH" title="Search documentation" aria-expanded="false" aria-controls="search-panel">{% call icon_image("search", "header-btn__icon header-btn__icon--custom") %}<span class="header-btn__icon header-btn__icon--search" aria-hidden="true"></span>{% endcall %}<span class="header-btn__label">SEARCH</span></button>
@@ -123,6 +116,13 @@
             <div id="mkdocs-search-results" class="search-results" data-no-results-text="No matching pages."></div>
           </div>
         </div>
+        {% if config.repo_url and config.theme.show_repo %}
+          {% set repo_label = config.repo_name or "Repository" %}
+          <a class="header-btn header-btn--repo" href="{{ config.repo_url | e }}" aria-label="Open repository: {{ repo_label | e }}" title="Open repository: {{ repo_label | e }}">
+            {% call icon_image("repo", "header-btn__icon header-btn__icon--repo") %}<span class="header-btn__icon header-btn__icon--repo" aria-hidden="true"></span>{% endcall %}
+            <span class="header-btn__label">{{ repo_label | e }}</span>
+          </a>
+        {% endif %}
       </div>
     </header>
     <nav class="tabs" aria-label="Primary navigation">

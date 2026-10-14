@@ -95,8 +95,8 @@ def test_navigation_placements(tmp_path, navigation, dropdown, inline, footer):
     assert ('class="package-footer"' in html) is footer
 
 
-@pytest.mark.parametrize("width", [1440, 390, 320])
-def test_repository_precedes_packages(navigation_page, width):
+@pytest.mark.parametrize("width", [1440, 851, 850, 700, 390, 320])
+def test_toolbar_order_is_packages_search_repository(navigation_page, width):
     page = navigation_page
     page.set_viewport_size({"width": width, "height": 900})
     page.goto(ORIGIN)
@@ -105,18 +105,22 @@ def test_repository_precedes_packages(navigation_page, width):
     packages = page.get_by_role("button", name="Packages", exact=True)
     search = page.get_by_role("button", name="SEARCH", exact=True)
     expect(repo).to_be_visible()
-    assert repo.evaluate("element => element.nextElementSibling.classList.contains('site-switcher')")
+    assert page.locator(".header-right").evaluate("""element =>
+        [...element.children].map(child =>
+            child.matches('.site-switcher') ? 'packages' :
+            child.matches('.search-shell') ? 'search' : 'repository'
+        )""") == ["packages", "search", "repository"]
     repo_bounds = repo.bounding_box()
     package_bounds = packages.bounding_box()
     search_bounds = search.bounding_box()
-    assert repo_bounds["x"] + repo_bounds["width"] <= package_bounds["x"]
     assert package_bounds["x"] + package_bounds["width"] <= search_bounds["x"]
-    assert search_bounds["x"] + search_bounds["width"] <= width - 2
-    repo.focus()
-    page.keyboard.press("Tab")
-    expect(packages).to_be_focused()
+    assert search_bounds["x"] + search_bounds["width"] <= repo_bounds["x"]
+    assert repo_bounds["x"] + repo_bounds["width"] <= width - 2
+    packages.focus()
     page.keyboard.press("Tab")
     expect(search).to_be_focused()
+    page.keyboard.press("Tab")
+    expect(repo).to_be_focused()
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
 
 
@@ -238,7 +242,7 @@ def test_lifted_toolbar_button_original_corner_remains_clickable(navigation_page
     expect(shell).to_have_class(re.compile(r"\bis-preview\b"))
 
 
-@pytest.mark.parametrize("width", [1440, 390])
+@pytest.mark.parametrize("width", [1440, 850, 700, 390, 320])
 def test_search_hover_bridge_and_input_activation(navigation_page, width):
     page = navigation_page
     page.set_viewport_size({"width": width, "height": 900})
@@ -259,6 +263,8 @@ def test_search_hover_bridge_and_input_activation(navigation_page, width):
     expect(panel).to_have_css("transform", "matrix(1, 0, 0, 1, 0, 0)")
     button_bounds = toggle.bounding_box()
     panel_bounds = panel.bounding_box()
+    assert panel_bounds["x"] >= 0
+    assert panel_bounds["x"] + panel_bounds["width"] <= width
     button_bottom = button_bounds["y"] + button_bounds["height"]
     gap = panel_bounds["y"] - button_bottom
     assert gap == pytest.approx(13)
@@ -674,6 +680,12 @@ def test_compact_toolbar_does_not_depend_on_optional_buttons(navigation_page, wi
     assert toolbar["x"] + toolbar["width"] <= width - 2
     assert page.locator(".header").evaluate("element => element.scrollWidth <= element.clientWidth")
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+    search.click()
+    expect(page.locator("#mkdocs-search-query")).to_be_focused()
+    panel = page.locator("#search-panel").bounding_box()
+    assert panel["x"] >= 0
+    assert panel["x"] + panel["width"] <= width
+    page.keyboard.press("Escape")
 
 
 def test_dropdown_keyboard_and_search(navigation_page):

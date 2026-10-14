@@ -590,8 +590,8 @@ def test_repository_button_in_toolbar(browser, site_url: str, width: int, javasc
         brand = page.locator(".brand").bounding_box()
         search = page.locator("#search-toggle").bounding_box()
         assert bounds["x"] >= brand["x"] + brand["width"]
-        assert bounds["x"] + bounds["width"] <= search["x"]
-        assert search["x"] + search["width"] <= width - 2
+        assert search["x"] + search["width"] <= bounds["x"]
+        assert bounds["x"] + bounds["width"] <= width - 2
         assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
 
         repo.hover()

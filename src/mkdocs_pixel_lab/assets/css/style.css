@@ -76,7 +76,6 @@ body {
 .brand-trademark__rim { fill: var(--accent-dark); }
 .brand-trademark__fill { fill: currentColor; }
 .header-right { align-items: center; display: flex; flex-shrink: 0; gap: 10px; margin-left: auto; position: relative; }
-.search-shell { position: relative; }
 .header-btn {
   background: var(--surface);
   border: 2px solid var(--border);
@@ -157,6 +156,7 @@ span.header-btn__icon--search {
   opacity: 0;
   pointer-events: none;
   position: absolute;
+  /* Anchor to the toolbar, keeping the panel on-screen with actions after Search. */
   right: 0;
   top: calc(100% + 10px);
   transform: translateY(-4px);
