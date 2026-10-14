@@ -25,6 +25,56 @@ Run the commands below from the repository root.
 
 ## Preview the theme
 
+### Documentation website
+
+The public theme manual lives in `docs/` and uses the root `mkdocs.yml`.
+Preview it with the editable theme installation:
+
+```bash
+python -m mkdocs serve --watch-theme
+```
+
+The console prints the local preview URL. Validate its pages, examples, and
+internal links with:
+
+```bash
+python -m mkdocs build --strict
+python -m pytest tests/test_documentation.py -q
+```
+
+Put site-wide configuration in Theme setup. Put page-authoring syntax,
+component behavior, and component-specific customization together in
+Components, even when those appearance settings live under `theme`.
+Cross-link shared colors/fonts rather than duplicating their full guides.
+Explain main configuration beside the example that enables or defines the
+feature. Use Further customization for optional appearance refinements in
+feature setup guides, and Customization in component guides. Don't repeat
+feature-enabling settings or content fields there. Don't add an appearance
+section to features with no appearance options, such as page metadata.
+For features with multiple presentations, explain presentation-specific
+artwork alongside that presentation and keep shared appearance attributes
+in the final customization section.
+Use Parameter / Default / Effect tables beside the relevant
+instructions, with color names beside values and component-specific effects.
+Link to Common attributes in the configuration reference instead of repeating
+explanations of shared theme settings. Distinguish native MkDocs settings and
+CSS from theme options.
+Configuration defaults in Reference are checked against the theme by tests.
+
+In visible component guides, use Customization for all instances and add only
+the Override an instance subheading for one occurrence. Show component-scoped
+CSS for all instances, and use a wrapper-scoped selector for one instance.
+Both CSS scopes use `extra_css`;
+don't describe an HTML wrapper or native HTML authoring as a different styling
+mechanism. Link to the Components overview for stylesheet and `md_in_html` setup.
+
+Give common guidance one home and link to it from other pages. Document nested
+shadow behavior in the Components overview, with a brief note in relevant
+container guides; don't repeat it in child-content guides such as media and
+code blocks. Keep component-specific settings with their component.
+
+### Test fixture
+
 The fixture site exercises the theme's navigation, Markdown components, and
 media layouts. Preview it using the editable installation:
 

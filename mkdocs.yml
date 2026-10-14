@@ -1,0 +1,73 @@
+site_name: Pixel Lab
+site_description: A retro-inspired MkDocs theme with pixel borders, bold colors, and arcade-style shadows.
+site_url: https://trained-by-humans.github.io/mkdocs-pixel-lab/
+repo_url: https://github.com/trained-by-humans/mkdocs-pixel-lab
+repo_name: GitHub
+edit_uri: edit/main/docs/
+docs_dir: docs
+site_dir: build/docs
+exclude_docs: |
+  theme-coverage-results.json
+
+theme:
+  name: pixel-lab
+
+nav:
+  - Home: index.md
+  - Get started: getting-started.md
+  - Theme setup:
+      - Overview: setup/index.md
+      - Colors: setup/colors.md
+      - Fonts: setup/fonts.md
+      - Icons: setup/icons.md
+      - Branding and footer: setup/branding.md
+      - Navigation: setup/navigation.md
+      - Search: setup/search.md
+      - Repository and page actions: setup/repository.md
+      - Related sites: setup/related-sites.md
+      - Analytics and privacy: setup/analytics.md
+  - Components:
+      - Overview: components/index.md
+      - Text and lists: components/text.md
+      - Code blocks: components/code-blocks.md
+      - Alerts: components/alerts.md
+      - Admonitions: components/admonitions.md
+      - Content tabs: components/tabs.md
+      - Collapsible content: components/details.md
+      - Tables: components/tables.md
+      - Images and video: components/media.md
+      - Heading links: components/heading-links.md
+      - Page metadata: components/metadata.md
+  - Reference:
+      - Configuration: reference/configuration.md
+      - Bundled plugins: reference/plugins.md
+      - Compatibility: reference/compatibility.md
+      - Troubleshooting: reference/troubleshooting.md
+      - Upgrading: reference/upgrading.md
+
+plugins:
+  - search
+  - pixel-lab/metadata
+
+markdown_extensions:
+  - admonition
+  - mkdocs_pixel_lab.github_alerts
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - md_in_html
+  - toc:
+      permalink: true
+
+validation:
+  nav:
+    omitted_files: warn
+  links:
+    not_found: warn
+    unrecognized_links: warn
+    anchors: warn
