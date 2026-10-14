@@ -108,6 +108,7 @@ def test_custom_toolbar_icons_keep_controls_and_layout(custom_icons_page, width)
     expect(repo).to_have_attribute("aria-label", "Open repository: GitHub")
     expect(packages).to_have_attribute("aria-label", "Packages")
     expect(search).to_have_attribute("aria-label", "SEARCH")
+    expect(search.locator(".header-btn__icon--search")).to_have_count(0)
     repo_bounds, package_bounds, search_bounds = (element.bounding_box() for element in (repo, packages, search))
     assert repo_bounds["x"] + repo_bounds["width"] <= package_bounds["x"]
     assert package_bounds["x"] + package_bounds["width"] <= search_bounds["x"]
@@ -174,7 +175,7 @@ def test_unset_icons_keep_defaults(tmp_path, icons):
     html = (tmp_path / "index.html").read_text()
     assert 'data-permalink-style="icon"' in html
     assert 'class="hamburger"' in html
-    assert '>⌕</span>' in html
+    assert '<span class="header-btn__icon header-btn__icon--search" aria-hidden="true"></span>' in html
     assert "header-btn__icon--custom" not in html
     assert "--page-action-mask:" not in html
 

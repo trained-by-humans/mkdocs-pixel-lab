@@ -108,6 +108,8 @@ def test_strict_fixture_build(site_dir: Path) -> None:
     edit_icon = (site_dir / "assets/icons/page-edit.svg").read_text()
     assert 'shape-rendering="crispEdges"' in edit_icon
     assert 'id="edit-pixel"' in edit_icon and "<path " in edit_icon
+    search_icon = (site_dir / "assets/icons/search.svg").read_text()
+    assert 'id="search"' in search_icon and "<path " in search_icon
 
 
 def test_page_source_icon_has_one_pixel_gap(page, site_url: str) -> None:
@@ -521,6 +523,41 @@ def test_trademark_glyph_uses_theme_colors(page, site_url: str) -> None:
     expect(glyph.locator(".brand-trademark__outline")).to_have_css("fill", "rgb(254, 220, 186)")
     expect(glyph.locator(".brand-trademark__rim")).to_have_css("fill", "rgb(18, 52, 86)")
     expect(glyph.locator(".brand-trademark__fill")).to_have_css("fill", "rgb(171, 205, 239)")
+
+
+@pytest.mark.parametrize("width", [1440, 390, 320])
+@pytest.mark.parametrize("javascript", [True, False])
+def test_default_search_icon_in_toolbar(browser, site_url: str, width: int, javascript: bool) -> None:
+    context = browser.new_context(java_script_enabled=javascript, viewport={"width": width, "height": 900})
+    try:
+        page = context.new_page()
+        page.goto(f"{site_url}/guide/nested/")
+        page.evaluate("document.fonts.ready")
+        search = page.get_by_role("button", name="SEARCH", exact=True)
+        icon = search.locator(".header-btn__icon--search")
+        expect(icon).to_be_visible()
+        expect(icon).to_have_attribute("aria-hidden", "true")
+        assert icon.text_content() == ""
+        expect(icon).to_have_css("width", "14px")
+        expect(icon).to_have_css("height", "14px")
+        expect(icon).to_have_css("transform", "none")
+        expect(icon).to_have_css("box-shadow", "none")
+        expect(icon).to_have_css("mask-image", f'url("{site_url}/assets/icons/search.svg")')
+        assert icon.evaluate("element => getComputedStyle(element).backgroundColor") == (
+            search.evaluate("element => getComputedStyle(element).color")
+        )
+        search.hover()
+        expect(search).to_have_css("transform", "matrix(1, 0, 0, 1, -3, -3)")
+        expect(icon).to_have_css("box-shadow", "none")
+        page.locator("html").evaluate("element => element.style.setProperty('--strong-text', '#abcdef')")
+        expect(icon).to_have_css("background-color", "rgb(171, 205, 239)")
+        if javascript:
+            search.click()
+            expect(page.locator("#mkdocs-search-query")).to_be_focused()
+            page.keyboard.press("Escape")
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+    finally:
+        context.close()
 
 
 @pytest.mark.parametrize("width", [1440, 850, 600, 390, 320])

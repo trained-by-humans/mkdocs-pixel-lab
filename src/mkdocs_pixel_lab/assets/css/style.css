@@ -92,6 +92,7 @@ body {
 .header-btn--repo { text-decoration: none; text-transform: uppercase; white-space: nowrap; }
 .header-btn--repo .header-btn__label { max-width: 12rem; overflow: hidden; text-overflow: ellipsis; }
 .header-btn__icon--repo,
+.header-btn__icon--search,
 .header-btn__icon--custom {
   background: none;
   border: 0;
@@ -109,6 +110,11 @@ span.header-btn__icon--repo {
   background: currentColor;
   -webkit-mask: url("../icons/repository.svg") center / contain no-repeat;
   mask: url("../icons/repository.svg") center / contain no-repeat;
+}
+span.header-btn__icon--search {
+  background: currentColor;
+  -webkit-mask: url("../icons/search.svg") center / contain no-repeat;
+  mask: url("../icons/search.svg") center / contain no-repeat;
 }
 .header-btn--menu {
   display: none;

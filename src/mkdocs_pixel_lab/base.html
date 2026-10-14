@@ -114,7 +114,7 @@
         {% endif %}
         {% include "site_navigation.html" %}
         <div class="search-shell">
-          <button class="header-btn header-btn--search" id="search-toggle" type="button" aria-label="SEARCH" aria-expanded="false" aria-controls="search-panel">{% call icon_image("search", "header-btn__icon header-btn__icon--custom") %}<span class="header-btn__icon" aria-hidden="true">⌕</span>{% endcall %}<span class="header-btn__label">SEARCH</span></button>
+          <button class="header-btn header-btn--search" id="search-toggle" type="button" aria-label="SEARCH" aria-expanded="false" aria-controls="search-panel">{% call icon_image("search", "header-btn__icon header-btn__icon--custom") %}<span class="header-btn__icon header-btn__icon--search" aria-hidden="true"></span>{% endcall %}<span class="header-btn__label">SEARCH</span></button>
           <div class="search-panel" id="search-panel">
             <div class="search-panel__controls">
               <label class="search-label" for="mkdocs-search-query">SEARCH DOCUMENTATION</label>
