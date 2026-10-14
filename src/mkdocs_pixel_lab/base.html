@@ -43,7 +43,6 @@
         --accent: {{ config.theme.accent_color }};
         --accent-dark: {{ config.theme.accent_dark_color }};
         --accent-foreground: {{ config.theme.accent_foreground_color }};
-        --permalink-fill-color: {{ config.theme.permalink_fill_color }};
         --header-background: {{ config.theme.header_background }};
         --header-border: {{ config.theme.header_border_color }};
         --header-shadow: {{ config.theme.header_shadow_color }};
@@ -75,8 +74,6 @@
       <link rel="stylesheet" href="{{ style | url }}">
     {% endfor %}
   </head>
-  {% set icons = config.theme.icon if config.theme.icon is mapping else {} %}
-  {% set custom_permalink = icons.get("permalink") %}
   {# Match the last registered TOC extension and Python-Markdown's boolean strings. #}
   {% set toc = namespace(options={}) %}
   {% for extension in config.markdown_extensions %}
@@ -89,10 +86,7 @@
   {% set text_permalink = toc_permalink is string and toc_permalink | lower not in boolean_strings %}
   {% set leading = toc.options.get('permalink_leading', false) %}
   {% set leading = leading | lower in ['true', 'yes', 'y', 'on', '1'] if leading is string else leading %}
-  {% set permalink_icon = config.theme.permalink_icon if config.theme.permalink_icon in ['link', 'hash', 'chain'] else 'chain' %}
-  {% if text_permalink %}{% set permalink_icon = 'text' %}{% endif %}
-  {% if custom_permalink is string and custom_permalink | trim %}{% set permalink_icon = 'custom' %}{% endif %}
-  <body data-permalink-icon="{{ permalink_icon }}"{% if leading %} data-permalink-leading="true"{% endif %}>
+  <body data-permalink-style="{{ 'text' if text_permalink else 'icon' }}"{% if leading %} data-permalink-leading="true"{% endif %}>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="header">
       <button class="header-btn header-btn--menu" id="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-nav">

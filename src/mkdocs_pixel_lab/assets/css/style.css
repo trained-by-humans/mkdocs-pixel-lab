@@ -378,81 +378,42 @@ a { color: var(--accent-dark); }
 a:hover { color: var(--ink); }
 p, li { max-width: 760px; }
 .headerlink {
-  --permalink-fill-mask: url("../icons/heading-link-fill.svg");
-  --permalink-outline-mask: url("../icons/heading-link.svg");
   color: var(--accent);
   display: inline-block;
   font-family: "IBM Plex Mono", monospace;
   font-size: inherit;
-  height: 0.7em;
   margin-left: 0.45rem;
-  overflow: hidden;
   position: relative;
   text-decoration: none;
-  text-indent: -9999px;
   vertical-align: baseline;
-  width: 0.7em;
 }
 .headerlink:hover { color: var(--accent-dark); }
 .main h1 > .headerlink { display: none; }
-[data-permalink-icon="hash"] .headerlink {
-  --permalink-fill-mask: url("../icons/heading-anchor-fill.svg");
-  --permalink-outline-mask: url("../icons/heading-anchor.svg");
+/* Use the icon box's baseline, not the indented text's, without clipping its shadow. */
+[data-permalink-style="icon"] .headerlink {
+  contain: layout;
+  height: 0.7em;
+  overflow: visible;
+  text-indent: -9999px;
+  width: 0.7em;
 }
-[data-permalink-icon="chain"] .headerlink {
-  --permalink-fill-mask: url("../icons/heading-chain-shadow.svg");
-  --permalink-outline-mask: url("../icons/heading-chain.svg");
-}
-.headerlink::before,
-.headerlink::after,
-.headerlink__fill {
+[data-permalink-style="icon"] .headerlink::before,
+[data-permalink-style="icon"] .headerlink::after {
   content: "";
-  height: 100%;
   inset: 0;
-  position: absolute;
-  width: 100%;
-}
-.headerlink__fill {
-  background: var(--permalink-fill-color, var(--accent));
   pointer-events: none;
-  -webkit-mask: url("../icons/heading-chain-fill.svg") center / contain no-repeat;
-  mask: url("../icons/heading-chain-fill.svg") center / contain no-repeat;
+  position: absolute;
+  -webkit-mask: url("../icons/heading-link.svg") center / contain no-repeat;
+  mask: url("../icons/heading-link.svg") center / contain no-repeat;
 }
-.headerlink::before {
-  background: currentColor;
-  -webkit-mask: var(--permalink-fill-mask) center / contain no-repeat;
-  mask: var(--permalink-fill-mask) center / contain no-repeat;
-}
-.headerlink::after {
-  background: #000;
-  -webkit-mask: var(--permalink-outline-mask) center / contain no-repeat;
-  mask: var(--permalink-outline-mask) center / contain no-repeat;
-}
-[data-permalink-icon="chain"] .headerlink::before {
-  background: var(--accent-dark);
-  opacity: 0;
-}
-[data-permalink-icon="chain"] .headerlink:hover::before,
-[data-permalink-icon="chain"] .headerlink:focus-visible::before {
-  opacity: 1;
-}
-[data-permalink-icon="custom"] .headerlink { overflow: visible; }
-[data-permalink-icon="custom"] .headerlink::before {
+[data-permalink-style="icon"] .headerlink::before {
   background: var(--accent-dark);
   opacity: 0;
   transform: translate(0.07em, 0.07em);
 }
-[data-permalink-icon="custom"] .headerlink:hover::before,
-[data-permalink-icon="custom"] .headerlink:focus-visible::before { opacity: 1; }
-/* A TOC-supplied symbol is text, not a replacement theme mask. */
-[data-permalink-icon="text"] .headerlink {
-  height: auto;
-  overflow: visible;
-  text-indent: 0;
-  width: auto;
-}
-[data-permalink-icon="text"] .headerlink::before,
-[data-permalink-icon="text"] .headerlink::after { content: none; }
+[data-permalink-style="icon"] .headerlink::after { background: #000; }
+[data-permalink-style="icon"] .headerlink:hover::before,
+[data-permalink-style="icon"] .headerlink:focus-visible::before { opacity: 1; }
 [data-permalink-leading="true"] .headerlink { margin-left: 0; margin-right: 0.45rem; }
 .main h2[id],
 .main h3[id],

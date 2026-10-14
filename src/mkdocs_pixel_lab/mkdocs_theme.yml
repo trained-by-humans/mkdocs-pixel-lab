@@ -13,9 +13,6 @@ icon:
   dropdown: null
   view: null
   edit: null
-  permalink: null
-permalink_icon: chain
-permalink_fill_color: "var(--accent)"
 background_color: "#f4f1df"
 surface_color: "#fffdf2"
 surface_alt_color: "#e8e4cf"

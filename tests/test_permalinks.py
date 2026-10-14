@@ -1,4 +1,4 @@
-"""Selectable heading permalinks keep their appearance and navigation contract."""
+"""One built-in heading-link icon plus Python-Markdown's native TOC options."""
 
 import mimetypes
 from pathlib import Path
@@ -12,38 +12,6 @@ from playwright.sync_api import expect
 
 FIXTURE = Path(__file__).parent / "fixture_site" / "mkdocs.yml"
 ORIGIN = "https://example.invalid"
-LAYERS = {
-    "link": ("heading-link", "heading-link-fill"),
-    "hash": ("heading-anchor", "heading-anchor-fill"),
-    "chain": ("heading-chain", "heading-chain-shadow"),
-}
-
-
-@pytest.fixture(
-    scope="session",
-    params=[
-        (None, None), ("link", None), ("hash", None),
-        ("chain", None), ("chain", "#abcdef"), ("chain", "transparent"),
-    ],
-    ids=["default", "link", "hash", "chain", "chain-custom-fill", "chain-no-fill"],
-)
-def permalink_site(request, tmp_path_factory):
-    icon, fill_color = request.param
-    destination = tmp_path_factory.mktemp("permalink-site")
-    config = load_config(config_file=str(FIXTURE), site_dir=str(destination), strict=True)
-    if icon is not None:
-        config.theme["permalink_icon"] = icon
-    if fill_color is not None:
-        config.theme["permalink_fill_color"] = fill_color
-    build(config)
-    return destination, icon or "chain", fill_color
-
-
-@pytest.fixture()
-def permalink_page(page, permalink_site):
-    destination, icon, fill_color = permalink_site
-    route_site(page, destination)
-    return page, destination, icon, fill_color
 
 
 def route_site(page, destination):
@@ -66,137 +34,201 @@ def route_site(page, destination):
     page.route("**/*", respond)
 
 
-def test_selectable_heading_permalinks(permalink_page):
-    page, destination, icon, configured_fill = permalink_page
-    outline_asset, accent_asset = LAYERS[icon]
-    for name in (outline_asset, accent_asset, "heading-chain-fill"):
-        svg = (destination / "assets" / "icons" / f"{name}.svg").read_text()
-        assert "<path " in svg and "<image" not in svg
+@pytest.fixture(scope="session")
+def permalink_site(tmp_path_factory):
+    destination = tmp_path_factory.mktemp("permalink-site")
+    config = load_config(config_file=str(FIXTURE), site_dir=str(destination), strict=True)
+    build(config)
+    return destination
 
+
+@pytest.fixture(params=[True, False], ids=["javascript", "no-javascript"])
+def permalink_page(request, browser, permalink_site):
+    context = browser.new_context(java_script_enabled=request.param)
+    page = context.new_page()
+    route_site(page, permalink_site)
+    yield page
+    context.close()
+
+
+def test_only_one_built_in_permalink_asset_and_no_theme_options(permalink_site):
+    assets = permalink_site / "assets" / "icons"
+    assert sorted(path.name for path in assets.glob("heading-*.svg")) == ["heading-link.svg"]
+    svg = (assets / "heading-link.svg").read_text()
+    assert 'id="link-solid"' in svg and "<polygon " in svg and "<image" not in svg
+    config = load_config(config_file=str(FIXTURE))
+    assert "permalink" not in config.theme["icon"]
+    assert "permalink_icon" not in config.theme
+    assert "permalink_fill_color" not in config.theme
+
+
+@pytest.mark.parametrize("width", [1440, 390])
+def test_default_heading_permalinks(permalink_page, width):
+    page = permalink_page
+    page.set_viewport_size({"width": width, "height": 900})
     for path, title_id, section_id in [
         ("/", "fixture-home", "searchable-heading"),
         ("/guide/nested/", "nested-page", "fragment-target"),
     ]:
         page.goto(ORIGIN + path)
-        expect(page.locator("body")).to_have_attribute("data-permalink-icon", icon)
+        page.evaluate("document.fonts.ready")
+        expect(page.locator("body")).to_have_attribute("data-permalink-style", "icon")
         expect(page.locator("main h1")).to_have_attribute("id", title_id)
         expect(page.locator("main h1 > .headerlink")).to_be_hidden()
         anchor = page.locator(f"#{section_id} > .headerlink")
         expect(anchor).to_be_visible()
         expect(anchor).to_have_attribute("href", f"#{section_id}")
         expect(anchor).to_have_attribute("title", "Permanent link")
-        assert anchor.evaluate("e => e.parentElement.lastChild === e")
+        assert anchor.evaluate("element => element.parentElement.lastChild === element")
         expect(anchor).to_have_css("height", "14px")
+        expect(anchor).to_have_css("width", "14px")
         expect(anchor).to_have_css("vertical-align", "baseline")
-        assert anchor.evaluate(
-            "e => getComputedStyle(e, '::after').maskImage"
-        ) == f'url("{ORIGIN}/assets/icons/{outline_asset}.svg")'
-        assert anchor.evaluate(
-            "e => getComputedStyle(e, '::before').maskImage"
-        ) == f'url("{ORIGIN}/assets/icons/{accent_asset}.svg")'
-
-        accent = page.locator(".tab.active").evaluate("e => getComputedStyle(e, '::before').color")
-        dark = page.locator(".tab.active").evaluate("e => getComputedStyle(e).color")
-        fill = anchor.locator(".headerlink__fill")
-        if icon == "chain":
-            expect(fill).to_have_count(1)
-            expect(fill).to_have_attribute("aria-hidden", "true")
-            assert fill.evaluate("e => getComputedStyle(e).maskImage") == (
-                f'url("{ORIGIN}/assets/icons/heading-chain-fill.svg")'
-            )
-            fill_color = {
-                "#abcdef": "rgb(171, 205, 239)",
-                "transparent": "rgba(0, 0, 0, 0)",
-            }.get(configured_fill, accent)
-            expect(fill).to_have_css("background-color", fill_color)
-        else:
-            expect(fill).to_have_count(0)
-
-        shadow_color = dark if icon == "chain" else accent
-        shadow_opacity = "0" if icon == "chain" else "1"
-        assert anchor.evaluate("e => getComputedStyle(e, '::before').backgroundColor") == shadow_color
-        assert anchor.evaluate("e => getComputedStyle(e, '::before').opacity") == shadow_opacity
+        expect(anchor).to_have_css("overflow", "visible")
+        expect(anchor.locator("*")).to_have_count(0)
+        for pseudo in ("::before", "::after"):
+            assert anchor.evaluate(
+                "(element, pseudo) => getComputedStyle(element, pseudo).maskImage", pseudo,
+            ) == f'url("{ORIGIN}/assets/icons/heading-link.svg")'
+        assert anchor.evaluate("element => getComputedStyle(element, '::after').backgroundColor") == "rgb(0, 0, 0)"
+        dark = page.locator(".tab.active").evaluate("element => getComputedStyle(element).color")
+        assert anchor.evaluate("element => getComputedStyle(element, '::before').backgroundColor") == dark
+        assert anchor.evaluate("element => getComputedStyle(element, '::before').opacity") == "0"
+        bounds = anchor.bounding_box()
         anchor.hover()
-        assert anchor.evaluate("e => getComputedStyle(e, '::before').backgroundColor") == dark
-        assert anchor.evaluate("e => getComputedStyle(e, '::before').opacity") == "1"
-        assert anchor.evaluate("e => getComputedStyle(e, '::after').backgroundColor") == "rgb(0, 0, 0)"
-        if icon == "chain":
-            expect(fill).to_have_css("background-color", fill_color)
+        assert anchor.evaluate("element => getComputedStyle(element, '::before').opacity") == "1"
+        assert anchor.bounding_box() == bounds
+        offset = anchor.evaluate("""element => {
+            const matrix = new DOMMatrix(getComputedStyle(element, '::before').transform);
+            return [matrix.m41, matrix.m42];
+        }""")
+        assert offset == pytest.approx([1.4, 1.4], abs=0.01)
         page.mouse.move(0, 0)
-        assert anchor.evaluate("e => getComputedStyle(e, '::before').backgroundColor") == shadow_color
-        assert anchor.evaluate("e => getComputedStyle(e, '::before').opacity") == shadow_opacity
+        assert anchor.evaluate("element => getComputedStyle(element, '::before').opacity") == "0"
         page.keyboard.press("Tab")
         anchor.focus()
-        assert anchor.evaluate("e => getComputedStyle(e, '::before').opacity") == "1"
-        if icon == "chain":
-            expect(fill).to_have_css("background-color", fill_color)
-            assert anchor.evaluate("e => getComputedStyle(e, '::before').backgroundColor") == dark
+        assert anchor.evaluate("element => getComputedStyle(element, '::before').opacity") == "1"
         page.keyboard.press("Enter")
         expect(page).to_have_url(f"{ORIGIN}{path}#{section_id}")
+
+
+@pytest.mark.parametrize("width", [1440, 390])
+def test_permalink_aligns_to_heading_baseline(permalink_page, width):
+    page = permalink_page
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(ORIGIN + "/guide/nested/")
+    page.evaluate("document.fonts.ready")
+    page.evaluate("""() => {
+        const original = document.querySelector('#fragment-target > .headerlink');
+        const footer = document.querySelector('.main .footer');
+        for (let level = 2; level <= 6; level++) {
+            const heading = document.createElement('h' + level);
+            heading.id = 'alignment-h' + level;
+            heading.textContent = level === 2
+                ? 'A longer heading that wraps across multiple lines on smaller screens'
+                : 'Heading level ' + level;
+            const link = original.cloneNode(true);
+            link.href = '#' + heading.id;
+            heading.append(link);
+            footer.before(heading);
+        }
+    }""")
+    for level in range(2, 7):
+        heading = page.locator(f"#alignment-h{level}")
+        anchor = heading.locator(".headerlink")
+        expect(anchor).to_be_visible()
+        expect(anchor).to_have_css("overflow", "visible")
+        metrics = heading.evaluate("""heading => {
+            const anchor = heading.querySelector('.headerlink');
+            const marker = document.createElement('span');
+            marker.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+            heading.append(marker);
+            const bounds = anchor.getBoundingClientRect();
+            const metrics = {
+                baselineOffset: bounds.bottom - marker.getBoundingClientRect().top,
+                height: bounds.height,
+                fontSize: parseFloat(getComputedStyle(heading).fontSize),
+            };
+            marker.remove();
+            return metrics;
+        }""")
+        assert metrics["baselineOffset"] == pytest.approx(0, abs=0.1)
+        assert metrics["height"] == pytest.approx(metrics["fontSize"] * 0.7, abs=0.1)
+        anchor.hover()
+        assert anchor.evaluate("element => getComputedStyle(element, '::before').opacity") == "1"
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
 
 
 @pytest.fixture(
     scope="session",
     params=[
-        ({"permalink": "⚓", "permalink_title": "Link to this section"}, None, "text"),
-        ({"permalink": "¶", "permalink_title": ""}, None, "text"),
-        ({"permalink": "Link here", "permalink_leading": True, "separator": "_", "anchorlink": True}, None, "text"),
-        ({"permalink": True, "permalink_leading": True}, None, "chain"),
-        ({"permalink": "⚓", "permalink_leading": "false"}, "assets/icons/repository.svg", "custom"),
-        ({"permalink": False}, "assets/icons/repository.svg", "custom"),
-        ({}, "assets/icons/repository.svg", "custom"),
-        ({"permalink": "true"}, None, "chain"),
-        ({"permalink": "false"}, "assets/icons/repository.svg", "custom"),
+        ({"permalink": "⚓", "permalink_title": "Link to this section"}, "text", True),
+        ({"permalink": "¶", "permalink_title": ""}, "text", True),
+        ({"permalink": "Link here", "permalink_leading": True, "separator": "_", "anchorlink": True}, "text", True),
+        ({"permalink": "#", "permalink_leading": "false"}, "text", True),
+        ({"permalink": True, "permalink_leading": True}, "icon", True),
+        ({"permalink": "true", "permalink_leading": "true"}, "icon", True),
+        ({"permalink": "ON"}, "icon", True),
+        ({"permalink": False}, "icon", False),
+        ({}, "icon", False),
+        ({"permalink": "false"}, "icon", False),
+        ({"permalink": ""}, "text", True),
+        ({"permalink": None}, "icon", False),
     ],
     ids=[
         "symbol", "explicit-paragraph-symbol", "leading-text-and-heading-links",
-        "leading-default-icon", "explicit-image-override", "disabled-with-image",
-        "omitted-with-image", "string-true", "string-false-with-image",
+        "trailing-symbol", "leading-default-icon", "string-true", "string-on",
+        "disabled", "omitted", "string-false", "empty-symbol", "null",
     ],
 )
 def toc_permalink_site(request, tmp_path_factory):
-    options, custom_icon, mode = request.param
+    options, mode, enabled = request.param
     destination = tmp_path_factory.mktemp("toc-permalink-site")
     config = load_config(config_file=str(FIXTURE), site_dir=str(destination), strict=True)
     config.mdx_configs["toc"] = options
-    if custom_icon:
-        config.theme["icon"] = {"permalink": custom_icon}
     build(config)
-    return destination, options, custom_icon, mode
+    return destination, options, mode, enabled
 
 
 @pytest.fixture(params=[True, False], ids=["javascript", "no-javascript"])
 def toc_permalink_page(request, browser, toc_permalink_site):
-    destination, options, custom_icon, mode = toc_permalink_site
+    destination, options, mode, enabled = toc_permalink_site
     context = browser.new_context(java_script_enabled=request.param)
     page = context.new_page()
     route_site(page, destination)
-    yield page, options, custom_icon, mode, request.param
+    yield page, options, mode, enabled
     context.close()
 
 
 def test_toc_permalink_configuration_is_respected(toc_permalink_page):
-    page, options, custom_icon, mode, javascript = toc_permalink_page
+    page, options, mode, enabled = toc_permalink_page
     page.set_viewport_size({"width": 390, "height": 900})
     page.goto(ORIGIN + "/guide/nested/")
-    expect(page.locator("body")).to_have_attribute("data-permalink-icon", mode)
+    page.evaluate("document.fonts.ready")
+    expect(page.locator("body")).to_have_attribute("data-permalink-style", mode)
     separator = options.get("separator", "-")
     section_id = f"fragment{separator}target"
     heading = page.locator(f"#{section_id}")
     expect(heading).to_be_visible()
     expect(page.locator("main h1")).to_have_attribute("id", f"nested{separator}page")
     anchor = heading.locator(".headerlink")
-    if options.get("permalink", False) in (False, "false"):
+    if not enabled:
         expect(page.locator(".main .headerlink")).to_have_count(0)
-        expect(page.locator(".headerlink__fill")).to_have_count(0)
+        return
+    if options.get("permalink") == "":
+        # TOC emits an empty anchor for an empty symbol; do not replace it with the icon.
+        expect(anchor).to_have_count(1)
+        expect(anchor).to_have_text("")
+        expect(anchor).to_have_css("width", "0px")
+        assert anchor.evaluate("element => getComputedStyle(element, '::after').content") == "none"
         return
 
     expect(page.locator("main h1 > .headerlink")).to_be_hidden()
     expect(anchor).to_be_visible()
     expect(anchor).to_have_attribute("href", f"#{section_id}")
+    expect(anchor.locator("*")).to_have_count(0)
     title = options.get("permalink_title", "Permanent link")
     assert anchor.get_attribute("title") == (title or None)
-    leading = options.get("permalink_leading", False) is True
+    leading = options.get("permalink_leading", False) in (True, "true")
     if leading:
         assert anchor.evaluate("element => element.parentElement.firstChild === element")
         expect(anchor).to_have_css("margin-left", "0px")
@@ -210,10 +242,10 @@ def test_toc_permalink_configuration_is_respected(toc_permalink_page):
         expect(anchor).to_have_text(options["permalink"])
         expect(anchor).to_have_css("text-indent", "0px")
         expect(anchor).to_have_css("overflow", "visible")
-        expect(page.locator(".headerlink__fill")).to_have_count(0)
         for pseudo in ("::before", "::after"):
-            assert anchor.evaluate("(element, pseudo) => getComputedStyle(element, pseudo).content", pseudo) == "none"
-        # Confirm the symbol's glyphs occupy its visible box, not hidden indented text.
+            assert anchor.evaluate(
+                "(element, pseudo) => getComputedStyle(element, pseudo).content", pseudo,
+            ) == "none"
         text_bounds = anchor.evaluate("""element => {
             const range = document.createRange();
             range.selectNodeContents(element);
@@ -223,15 +255,11 @@ def test_toc_permalink_configuration_is_respected(toc_permalink_page):
         bounds = anchor.bounding_box()
         assert text_bounds["x"] == pytest.approx(bounds["x"], abs=1)
         assert text_bounds["width"] == pytest.approx(bounds["width"], abs=1)
-    elif mode == "custom":
-        assert anchor.evaluate("element => getComputedStyle(element, '::after').maskImage") == (
-            f'url("{ORIGIN}/{custom_icon}")'
-        )
-        expect(page.locator(".headerlink__fill")).to_have_count(0)
     else:
         expect(anchor).to_have_css("height", "14px")
-        expect(anchor.locator(".headerlink__fill")).to_have_count(1 if javascript else 0)
-
+        assert anchor.evaluate("element => getComputedStyle(element, '::after').maskImage") == (
+            f'url("{ORIGIN}/assets/icons/heading-link.svg")'
+        )
     if options.get("anchorlink"):
         expect(heading.locator(".toclink")).to_have_text("Fragment target")
         expect(heading.locator(".toclink")).to_have_attribute("href", f"#{section_id}")
@@ -252,6 +280,6 @@ def test_toc_extension_names_and_custom_permalink_classes(tmp_path, extension):
     }
     build(config)
     html = (tmp_path / "guide/nested/index.html").read_text()
-    assert 'data-permalink-icon="text"' in html
+    assert 'data-permalink-style="text"' in html
     assert 'data-permalink-leading="true"' in html
     assert '<h2 id="fragment_target"><a class="section-link custom-link" href="#fragment_target" title="Section URL">⚓</a>Fragment target</h2>' in html

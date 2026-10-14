@@ -23,11 +23,4 @@
       {{ selector }} { --page-action-mask: {{ mask_url(icon) }}; }
     {% endif %}
   {% endfor %}
-  {% set permalink = icons.get('permalink') %}
-  {% if permalink is string and permalink | trim %}
-    [data-permalink-icon="custom"] .headerlink {
-      --permalink-outline-mask: {{ mask_url(permalink) }};
-      --permalink-fill-mask: {{ mask_url(permalink) }};
-    }
-  {% endif %}
 {%- endmacro %}

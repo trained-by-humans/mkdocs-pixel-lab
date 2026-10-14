@@ -16,13 +16,12 @@ ORIGIN = "https://example.invalid"
 ICONS = {
     "repo": "assets/icons/repository.svg",
     "search": "assets/icons/heading-link.svg",
-    "menu": "assets/icons/heading-anchor.svg",
+    "menu": "assets/icons/repository.svg",
     "close": "assets/icons/page-edit.svg",
-    "sites": "assets/icons/heading-chain.svg",
-    "dropdown": "assets/icons/heading-link-fill.svg",
+    "sites": "assets/icons/page-source.svg",
+    "dropdown": "assets/icons/heading-link.svg",
     "view": "assets/icons/page-edit.svg",
     "edit": "assets/icons/page-source.svg",
-    "permalink": "assets/icons/repository.svg",
 }
 
 
@@ -32,7 +31,6 @@ def custom_icons_site(request, tmp_path_factory):
     icons = ICONS if request.param == "svg" else dict.fromkeys(ICONS, "assets/favicon.png")
     config = load_config(config_file=str(FIXTURE), site_dir=str(destination), strict=True)
     config.theme["icon"] = icons
-    config.theme["permalink_icon"] = "hash"  # Custom artwork takes precedence.
     config.extra["site_navigation"] = {
         "dropdown_label": "Packages",
         "items": [{"title": "Guide", "url": "guide/nested/"}],
@@ -140,13 +138,12 @@ def test_custom_page_icons_keep_masks_and_navigation(custom_icons_page, width):
     page.set_viewport_size({"width": width, "height": 900})
     page.goto(ORIGIN + "/guide/nested/")
     page.evaluate("document.fonts.ready")
-    expect(page.locator("body")).to_have_attribute("data-permalink-icon", "custom")
+    expect(page.locator("body")).to_have_attribute("data-permalink-style", "icon")
     expect(page.locator(".main h1")).to_have_attribute("id", "nested-page")
     expect(page.locator(".main h1 > .headerlink")).to_be_hidden()
     for key, selector, href in [
         ("view", ".page-source", "https://github.com/trained-by-humans/pixel-lab-fixture/blob/main/docs/guide/nested.md"),
         ("edit", ".page-edit", "https://github.com/trained-by-humans/pixel-lab-fixture/edit/main/docs/guide/nested.md"),
-        ("permalink", "#fragment-target > .headerlink", "#fragment-target"),
     ]:
         anchor = page.locator(selector)
         expect(anchor).to_be_visible()
@@ -164,7 +161,6 @@ def test_custom_page_icons_keep_masks_and_navigation(custom_icons_page, width):
         anchor.focus()
         assert anchor.evaluate("element => getComputedStyle(element, '::before').opacity") == "1"
         page.locator(".main h1").click()
-    expect(page.locator(".headerlink__fill")).to_have_count(0)
     page.locator("#fragment-target > .headerlink").click()
     expect(page).to_have_url(ORIGIN + "/guide/nested/#fragment-target")
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
@@ -176,7 +172,7 @@ def test_unset_icons_keep_defaults(tmp_path, icons):
     config.theme["icon"] = icons
     build(config)
     html = (tmp_path / "index.html").read_text()
-    assert 'data-permalink-icon="chain"' in html
+    assert 'data-permalink-style="icon"' in html
     assert 'class="hamburger"' in html
     assert '>⌕</span>' in html
     assert "header-btn__icon--custom" not in html
@@ -201,7 +197,7 @@ def test_custom_icons_do_not_enable_disabled_features(tmp_path):
 def test_mask_urls_are_safe_css_strings_and_keep_queries(tmp_path):
     config = load_config(config_file=str(FIXTURE), site_dir=str(tmp_path), strict=True)
     path = """https://icons.example.org/a\\'";color:red;/*</style><script>alert(1)</script>.svg?x=1&y=2"""
-    config.theme["icon"] = dict.fromkeys(("view", "edit", "permalink"), path)
+    config.theme["icon"] = dict.fromkeys(("view", "edit"), path)
     build(config)
     html = (tmp_path / "guide/nested/index.html").read_text()
     style = re.search(r'<style id="pixel-lab-icons">(.*?)</style>', html, re.S)[1]
