@@ -109,9 +109,9 @@ types, use their selector in a [custom stylesheet](index.md#load-custom-css):
 }
 ```
 
-### Override an instance
+### Scoped overrides
 
-Wrap only the target code block, following [Scope one instance](index.md#scope-one-instance):
+Wrap each selected code block, following [Scope selected instances](index.md#scope-selected-instances):
 
 ````markdown
 <div class="instance-code" markdown="1">
@@ -123,8 +123,8 @@ print("Hello, Pixel Lab!")
 </div>
 ````
 
-Scope the CSS variables to this highlighted block in the same stylesheet.
-Other code blocks keep the component defaults:
+Scope the CSS variables to `.instance-code` in the same stylesheet.
+Unwrapped code blocks keep the component defaults:
 
 ```css
 .instance-code > .highlight {

@@ -75,9 +75,9 @@ title fill without changing other component types:
 }
 ```
 
-### Override an instance
+### Scoped overrides
 
-Wrap only the target admonition, following [Scope one instance](index.md#scope-one-instance):
+Wrap each selected admonition, following [Scope selected instances](index.md#scope-selected-instances):
 
 ```markdown
 <div class="instance-admonition" markdown="1">
@@ -89,8 +89,8 @@ Wrap only the target admonition, following [Scope one instance](index.md#scope-o
 </div>
 ```
 
-Add this scoped rule to the same stylesheet. Only this admonition's title
-changes; other admonitions keep the component defaults:
+Add this scoped rule to the same stylesheet. Titles inside `.instance-admonition`
+change; unwrapped admonitions keep the component defaults:
 
 ```css
 .instance-admonition > .admonition > .admonition-title {

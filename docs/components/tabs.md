@@ -94,12 +94,12 @@ Pixel Lab chooses each panel's layout automatically:
 Layout detection uses JavaScript. Without it, panels retain the padded
 presentation.
 
-### Override an instance's layout
+### Scoped layout overrides
 
-This overrides the layout of one wrapped tab group, not the defaults for all
-tab groups. It doesn't require replacing the generated tab HTML.
+These wrapper classes override the layout of selected tab groups, not the
+defaults for all tab groups. They don't require replacing the generated tab HTML.
 
-Follow [Scope one instance](index.md#scope-one-instance) for Markdown-in-HTML
+Follow [Scope selected instances](index.md#scope-selected-instances) for Markdown-in-HTML
 setup, then wrap a group in `.tabs-padded` or `.tabs-flush`:
 
 <div id="forced-tabs" class="tabs-padded" markdown="1">
@@ -157,7 +157,7 @@ See [Common attributes](../reference/configuration.md#common-attributes).
 
 To customize all tab groups without changing other component types, use a
 [custom stylesheet](index.md#load-custom-css). The `.tabbed-set` selector
-targets every group; it is component customization, not an instance override:
+targets every group, rather than only groups inside a wrapper class:
 
 ```css
 .tabbed-set {
@@ -171,9 +171,9 @@ targets every group; it is component customization, not an instance override:
 }
 ```
 
-### Override an instance
+### Scoped overrides
 
-Wrap only the target group, following [Scope one instance](index.md#scope-one-instance):
+Wrap each selected group, following [Scope selected instances](index.md#scope-selected-instances):
 
 ```markdown
 <div class="instance-tabs" markdown="1">
@@ -189,8 +189,8 @@ Wrap only the target group, following [Scope one instance](index.md#scope-one-in
 </div>
 ```
 
-Scope the CSS variables to this group in the same stylesheet. Other groups
-keep the component defaults:
+Scope the CSS variables to `.instance-tabs` in the same stylesheet. Unwrapped
+groups keep the component defaults:
 
 ```css
 .instance-tabs > .tabbed-set {
@@ -201,7 +201,7 @@ keep the component defaults:
 ```
 
 For layout rather than color changes, see
-[Override an instance's layout](#override-an-instances-layout).
+[Scoped layout overrides](#scoped-layout-overrides).
 
 ## Limits
 

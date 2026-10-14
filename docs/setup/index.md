@@ -10,6 +10,7 @@ of the documentation website you want to change.
 | Replace toolbar and page-action artwork | [Icons](icons.md) |
 | Set the site name, favicon, and footer | [Branding and footer](branding.md) |
 | Arrange sections and pages | [Navigation](navigation.md) |
+| Enable and style section anchor links | [Heading permalinks](heading-permalinks.md) |
 | Enable the search index | [Search](search.md) |
 | Link the repository and page sources | [Repository and page actions](repository.md) |
 | Link related projects | [Related sites](related-sites.md) |

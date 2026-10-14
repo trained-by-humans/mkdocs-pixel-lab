@@ -1,4 +1,4 @@
-# Heading links
+# Heading permalinks
 
 Headings organize a page, and permalinks let readers link to a specific section.
 Hover or focus the link beside a section heading on this page to try it.
@@ -26,25 +26,18 @@ theme parameters:
 Omit `permalink` or set it to `false` to disable visible heading links.
 Headings retain their IDs, so links to sections still work.
 
-## Write headings
+## Use heading permalinks
 
-```markdown
-# Page title
-
-## A section
-
-### A subsection
-```
-
-Use one H1 for the page title. Pixel Lab displays permalink artwork for H2–H6;
-the H1 retains its ID but doesn't display a heading-permalink icon. Optional
-[source/edit actions](../setup/repository.md) beside H1 are a separate feature.
+Pixel Lab displays permalink artwork for H2–H6; the H1 retains its ID but
+doesn't display a heading-permalink icon. Optional
+[source/edit actions](repository.md) beside H1 are a separate feature.
+For ordinary Markdown heading syntax, see [Text and lists](../components/text.md#headings).
 
 The theme follows the current section in the URL fragment as you scroll,
 without adding history entries. This scroll tracking uses JavaScript; the
 generated heading links themselves don't require it.
 
-## Customization
+## Further customization
 
 The `toc` settings below apply to heading links across the site.
 
@@ -93,7 +86,7 @@ for extension options. Enabling `toc` doesn't add a visible page-contents
 sidebar in Pixel Lab.
 
 To customize the hover/focus shadow for all heading links without changing
-navigation colors, use a [custom stylesheet](index.md#load-custom-css):
+navigation colors, use a [custom stylesheet](../components/index.md#load-custom-css):
 
 ```css
 .headerlink {
@@ -101,9 +94,9 @@ navigation colors, use a [custom stylesheet](index.md#load-custom-css):
 }
 ```
 
-### Override an instance
+### Scoped overrides
 
-Wrap only the target heading, following [Scope one instance](index.md#scope-one-instance):
+Wrap each selected heading, following [Scope selected instances](../components/index.md#scope-selected-instances):
 
 ```markdown
 <div class="instance-heading" markdown="1">
@@ -113,7 +106,7 @@ Wrap only the target heading, following [Scope one instance](index.md#scope-one-
 </div>
 ```
 
-Scope the CSS variable to that heading's link in the same stylesheet. Other
+Scope the CSS variable to `.instance-heading` in the same stylesheet. Unwrapped
 heading links keep the component defaults:
 
 ```css

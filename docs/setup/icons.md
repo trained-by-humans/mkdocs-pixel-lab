@@ -64,7 +64,7 @@ that dependency. These image and mask styles work without JavaScript.
 
 ## Other artwork
 
-- [Heading links](../components/heading-links.md#customization) use the built-in
+- [Heading permalinks](heading-permalinks.md#further-customization) use the built-in
   link icon or Python-Markdown's `toc.permalink` text, not `theme.icon`.
 - [Related-site items](related-sites.md#item-icons) use their own `icon` and
   `icon_hover` properties.

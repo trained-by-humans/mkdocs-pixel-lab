@@ -78,7 +78,8 @@ Each component guide explains exactly which shared and specific colors it uses:
 | [Admonitions](../components/admonitions.md#customization) | Title fill, body surface, border, and shadow |
 | [Tables](../components/tables.md#customization) | Header fill, rules, border, and shadow |
 | [Collapsible content](../components/details.md#customization) | Summary fill, border, and shadow |
-| [Heading links](../components/heading-links.md#customization) | Permalink symbol and hover shadow |
+
+For section-link colors, see [Heading permalinks](heading-permalinks.md#further-customization).
 
 For every token and its default, see [Configuration](../reference/configuration.md#theme-defaults).
 Pixel Lab currently has one configured palette, not a runtime light/dark switch.

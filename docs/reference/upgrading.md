@@ -27,7 +27,7 @@ markdown_extensions:
 
 Remove the obsolete `theme.permalink_icon` and `theme.permalink_fill_color`
 settings. There is one built-in link icon; use `toc.permalink` for a text-symbol
-replacement or to disable permalinks. See [Heading links](../components/heading-links.md).
+replacement or to disable permalinks. See [Heading permalinks](../setup/heading-permalinks.md).
 
 ### Page and repository actions
 

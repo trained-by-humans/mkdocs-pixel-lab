@@ -17,6 +17,7 @@ Merge snippets into your site's `mkdocs.yml`. Don't create duplicate `theme`,
 | `plugins: [pixel-lab/metadata]` | Bundled plugin | [Page metadata](../components/metadata.md) |
 | `pixel-lab/git-lastmod`, `pixel-lab/robots` | Bundled plugins | [Bundled plugins](plugins.md) |
 | `markdown_extensions` | Python-Markdown and extensions | [Components](../components/index.md) |
+| `markdown_extensions` → `toc.permalink` | Python-Markdown | [Heading permalinks](../setup/heading-permalinks.md) |
 | `extra.site_navigation` | Pixel Lab | [Related sites](../setup/related-sites.md) |
 | `extra.analytics` | Pixel Lab | [Analytics and privacy](../setup/analytics.md) |
 | `extra_css`, `extra_javascript` | MkDocs | [Fonts / CSS overrides](../setup/fonts.md#override-typography-with-css) |
@@ -32,7 +33,7 @@ See [Colors](../setup/colors.md), [Fonts](../setup/fonts.md), and
 [Theme defaults](#theme-defaults) for every theme attribute and its default.
 
 There is no built-in per-page theme palette. Use
-[component-scoped CSS or an instance override](../components/index.md#customization-scopes)
+[component-scoped CSS or scoped overrides](../components/index.md#customization-scopes)
 when you need a narrower styling scope.
 
 ## Theme defaults
@@ -116,11 +117,10 @@ Customization section:
 - [Tables](../components/tables.md#customization)
 - [Images and video](../components/media.md#customization)
 - [Text and lists](../components/text.md#customization)
-- [Heading links](../components/heading-links.md#customization)
 
 Component guides distinguish **Customization** (all instances)
-from **Override an instance** (one occurrence). Both can use `extra_css`;
-an instance wrapper scopes the selector rather than replacing the component's
+from **Scoped overrides** (selected instances). Both can use `extra_css`;
+a wrapper class scopes the selector rather than replacing the component's
 HTML. See [Customization scopes](../components/index.md#customization-scopes).
 
 For the full set of native settings, use the

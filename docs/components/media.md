@@ -64,9 +64,9 @@ other component types, use a [custom stylesheet](index.md#load-custom-css):
 }
 ```
 
-### Override an instance
+### Scoped overrides
 
-Wrap only the target image, following [Scope one instance](index.md#scope-one-instance):
+Wrap the selected media, following [Scope selected instances](index.md#scope-selected-instances):
 
 ```markdown
 <div class="instance-media" markdown="1">
@@ -76,8 +76,8 @@ Wrap only the target image, following [Scope one instance](index.md#scope-one-in
 </div>
 ```
 
-Scope the frame rule to this image in the same stylesheet. Other images keep
-the component defaults; the image still uses normal Markdown syntax:
+Scope the frame rule to `.instance-media` in the same stylesheet. Unwrapped
+images keep the component defaults; the images still use normal Markdown syntax:
 
 ```css
 .instance-media img {

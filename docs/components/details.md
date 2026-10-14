@@ -55,7 +55,7 @@ This is alternative authoring syntax, not a requirement for customizing the
 component or overriding an instance's appearance.
 
 You can also write `<details><summary>Title</summary>Content</details>` directly.
-Follow [Scope one instance](index.md#scope-one-instance) to enable Markdown
+Follow [Scope selected instances](index.md#scope-selected-instances) to enable Markdown
 inside HTML, then add `markdown="1"` to the wrapper:
 
 ```html
@@ -101,9 +101,9 @@ details > summary {
 }
 ```
 
-### Override an instance
+### Scoped overrides
 
-Wrap only the target block, following [Scope one instance](index.md#scope-one-instance):
+Wrap each selected block, following [Scope selected instances](index.md#scope-selected-instances):
 
 ```markdown
 <div class="instance-details" markdown="1">
@@ -115,8 +115,8 @@ Wrap only the target block, following [Scope one instance](index.md#scope-one-in
 </div>
 ```
 
-Add this scoped rule to the same stylesheet. Other collapsible blocks keep
-the component defaults; you don't need to rewrite this one as native HTML:
+Add this scoped rule to the same stylesheet. Unwrapped collapsible blocks keep
+the component defaults; you don't need to rewrite the blocks as native HTML:
 
 ```css
 .instance-details > details > summary {

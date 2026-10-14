@@ -22,6 +22,7 @@ nav:
       - Icons: setup/icons.md
       - Branding and footer: setup/branding.md
       - Navigation: setup/navigation.md
+      - Heading permalinks: setup/heading-permalinks.md
       - Search: setup/search.md
       - Repository and page actions: setup/repository.md
       - Related sites: setup/related-sites.md
@@ -36,7 +37,6 @@ nav:
       - Collapsible content: components/details.md
       - Tables: components/tables.md
       - Images and video: components/media.md
-      - Heading links: components/heading-links.md
       - Page metadata: components/metadata.md
   - Reference:
       - Configuration: reference/configuration.md

@@ -164,35 +164,37 @@ def test_components_have_syntax_and_relevant_appearance_options() -> None:
 
 
 @pytest.mark.parametrize(
-    ("name", "wrapper", "component"),
+    ("section", "name", "wrapper", "component"),
     [
-        ("admonitions", "instance-admonition", '<div class="admonition note">'),
-        ("alerts", "instance-alert", 'class="gh-alert gh-alert--tip"'),
-        ("code-blocks", "instance-code", 'class="language-python highlight"'),
-        ("details", "instance-details", '<details class="note">'),
-        ("heading-links", "instance-heading", '<h2 id="a-specific-section">'),
-        ("media", "instance-media", '<img '),
-        ("tables", "instance-table", '<table>'),
-        ("tabs", "instance-tabs", 'class="tabbed-set tabbed-alternate"'),
-        ("text", "instance-quote", '<blockquote>'),
+        ("components", "admonitions", "instance-admonition", '<div class="admonition note">'),
+        ("components", "alerts", "instance-alert", 'class="gh-alert gh-alert--tip"'),
+        ("components", "code-blocks", "instance-code", 'class="language-python highlight"'),
+        ("components", "details", "instance-details", '<details class="note">'),
+        ("setup", "heading-permalinks", "instance-heading", '<h2 id="a-specific-section">'),
+        ("components", "media", "instance-media", '<img '),
+        ("components", "tables", "instance-table", '<table>'),
+        ("components", "tabs", "instance-tabs", 'class="tabbed-set tabbed-alternate"'),
+        ("components", "text", "instance-quote", '<blockquote>'),
     ],
 )
-def test_component_and_instance_customization_scopes_render(
-    documentation_dir: Path, name: str, wrapper: str, component: str,
+def test_component_and_scoped_overrides_render(
+    documentation_dir: Path, section: str, name: str, wrapper: str, component: str,
 ) -> None:
-    source = DOCS / "components" / f"{name}.md"
-    customization = guide_section(source, "Customization")
-    component_scope, instance_scope = customization.split("### Override an instance\n", 1)
+    source = DOCS / section / f"{name}.md"
+    heading = "Further customization" if section == "setup" else "Customization"
+    customization = guide_section(source, heading)
+    component_scope, scoped_overrides = customization.split("### Scoped overrides\n", 1)
     assert "### Customize the component\n" not in customization
+    assert "### Override an instance" not in customization
     assert PARAMETER_HEADER in component_scope
     assert "index.md#load-custom-css" in component_scope
-    assert "index.md#scope-one-instance" in instance_scope
+    assert "index.md#scope-selected-instances" in scoped_overrides
     all_css = re.findall(r"```css\n(.*?)\n```", component_scope, re.DOTALL)
-    instance_css = re.findall(r"```css\n(.*?)\n```", instance_scope, re.DOTALL)
-    assert all_css and instance_css
+    scoped_css = re.findall(r"```css\n(.*?)\n```", scoped_overrides, re.DOTALL)
+    assert all_css and scoped_css
     assert all("instance-" not in css for css in all_css)
-    assert all(css.lstrip().startswith(f".{wrapper}") for css in instance_css)
-    example = re.search(r"(?P<fence>`{3,})markdown\n(.*?)\n(?P=fence)", instance_scope, re.DOTALL)
+    assert all(css.lstrip().startswith(f".{wrapper}") for css in scoped_css)
+    example = re.search(r"(?P<fence>`{3,})markdown\n(.*?)\n(?P=fence)", scoped_overrides, re.DOTALL)
     assert example is not None
     config = load_config(config_file=str(ROOT / "mkdocs.yml"))
     html = Markdown(
@@ -201,10 +203,16 @@ def test_component_and_instance_customization_scopes_render(
     assert html.startswith(f'<div class="{wrapper}">')
     assert 'markdown="1"' not in html
     assert component in html
-    rendered = (documentation_dir / "components" / name / "index.html").read_text()
-    assert '<h2 id="customization">Customization' in rendered
+    reused_html = Markdown(
+        extensions=config.markdown_extensions, extension_configs=config.mdx_configs,
+    ).convert(f"{example[2]}\n\n{example[2]}")
+    assert reused_html.count(f'<div class="{wrapper}">') == 2
+    rendered = (documentation_dir / section / name / "index.html").read_text()
+    anchor = heading.lower().replace(" ", "-")
+    assert f'<h2 id="{anchor}">{heading}' in rendered
     assert 'id="customize-the-component"' not in rendered
-    assert '<h3 id="override-an-instance">Override an instance' in rendered
+    assert '<h3 id="scoped-overrides">Scoped overrides' in rendered
+    assert 'id="override-an-instance"' not in rendered
 
 
 def test_alerts_and_admonitions_have_separate_guides() -> None:
@@ -253,8 +261,13 @@ def test_nested_shadow_guidance_belongs_to_container_guides(documentation_dir: P
 
 def test_common_stylesheet_and_wrapper_setup_is_centralized() -> None:
     overview = DOCS / "components/index.md"
-    assert "extra_css:" in guide_section(overview, "Customization scopes")
-    assert "  - md_in_html\n" in guide_section(overview, "Customization scopes")
+    scopes = guide_section(overview, "Customization scopes")
+    assert "extra_css:" in scopes
+    assert "  - md_in_html\n" in scopes
+    assert "**Scoped overrides**" in scopes
+    assert "one or several instances" in scopes
+    assert "### Scope selected instances\n" in scopes
+    assert "Override an instance" not in scopes
     for source in (DOCS / "components").glob("*.md"):
         if source.name == "index.md":
             continue
@@ -318,7 +331,7 @@ def test_main_configuration_tables_stay_with_their_instructions() -> None:
             "Enable GA4": ("`provider`", "`measurement_id`", "`privacy_policy`", "`enabled`", "`site_url`"),
             "Shared consent": ("`consent_domain`",),
         },
-        "components/heading-links.md": {"Enable": ("`permalink`",)},
+        "setup/heading-permalinks.md": {"Enable": ("`permalink`",)},
         "components/metadata.md": {
             "Write metadata": ("`title`", "`description`"),
             "Site defaults": ("`site_name`", "`site_description`"),
@@ -360,7 +373,7 @@ def test_customization_tables_cover_appearance_not_feature_setup() -> None:
 
 
 def test_feature_guides_use_further_customization(documentation_dir: Path) -> None:
-    for name in ("branding", "navigation", "search", "repository", "related-sites", "analytics"):
+    for name in ("branding", "navigation", "heading-permalinks", "search", "repository", "related-sites", "analytics"):
         source = DOCS / "setup" / f"{name}.md"
         content = source.read_text()
         assert content.count("## Further customization\n") == 1, source
@@ -467,3 +480,28 @@ def test_setup_and_component_navigation_are_separate(documentation_dir: Path) ->
     tabs = (documentation_dir / "components/tabs/index.html").read_text()
     assert "accent_color" in tabs and "tab_hover_color" in tabs
     assert 'id="customization"' in tabs
+
+
+def test_heading_setup_is_separate_from_markdown_syntax(documentation_dir: Path) -> None:
+    config = load_config(config_file=str(ROOT / "mkdocs.yml"))
+    setup = next(item["Theme setup"] for item in config.nav if "Theme setup" in item)
+    components = next(item["Components"] for item in config.nav if "Components" in item)
+    setup_entries = {name: path for item in setup for name, path in item.items()}
+    assert setup_entries["Heading permalinks"] == "setup/heading-permalinks.md"
+    assert not any("heading" in path for item in components for path in item.values())
+    assert not (DOCS / "components/heading-links.md").exists()
+    permalink = DOCS / "setup/heading-permalinks.md"
+    assert permalink.read_text().startswith("# Heading permalinks\n")
+    assert "## Write headings\n" not in permalink.read_text()
+    enable = re.search(r"```yaml\n(.*?)\n```", guide_section(permalink, "Enable"), re.DOTALL)
+    assert enable is not None
+    assert yaml.safe_load(enable[1])["markdown_extensions"] == [{"toc": {"permalink": True}}]
+    text = DOCS / "components/text.md"
+    headings = guide_section(text, "Headings")
+    assert "# Page title\n\n## A section\n\n### A subsection" in headings
+    assert "../setup/heading-permalinks.md" in headings
+    assert "../components/text.md#headings" in permalink.read_text()
+    rendered = (documentation_dir / "components/text/index.html").read_text()
+    assert '<h2 id="headings">Headings' in rendered
+    rendered_setup = (documentation_dir / "setup/heading-permalinks/index.html").read_text()
+    assert '<h1 id="heading-permalinks">Heading permalinks' in rendered_setup

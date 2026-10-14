@@ -110,4 +110,4 @@ Page-action artwork scales with the heading. Its hover/focus shadow uses
 `accent_dark_color`. These links remain usable without JavaScript; the theme's
 script moves them immediately after the authored H1 when JavaScript is enabled.
 
-Heading permalinks are separate: see [Heading links](../components/heading-links.md).
+Heading permalinks are separate: see [Heading permalinks](heading-permalinks.md).

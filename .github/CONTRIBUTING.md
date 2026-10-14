@@ -45,6 +45,8 @@ python -m pytest tests/test_documentation.py -q
 Put site-wide configuration in Theme setup. Put page-authoring syntax,
 component behavior, and component-specific customization together in
 Components, even when those appearance settings live under `theme`.
+Keep site-wide heading permalink configuration in Theme setup and ordinary
+Markdown heading syntax in Text and lists.
 Cross-link shared colors/fonts rather than duplicating their full guides.
 Explain main configuration beside the example that enables or defines the
 feature. Use Further customization for optional appearance refinements in
@@ -62,8 +64,9 @@ CSS from theme options.
 Configuration defaults in Reference are checked against the theme by tests.
 
 In visible component guides, use Customization for all instances and add only
-the Override an instance subheading for one occurrence. Show component-scoped
-CSS for all instances, and use a wrapper-scoped selector for one instance.
+the Scoped overrides subheading for selected instances. Show component-scoped
+CSS for all instances, and use a wrapper-scoped selector for selected instances.
+Explain that the wrapper class can be reused for one or several instances.
 Both CSS scopes use `extra_css`;
 don't describe an HTML wrapper or native HTML authoring as a different styling
 mechanism. Link to the Components overview for stylesheet and `md_in_html` setup.

@@ -1,7 +1,24 @@
 # Text and lists
 
-Basic text, links, quotations, and lists use standard Markdown. No extra
+Headings, basic text, links, quotations, and lists use standard Markdown. No extra
 extension is required.
+
+## Headings
+
+```markdown
+# Page title
+
+## A section
+
+### A subsection
+```
+
+Use one H1 (`#`) for the page title, H2 (`##`) for sections, and H3 (`###`)
+for subsections. Keep heading levels in order rather than choosing a level
+for its visual size.
+
+For site-wide anchor-link visibility and appearance, see
+[Heading permalinks](../setup/heading-permalinks.md).
 
 ## Emphasis and inline code
 
@@ -85,9 +102,9 @@ component types, use a [custom stylesheet](index.md#load-custom-css):
 }
 ```
 
-### Override an instance
+### Scoped overrides
 
-Wrap only the target quotation, following [Scope one instance](index.md#scope-one-instance):
+Wrap each selected quotation, following [Scope selected instances](index.md#scope-selected-instances):
 
 ```markdown
 <div class="instance-quote" markdown="1">
@@ -97,7 +114,7 @@ Wrap only the target quotation, following [Scope one instance](index.md#scope-on
 </div>
 ```
 
-Scope the rail rule to this quotation in the same stylesheet. Other
+Scope the rail rule to `.instance-quote` in the same stylesheet. Unwrapped
 quotations keep the component defaults:
 
 ```css

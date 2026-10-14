@@ -72,9 +72,9 @@ component types, use a [custom stylesheet](index.md#load-custom-css):
 }
 ```
 
-### Override an instance
+### Scoped overrides
 
-Wrap only the target table, following [Scope one instance](index.md#scope-one-instance):
+Wrap each selected table, following [Scope selected instances](index.md#scope-selected-instances):
 
 ```markdown
 <div class="instance-table" markdown="1">
@@ -86,8 +86,8 @@ Wrap only the target table, following [Scope one instance](index.md#scope-one-in
 </div>
 ```
 
-Scope the header rule to this table in the same stylesheet. It keeps working
-when JavaScript adds the scrolling frame; other tables keep the component defaults:
+Scope the header rule to `.instance-table` in the same stylesheet. It keeps working
+when JavaScript adds the scrolling frame; unwrapped tables keep the component defaults:
 
 ```css
 .instance-table th {

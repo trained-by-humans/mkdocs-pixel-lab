@@ -101,9 +101,9 @@ target their component class:
 }
 ```
 
-### Override an instance
+### Scoped overrides
 
-Wrap only the target alert, following [Scope one instance](index.md#scope-one-instance):
+Wrap each selected alert, following [Scope selected instances](index.md#scope-selected-instances):
 
 ```markdown
 <div class="instance-alert" markdown="1">
@@ -115,8 +115,8 @@ Wrap only the target alert, following [Scope one instance](index.md#scope-one-in
 </div>
 ```
 
-Scope the same CSS variables to this alert in your stylesheet. Other tip
-alerts keep the component defaults:
+Scope the same CSS variables to `.instance-alert` in your stylesheet.
+Unwrapped tip alerts keep the component defaults:
 
 ```css
 .instance-alert > .gh-alert--tip {
