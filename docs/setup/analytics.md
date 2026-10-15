@@ -59,7 +59,7 @@ By default, consent is scoped to each site URL and Measurement ID. To share
 acceptance and rejection across a domain and its subdomains, use the same
 Measurement ID and `consent_domain` on every participating site:
 
-```yaml
+```yaml hl_lines="6"
 extra:
   analytics:
     provider: google

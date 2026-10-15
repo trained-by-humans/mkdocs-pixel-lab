@@ -77,6 +77,8 @@ brief context needed locally, rather than recapping the linked guide. Document n
 shadow behavior in the Components overview, with a brief note in relevant
 container guides; don't repeat it in child-content guides such as media and
 code blocks. Keep component-specific settings with their component.
+When a configuration example builds on an earlier snippet, use `hl_lines`
+to highlight added or changed options and leave repeated context unhighlighted.
 
 ### Test fixture
 

@@ -39,7 +39,7 @@ relative to `docs_dir`, not the repository root.
 
 Add footer text with `theme.footer_text`:
 
-```yaml
+```yaml hl_lines="3"
 theme:
   name: pixel-lab
   footer_text: Build something useful

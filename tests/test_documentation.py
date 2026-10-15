@@ -23,6 +23,7 @@ GUIDES = sorted(
     if source.name != "index.md"
 )
 PARAMETER_HEADER = "| Parameter | Default | Effect |"
+YAML_EXAMPLE = re.compile(r"^```yaml(?:[ \t]+[^\n]*)?\n(.*?)\n```$", re.MULTILINE | re.DOTALL)
 
 
 class PageLinks(HTMLParser):
@@ -118,7 +119,7 @@ def test_readme_links_to_manual_and_keeps_a_minimal_theme_example() -> None:
     } <= guides
     for guide in guides:
         assert (ROOT / guide).is_file(), guide
-    examples = re.findall(r"^```yaml\n(.*?)\n```$", content, re.MULTILINE | re.DOTALL)
+    examples = YAML_EXAMPLE.findall(content)
     assert len(examples) == 1
     assert yaml.safe_load(examples[0]) == {"theme": {"name": "pixel-lab"}}
     for asset in re.findall(r'<img\s+src="([^"]+)"', content):
@@ -230,7 +231,7 @@ def test_troubleshooting_has_a_dedicated_reference_page(documentation_dir: Path)
 def test_documented_theme_defaults_match_implementation() -> None:
     reference = (DOCS / "reference/configuration.md").read_text()
     defaults_section = reference.split("## Theme defaults\n", 1)[1]
-    example = re.search(r"```yaml\n(.*?)\n```", defaults_section, re.DOTALL)
+    example = YAML_EXAMPLE.search(defaults_section)
     assert example is not None
     documented = yaml.safe_load(example.group(1))["theme"]
     actual = yaml.safe_load((ROOT / "src/mkdocs_pixel_lab/mkdocs_theme.yml").read_text())
@@ -239,13 +240,67 @@ def test_documented_theme_defaults_match_implementation() -> None:
 
 def test_documentation_yaml_examples_are_valid() -> None:
     for source in DOCS.rglob("*.md"):
-        for match in re.finditer(r"^```yaml\n(.*?)\n```$", source.read_text(), re.MULTILINE | re.DOTALL):
+        for match in YAML_EXAMPLE.finditer(source.read_text()):
             assert yaml.safe_load(match.group(1)) is not None, source
+
+
+@pytest.mark.parametrize(
+    ("path", "sections"),
+    [
+        ("setup/analytics.md", {
+            "Shared consent": [["consent_domain: example.com"]],
+        }),
+        ("setup/heading-permalinks.md", {
+            "Further customization": [[
+                'permalink: "⚓"', 'permalink_title: "Link to this section"',
+                "permalink_leading: false",
+            ]],
+        }),
+        ("setup/repository.md", {
+            "Repository button": [["show_repo_name: false"]],
+            "Page source and editing": [["edit_uri: edit/main/docs/"]],
+            "Control visibility": [["show_source: true", "show_edit: false"]],
+        }),
+        ("setup/related-sites.md", {
+            "Footer": [["show_footer: true", "footer_size: 3", "footer_label: Projects"]],
+            "Header: inline": [["header_mode: inline", "header_size: 3"]],
+            "Header: dropdown": [
+                ["header_mode: dropdown", "dropdown_label: Projects"],
+                ["icon: assets/api.svg", "icon_hover: assets/api.svg#icon-hover"],
+            ],
+        }),
+        ("setup/branding.md", {
+            "Footer": [["footer_text: Build something useful"]],
+        }),
+        ("reference/plugins.md", {
+            "Robots.txt": [["- pixel-lab/robots"]],
+        }),
+    ],
+)
+def test_incremental_configuration_examples_highlight_new_options(
+    documentation_dir: Path, path: str, sections: dict[str, list[list[str]]],
+) -> None:
+    source = DOCS / path
+    highlighted_count = 0
+    for heading, expected_blocks in sections.items():
+        examples = re.findall(
+            r'^```yaml hl_lines="([0-9 ]+)"\n(.*?)\n```$',
+            guide_section(source, heading), re.MULTILINE | re.DOTALL,
+        )
+        assert len(examples) == len(expected_blocks), (source, heading)
+        for (highlighted, content), expected in zip(examples, expected_blocks):
+            lines = content.splitlines()
+            numbers = [int(number) for number in highlighted.split()]
+            assert all(1 <= number <= len(lines) for number in numbers), (source, heading)
+            assert [lines[number - 1].strip() for number in numbers] == expected
+            highlighted_count += len(numbers)
+    rendered = (documentation_dir / Path(path).with_suffix("") / "index.html").read_text()
+    assert rendered.count('class="hll"') == highlighted_count, source
 
 
 def test_quick_start_rich_markdown_stays_focused_on_components() -> None:
     section = guide_section(DOCS / "getting-started.md", "Enable rich Markdown")
-    example = re.search(r"```yaml\n(.*?)\n```", section, re.DOTALL)
+    example = YAML_EXAMPLE.search(section)
     assert example is not None
     config = yaml.safe_load(example[1])
     assert set(config) == {"markdown_extensions"}
@@ -257,7 +312,7 @@ def test_quick_start_rich_markdown_stays_focused_on_components() -> None:
 
 def test_tab_setup_links_to_highlighting_instead_of_repeating_configuration() -> None:
     section = guide_section(DOCS / "components/tabs.md", "Enable")
-    example = re.search(r"```yaml\n(.*?)\n```", section, re.DOTALL)
+    example = YAML_EXAMPLE.search(section)
     assert example is not None
     assert yaml.safe_load(example[1]) == {
         "markdown_extensions": [{"pymdownx.tabbed": {"alternate_style": True}}],
@@ -272,7 +327,7 @@ def test_color_examples_match_the_site_default_palette() -> None:
     for key, value in colors.items():
         assert config.theme[key] == value, key
     for source in DOCS.rglob("*.md"):
-        for match in re.finditer(r"^```yaml\n(.*?)\n```$", source.read_text(), re.MULTILINE | re.DOTALL):
+        for match in YAML_EXAMPLE.finditer(source.read_text()):
             example = yaml.safe_load(match.group(1))
             if not isinstance(example, dict):
                 continue
@@ -363,7 +418,7 @@ def test_alerts_and_admonitions_have_separate_guides() -> None:
     ):
         source = DOCS / "components" / f"{name}.md"
         assert source.read_text().startswith(f"# {title}\n")
-        example = re.search(r"```yaml\n(.*?)\n```", guide_section(source, "Enable"), re.DOTALL)
+        example = YAML_EXAMPLE.search(guide_section(source, "Enable"))
         assert example is not None
         assert yaml.safe_load(example.group(1))["markdown_extensions"] == [extension]
     alerts = DOCS / "components/alerts.md"
@@ -407,7 +462,7 @@ def test_common_stylesheet_and_wrapper_setup_is_centralized() -> None:
     for source in (DOCS / "components").glob("*.md"):
         if source.name == "index.md":
             continue
-        for match in re.finditer(r"^```yaml\n(.*?)\n```$", source.read_text(), re.MULTILINE | re.DOTALL):
+        for match in YAML_EXAMPLE.finditer(source.read_text()):
             example = yaml.safe_load(match[1])
             assert "extra_css" not in example, source
             assert example.get("markdown_extensions") != ["md_in_html"], source
@@ -629,7 +684,7 @@ def test_heading_setup_is_separate_from_markdown_syntax(documentation_dir: Path)
     permalink = DOCS / "setup/heading-permalinks.md"
     assert permalink.read_text().startswith("# Heading permalinks\n")
     assert "## Write headings\n" not in permalink.read_text()
-    enable = re.search(r"```yaml\n(.*?)\n```", guide_section(permalink, "Enable"), re.DOTALL)
+    enable = YAML_EXAMPLE.search(guide_section(permalink, "Enable"))
     assert enable is not None
     assert yaml.safe_load(enable[1])["markdown_extensions"] == [{"toc": {"permalink": True}}]
     text = DOCS / "components/text.md"

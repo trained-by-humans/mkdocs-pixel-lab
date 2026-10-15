@@ -42,7 +42,7 @@ preserved and Pixel Lab doesn't run Git commands.
 
 ## Robots.txt
 
-```yaml
+```yaml hl_lines="4"
 site_url: https://example.com/
 plugins:
   - search

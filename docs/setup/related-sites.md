@@ -42,7 +42,7 @@ enabled when a catalog is configured. Merge the settings below into the same
 
 Show related-site links before the theme attribution:
 
-```yaml
+```yaml hl_lines="3 4 5"
 extra:
   site_navigation:
     show_footer: true
@@ -69,7 +69,7 @@ For footer text and attribution, see [Branding and footer](branding.md#footer).
 
 Place text links directly in the header instead of using a dropdown:
 
-```yaml
+```yaml hl_lines="3 4"
 extra:
   site_navigation:
     header_mode: inline
@@ -92,7 +92,7 @@ catalog. Inline links hide on narrow screens and don't display item icons.
 
 Use a toolbar button to open all configured links:
 
-```yaml
+```yaml hl_lines="3 4"
 extra:
   site_navigation:
     header_mode: dropdown
@@ -118,11 +118,11 @@ Each item and the catalog can specify an `icon` path relative to `docs_dir`
 or an image URL. Artwork appears in the dropdown; omitted artwork gets a
 themed pixel fallback.
 
-```yaml
+```yaml hl_lines="6 7"
 extra:
   site_navigation:
     items:
-      - title: API
+      - title: API reference
         url: https://example.com/api/
         icon: assets/api.svg
         icon_hover: assets/api.svg#icon-hover

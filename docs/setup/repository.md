@@ -21,7 +21,7 @@ repo_name: GitHub
 MkDocs normally infers GitHub, GitLab, or Bitbucket for the label. To show
 only the icon:
 
-```yaml
+```yaml hl_lines="4"
 theme:
   name: pixel-lab
   show_repo: true
@@ -35,7 +35,7 @@ The icon-only version retains its accessible label and tooltip. See
 
 Set MkDocs' `edit_uri` to your branch and Markdown directory:
 
-```yaml
+```yaml hl_lines="2"
 repo_url: https://github.com/OWNER/REPO
 edit_uri: edit/main/docs/
 theme:
@@ -66,7 +66,7 @@ URL inference is limited to standard `github.com` URLs.
 
 Choose which actions to show with the visibility settings under `theme`:
 
-```yaml
+```yaml hl_lines="3 4"
 theme:
   name: pixel-lab
   show_source: true

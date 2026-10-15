@@ -38,7 +38,7 @@ generated heading links themselves don't require it.
 To replace the built-in icon with a text symbol or adjust the tooltip and
 position, configure `toc`:
 
-```yaml
+```yaml hl_lines="3 4 5"
 markdown_extensions:
   - toc:
       permalink: "⚓"
