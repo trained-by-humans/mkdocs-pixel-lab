@@ -1,4 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const pageActions = document.querySelectorAll(".main > .page-source, .main > .page-edit");
+  const pageTitle = document.querySelector(".main h1");
+  if (pageTitle) {
+    // Preserve the authored title and its ID, including any inline markup.
+    pageTitle.append(...pageActions);
+  }
+
   const searchShell = document.querySelector(".search-shell");
   const searchToggle = document.querySelector("#search-toggle");
   const searchInput = document.querySelector("#mkdocs-search-query");
@@ -23,19 +30,36 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const setSearchPreview = (open) => {
+    if (!searchShell || !searchToggle) return;
+    if (open && (siteShell?.classList.contains("is-open") || mobileNav?.classList.contains("is-open"))) return;
+    searchShell.classList.toggle("is-preview", open);
+    searchToggle.setAttribute("aria-expanded", String(open || searchShell.classList.contains("is-open")));
+    if (open) setSiteOpen(false);
+  };
+
   const setSearchOpen = (open) => {
     if (!searchShell || !searchToggle) return;
     searchShell.classList.toggle("is-open", open);
-    searchToggle.setAttribute("aria-expanded", String(open));
+    setSearchPreview(false);
     if (open) setSiteOpen(false);
+  };
+
+  const setSitePreview = (open) => {
+    if (!siteShell || !siteToggle || !sitePanel) return;
+    if (open && (searchShell?.classList.contains("is-open") || mobileNav?.classList.contains("is-open"))) return;
+    siteShell.classList.toggle("is-preview", open);
+    const expanded = open || siteShell.classList.contains("is-open");
+    sitePanel.hidden = !expanded;
+    siteToggle.setAttribute("aria-expanded", String(expanded));
+    if (!expanded) resetSiteIcons.forEach((reset) => reset());
+    if (open) setSearchOpen(false);
   };
 
   const setSiteOpen = (open) => {
     if (!siteShell || !siteToggle || !sitePanel) return;
-    sitePanel.hidden = !open;
     siteShell.classList.toggle("is-open", open);
-    siteToggle.setAttribute("aria-expanded", String(open));
-    if (!open) resetSiteIcons.forEach((reset) => reset());
+    setSitePreview(false);
     if (open) setSearchOpen(false);
   };
 
@@ -53,23 +77,45 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   if (searchShell && searchToggle && searchInput) {
-    searchToggle.addEventListener("click", () => {
+    let searchHovered = false;
+    searchToggle.addEventListener("click", (event) => {
       const open = !searchShell.classList.contains("is-open");
       setSearchOpen(open);
-      if (open) window.requestAnimationFrame(() => {
-        if (searchShell.classList.contains("is-open")) searchInput.focus();
-      });
+      if (open) {
+        window.requestAnimationFrame(() => {
+          if (searchShell.classList.contains("is-open")) searchInput.focus();
+        });
+      } else {
+        searchToggle.focus();
+        // A second mouse click deactivates typing but keeps the hover preview.
+        // Keyboard activation and touch still dismiss explicitly.
+        if (event.detail > 0 && searchHovered) setSearchPreview(true);
+      }
     });
 
     document.addEventListener("click", (event) => {
       if (!searchShell.contains(event.target)) setSearchOpen(false);
     });
 
-    searchShell.addEventListener("pointerenter", () => setSiteOpen(false));
-    searchShell.addEventListener("focusin", () => setSiteOpen(false));
+    searchShell.addEventListener("pointerenter", (event) => {
+      // Touch uses explicit activation; hovering never steals keyboard focus.
+      searchHovered = event.pointerType !== "touch";
+      if (searchHovered && !searchShell.classList.contains("is-open")) {
+        setSearchPreview(true);
+      }
+    });
+    searchShell.addEventListener("pointerleave", () => {
+      searchHovered = false;
+      setSearchPreview(false);
+    });
+    searchInput.addEventListener("focus", () => setSearchOpen(true));
+    searchShell.addEventListener("focusout", (event) => {
+      if (!searchShell.contains(event.relatedTarget)) setSearchOpen(false);
+    });
   }
 
   if (siteShell && siteToggle && sitePanel) {
+    let siteHovered = false;
     const links = Array.from(sitePanel.querySelectorAll("a"));
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const hoverAssets = new Map();
@@ -132,7 +178,23 @@ document.addEventListener("DOMContentLoaded", () => {
     reducedMotion.addEventListener("change", () => {
       if (reducedMotion.matches) resetSiteIcons.forEach((reset) => reset());
     });
-    siteToggle.addEventListener("click", () => setSiteOpen(sitePanel.hidden));
+    siteToggle.addEventListener("click", (event) => {
+      const open = !siteShell.classList.contains("is-open");
+      setSiteOpen(open);
+      if (!open) {
+        siteToggle.focus();
+        if (event.detail > 0 && siteHovered) setSitePreview(true);
+      }
+    });
+    siteShell.addEventListener("pointerenter", (event) => {
+      siteHovered = event.pointerType !== "touch";
+      if (siteHovered && !siteShell.classList.contains("is-open")) setSitePreview(true);
+    });
+    siteShell.addEventListener("pointerleave", () => {
+      siteHovered = false;
+      setSitePreview(false);
+    });
+    sitePanel.addEventListener("focusin", () => setSiteOpen(true));
     siteToggle.addEventListener("keydown", (event) => {
       if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
       event.preventDefault();
@@ -162,14 +224,16 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
     if (sitePanel && !sitePanel.hidden) {
+      const hadSiteFocus = siteShell?.contains(document.activeElement);
       setSiteOpen(false);
-      siteToggle.focus();
+      if (hadSiteFocus) siteToggle.focus();
     } else if (mobileNav?.classList.contains("is-open")) {
       setNavOpen(false);
       navToggle?.focus();
-    } else if (searchShell?.contains(document.activeElement) || searchShell?.classList.contains("is-open")) {
+    } else if (searchShell?.contains(document.activeElement) || searchToggle?.getAttribute("aria-expanded") === "true") {
+      const hadSearchFocus = searchShell?.contains(document.activeElement);
       setSearchOpen(false);
-      searchToggle?.focus();
+      if (hadSearchFocus) searchToggle?.focus();
     }
   });
 
@@ -238,16 +302,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 1600);
     });
   });
-
-  if (document.body.dataset.permalinkIcon === "chain") {
-    document.querySelectorAll(".main .headerlink").forEach((anchor) => {
-      if (anchor.querySelector(".headerlink__fill")) return;
-      const fill = document.createElement("span");
-      fill.className = "headerlink__fill";
-      fill.setAttribute("aria-hidden", "true");
-      anchor.prepend(fill);
-    });
-  }
 
   const trackedHeadings = Array.from(
     document.querySelectorAll(".main h2[id], .main h3[id], .main h4[id], .main h5[id], .main h6[id]"),

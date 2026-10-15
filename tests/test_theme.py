@@ -12,6 +12,8 @@ import threading
 from pathlib import Path
 
 import pytest
+from mkdocs.commands.build import build
+from mkdocs.config import load_config
 from playwright.sync_api import expect
 
 
@@ -47,8 +49,17 @@ def site_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
     return destination
 
 
-@pytest.fixture()
-def site_url(site_dir: Path):
+@pytest.fixture(scope="session")
+def edit_site_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    destination = tmp_path_factory.mktemp("edit-site")
+    config = load_config(
+        config_file=str(FIXTURE / "mkdocs.yml"), site_dir=str(destination), strict=True,
+    )
+    build(config)
+    return destination
+
+
+def serve_site(site_dir: Path):
     handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(site_dir))
     server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -60,9 +71,269 @@ def site_url(site_dir: Path):
         thread.join()
 
 
+@pytest.fixture()
+def site_url(site_dir: Path):
+    yield from serve_site(site_dir)
+
+
+@pytest.fixture()
+def edit_site_url(edit_site_dir: Path):
+    yield from serve_site(edit_site_dir)
+
+
+@pytest.fixture(scope="session", params=["assets/site-navigation-hover.svg#icon-hover", "assets/favicon.png"])
+def custom_repo_site_dir(request, tmp_path_factory):
+    destination = tmp_path_factory.mktemp("custom-repo-site")
+    config = load_config(
+        config_file=str(FIXTURE / "mkdocs.yml"), site_dir=str(destination), strict=True,
+    )
+    config.theme["icon"] = {"repo": request.param}
+    build(config)
+    return destination, request.param
+
+
+@pytest.fixture()
+def custom_repo_site_url(custom_repo_site_dir):
+    destination, icon = custom_repo_site_dir
+    for url in serve_site(destination):
+        yield url, icon
+
+
+@pytest.fixture(scope="session", params=[None, "assets/site-navigation-hover.svg#icon-hover", "assets/favicon.png"], ids=["default", "svg", "png"])
+def icon_only_repo_site_dir(request, tmp_path_factory):
+    destination = tmp_path_factory.mktemp("icon-only-repo-site")
+    config = load_config(
+        config_file=str(FIXTURE / "mkdocs.yml"), site_dir=str(destination), strict=True,
+    )
+    config.theme["show_repo_name"] = False
+    config.theme["icon"] = {"repo": request.param}
+    config.repo_name = 'Fixture "source" & code'
+    config.extra["site_navigation"] = {
+        "dropdown_label": "Packages",
+        "items": [{"title": "Guide", "url": "guide/nested/"}],
+    }
+    build(config)
+    return destination
+
+
+@pytest.fixture()
+def icon_only_repo_site_url(icon_only_repo_site_dir):
+    yield from serve_site(icon_only_repo_site_dir)
+
+
 def test_strict_fixture_build(site_dir: Path) -> None:
     assert (site_dir / "index.html").is_file()
     assert (site_dir / "assets" / "css" / "style.css").is_file()
+    icon = (site_dir / "assets/icons/page-source.svg").read_text()
+    assert 'shape-rendering="crispEdges"' in icon
+    assert "<path " in icon and "<image" not in icon
+    edit_icon = (site_dir / "assets/icons/page-edit.svg").read_text()
+    assert 'shape-rendering="crispEdges"' in edit_icon
+    assert 'id="edit-pixel"' in edit_icon and "<path " in edit_icon
+    search_icon = (site_dir / "assets/icons/search.svg").read_text()
+    assert 'id="search"' in search_icon and "<path " in search_icon
+
+
+def test_page_source_icon_has_one_pixel_gap(page, site_url: str) -> None:
+    page.goto(site_url)
+    pixels = page.evaluate("""async () => {
+        const icon = new Image();
+        icon.src = new URL('assets/icons/page-source.svg', document.baseURI).href;
+        await icon.decode();
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 24;
+        const context = canvas.getContext('2d');
+        context.drawImage(icon, 0, 0, 24, 24);
+        // Slash, transparent gap, and right bracket at their closest point.
+        return [13, 14, 15].map(x => context.getImageData(x, 5, 1, 1).data[3]);
+    }""")
+    assert pixels == [255, 0, 255]
+
+
+@pytest.mark.parametrize("width", [1440, 390, 320])
+@pytest.mark.parametrize("long_title", [False, True])
+def test_page_source_icon_trails_title(page, site_url: str, width: int, long_title: bool) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(f"{site_url}/guide/nested/")
+    page.evaluate("document.fonts.ready")
+    title = page.locator(".main h1")
+    expect(title).to_have_count(1)
+    expect(title).to_have_attribute("id", "nested-page")
+    if long_title:
+        title.evaluate("element => { element.firstChild.textContent = 'A very long documentation title that wraps across several lines'; }")
+    source = page.get_by_role("link", name="View source", exact=True)
+    expect(source).to_be_visible()
+    expect(source).to_have_attribute(
+        "href", "https://github.com/trained-by-humans/pixel-lab-fixture/blob/main/docs/guide/nested.md",
+    )
+    expect(source).to_have_attribute("title", "View source on GitHub")
+    assert source.text_content().strip() == ""
+    expect(page.get_by_role("link", name="Edit this page", exact=True)).to_have_count(1)
+    expect(page.locator(".footer .page-source")).to_have_count(0)
+    assert source.evaluate("element => element.parentElement.tagName === 'H1' && element.nextElementSibling.classList.contains('page-edit')")
+    font_size = title.evaluate("element => parseFloat(getComputedStyle(element).fontSize)")
+    last_line = title.evaluate("""element => {
+        const range = document.createRange();
+        range.selectNodeContents(element.firstChild);
+        const rectangle = Array.from(range.getClientRects()).at(-1);
+        return {right: rectangle.right, top: rectangle.top, bottom: rectangle.bottom};
+    }""")
+    source_bounds = source.bounding_box()
+    assert source_bounds["height"] == pytest.approx(font_size * 0.7, abs=0.1)
+    assert source_bounds["width"] == pytest.approx(font_size * 0.7, abs=0.1)
+    assert source_bounds["x"] == pytest.approx(last_line["right"] + 7.2, abs=1)
+    assert source_bounds["y"] >= last_line["top"] - 1
+    assert source_bounds["y"] + source_bounds["height"] <= last_line["bottom"] + 1
+    expect(source).to_have_css("background-color", "rgba(0, 0, 0, 0)")
+    expect(source).to_have_css("border-top-width", "0px")
+    expect(source).to_have_css("box-shadow", "none")
+    expect(source).to_have_css("vertical-align", "baseline")
+    assert source.evaluate("element => getComputedStyle(element, '::before').opacity") == "0"
+    source.hover()
+    assert source.evaluate("element => getComputedStyle(element, '::before').opacity") == "1"
+    shadow_offset = source.evaluate("""element => {
+        const matrix = new DOMMatrix(getComputedStyle(element, '::before').transform);
+        return [matrix.m41, matrix.m42];
+    }""")
+    assert shadow_offset == pytest.approx([font_size * 0.07] * 2, abs=0.01)
+    assert source.bounding_box() == source_bounds
+    expect(source).to_have_css("background-color", "rgba(0, 0, 0, 0)")
+    page.mouse.move(0, 0)
+    assert source.evaluate("element => getComputedStyle(element, '::before').opacity") == "0"
+    page.keyboard.press("Tab")
+    source.focus()
+    expect(source).to_be_focused()
+    expect(source).to_have_css("outline-style", "solid")
+    assert source.evaluate("element => getComputedStyle(element, '::before').opacity") == "1"
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+
+@pytest.mark.parametrize("width", [1440, 390])
+def test_page_source_link_works_without_javascript(browser, site_url: str, width: int) -> None:
+    context = browser.new_context(java_script_enabled=False, viewport={"width": width, "height": 900})
+    try:
+        page = context.new_page()
+        page.goto(f"{site_url}/guide/nested/")
+        source = page.get_by_role("link", name="View source", exact=True)
+        expect(source).to_be_visible()
+        expect(source).to_have_attribute(
+            "href", "https://github.com/trained-by-humans/pixel-lab-fixture/blob/main/docs/guide/nested.md",
+        )
+        assert source.bounding_box()["y"] == pytest.approx(page.locator(".main h1").bounding_box()["y"], abs=1)
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+    finally:
+        context.close()
+
+
+def test_page_edit_icon_uses_pen_nib_and_stepped_underline(page, edit_site_url: str) -> None:
+    page.goto(edit_site_url)
+    pixels = page.evaluate("""async () => {
+        const icon = new Image();
+        icon.src = new URL('assets/icons/page-edit.svg', document.baseURI).href;
+        await icon.decode();
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 44;
+        const context = canvas.getContext('2d');
+        context.drawImage(icon, 0, 0, 44, 44);
+        // Sample the selected pen-nib silhouette and its stepped underline.
+        return Array.from({length: 22}, (_, y) =>
+            Array.from({length: 22}, (_, x) =>
+                context.getImageData(x * 2 + 1, y * 2 + 1, 1, 1).data[3] === 255 ? '#' : '.'
+            ).join(''));
+    }""")
+    assert pixels == [
+        "................###...",
+        "...............#####..",
+        "..............#######.",
+        ".............#########",
+        "...........###########",
+        "........##############",
+        ".....######...#######.",
+        "....####.......#####..",
+        "....##..........###...",
+        "...##...........##....",
+        "...##...........##....",
+        "...##..###.....##.....",
+        "..##...####....##.....",
+        "..##...####....##.....",
+        "..##..#####...##......",
+        ".##..###......##......",
+        ".##.###......###......",
+        ".#####....#####.......",
+        "#####..######.........",
+        "##########.........###",
+        "#######........#######",
+        ".###...........#######",
+    ]
+
+
+@pytest.mark.parametrize("width", [1440, 390, 320])
+@pytest.mark.parametrize("long_title", [False, True])
+def test_page_edit_icon_trails_source(page, edit_site_url: str, width: int, long_title: bool) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(f"{edit_site_url}/guide/nested/")
+    page.evaluate("document.fonts.ready")
+    title = page.locator(".main h1")
+    if long_title:
+        title.evaluate("element => { element.firstChild.textContent = 'A very long documentation title that wraps across several lines'; }")
+    expect(title).to_have_attribute("id", "nested-page")
+    source = page.get_by_role("link", name="View source", exact=True)
+    edit = page.get_by_role("link", name="Edit this page", exact=True)
+    expect(edit).to_be_visible()
+    expect(edit).to_have_attribute(
+        "href", "https://github.com/trained-by-humans/pixel-lab-fixture/edit/main/docs/guide/nested.md",
+    )
+    expect(edit).to_have_attribute("title", "Edit this page")
+    assert edit.evaluate("element => element.parentElement.tagName === 'H1' && element.previousElementSibling.classList.contains('page-source') && element.parentElement.lastChild === element")
+    assert edit.text_content().strip() == ""
+    font_size = title.evaluate("element => parseFloat(getComputedStyle(element).fontSize)")
+    bounds = edit.bounding_box()
+    assert bounds["width"] == pytest.approx(font_size * 0.7, abs=0.1)
+    assert bounds["height"] == pytest.approx(font_size * 0.7, abs=0.1)
+    source_bounds = source.bounding_box()
+    # Either trails View source on the same line, or wraps without overlapping.
+    assert bounds["y"] > source_bounds["y"] or bounds["x"] >= source_bounds["x"] + source_bounds["width"]
+    expect(edit).to_have_css("background-color", "rgba(0, 0, 0, 0)")
+    expect(edit).to_have_css("border-top-width", "0px")
+    expect(edit).to_have_css("box-shadow", "none")
+    mask = edit.evaluate("element => getComputedStyle(element, '::after').maskImage")
+    assert mask.endswith('/assets/icons/page-edit.svg")')
+    assert edit.evaluate("element => getComputedStyle(element, '::before').opacity") == "0"
+    edit.hover()
+    assert edit.evaluate("element => getComputedStyle(element, '::before').opacity") == "1"
+    shadow_offset = edit.evaluate("""element => {
+        const matrix = new DOMMatrix(getComputedStyle(element, '::before').transform);
+        return [matrix.m41, matrix.m42];
+    }""")
+    assert shadow_offset == pytest.approx([font_size * 0.07] * 2, abs=0.01)
+    assert edit.bounding_box() == bounds
+    page.mouse.move(0, 0)
+    assert edit.evaluate("element => getComputedStyle(element, '::before').opacity") == "0"
+    source.focus()
+    page.keyboard.press("Tab")
+    expect(edit).to_be_focused()
+    expect(edit).to_have_css("outline-style", "solid")
+    assert edit.evaluate("element => getComputedStyle(element, '::before').opacity") == "1"
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+
+@pytest.mark.parametrize("width", [1440, 390, 320])
+def test_page_edit_link_works_without_javascript(browser, edit_site_url: str, width: int) -> None:
+    context = browser.new_context(java_script_enabled=False, viewport={"width": width, "height": 900})
+    try:
+        page = context.new_page()
+        page.goto(f"{edit_site_url}/guide/nested/")
+        source = page.get_by_role("link", name="View source", exact=True)
+        edit = page.get_by_role("link", name="Edit this page", exact=True)
+        expect(source).to_be_visible()
+        expect(edit).to_be_visible()
+        expect(edit).to_have_attribute(
+            "href", "https://github.com/trained-by-humans/pixel-lab-fixture/edit/main/docs/guide/nested.md",
+        )
+        assert edit.bounding_box()["x"] + edit.bounding_box()["width"] <= source.bounding_box()["x"]
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+    finally:
+        context.close()
 
 
 def test_code_highlighting_is_bundled_and_rendered(site_dir: Path) -> None:
@@ -278,6 +549,179 @@ def test_trademark_glyph_uses_theme_colors(page, site_url: str) -> None:
     expect(glyph.locator(".brand-trademark__outline")).to_have_css("fill", "rgb(254, 220, 186)")
     expect(glyph.locator(".brand-trademark__rim")).to_have_css("fill", "rgb(18, 52, 86)")
     expect(glyph.locator(".brand-trademark__fill")).to_have_css("fill", "rgb(171, 205, 239)")
+
+
+@pytest.mark.parametrize("width", [1440, 390, 320])
+@pytest.mark.parametrize("javascript", [True, False])
+def test_default_search_icon_in_toolbar(browser, site_url: str, width: int, javascript: bool) -> None:
+    context = browser.new_context(java_script_enabled=javascript, viewport={"width": width, "height": 900})
+    try:
+        page = context.new_page()
+        page.goto(f"{site_url}/guide/nested/")
+        page.evaluate("document.fonts.ready")
+        search = page.get_by_role("button", name="SEARCH", exact=True)
+        icon = search.locator(".header-btn__icon--search")
+        expect(icon).to_be_visible()
+        expect(icon).to_have_attribute("aria-hidden", "true")
+        assert icon.text_content() == ""
+        expect(icon).to_have_css("width", "14px")
+        expect(icon).to_have_css("height", "14px")
+        expect(icon).to_have_css("transform", "none")
+        expect(icon).to_have_css("box-shadow", "none")
+        expect(icon).to_have_css("mask-image", f'url("{site_url}/assets/icons/search.svg")')
+        assert icon.evaluate("element => getComputedStyle(element).backgroundColor") == (
+            search.evaluate("element => getComputedStyle(element).color")
+        )
+        search.hover()
+        expect(search).to_have_css("transform", "matrix(1, 0, 0, 1, -3, -3)")
+        expect(icon).to_have_css("box-shadow", "none")
+        page.locator("html").evaluate("element => element.style.setProperty('--strong-text', '#abcdef')")
+        expect(icon).to_have_css("background-color", "rgb(171, 205, 239)")
+        if javascript:
+            search.click()
+            expect(page.locator("#mkdocs-search-query")).to_be_focused()
+            page.keyboard.press("Escape")
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+    finally:
+        context.close()
+
+
+@pytest.mark.parametrize("width", [1440, 851, 850, 700, 600, 390, 320])
+@pytest.mark.parametrize("javascript", [True, False])
+def test_repository_button_in_toolbar(browser, site_url: str, width: int, javascript: bool) -> None:
+    context = browser.new_context(java_script_enabled=javascript, viewport={"width": width, "height": 900})
+    try:
+        page = context.new_page()
+        page.goto(site_url)
+        page.evaluate("document.fonts.ready")
+        repo = page.get_by_role("link", name="Open repository: GitHub", exact=True)
+        expect(repo).to_be_visible()
+        expect(repo).to_have_attribute("href", "https://github.com/trained-by-humans/pixel-lab-fixture")
+        expect(repo).to_have_attribute("title", "Open repository: GitHub")
+        expect(repo.locator(".header-btn__label")).to_have_text("GitHub")
+        expect(repo.locator(".header-btn__icon")).to_have_attribute("aria-hidden", "true")
+        expect(repo.locator(".header-btn__icon")).to_have_css("height", "14px")
+        expect(repo).to_have_css("box-shadow", "none")
+        expect(repo).to_have_css("transform", "none")
+        label = repo.locator(".header-btn__label")
+        if width <= 850:
+            expect(label).to_be_hidden()
+        else:
+            expect(label).to_be_visible()
+        bounds = repo.bounding_box()
+        brand = page.locator(".brand").bounding_box()
+        search = page.locator("#search-toggle").bounding_box()
+        assert bounds["x"] >= brand["x"] + brand["width"]
+        assert search["x"] + search["width"] <= bounds["x"]
+        assert bounds["x"] + bounds["width"] <= width - 2
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+        repo.hover()
+        expect(repo).to_have_css("background-color", "rgb(245, 200, 66)")
+        expect(repo).to_have_css("box-shadow", "rgb(101, 67, 33) 3px 3px 0px 0px")
+        expect(repo).to_have_css("transform", "matrix(1, 0, 0, 1, -3, -3)")
+        page.mouse.move(0, 800)
+        expect(repo).to_have_css("box-shadow", "none")
+        page.keyboard.press("Tab")
+        repo.focus()
+        expect(repo).to_be_focused()
+        expect(repo).to_have_css("box-shadow", "rgb(101, 67, 33) 3px 3px 0px 0px")
+        page.route("https://github.com/trained-by-humans/pixel-lab-fixture",
+                   lambda route: route.fulfill(content_type="text/html", body="<h1>Repository</h1>"))
+        page.keyboard.press("Enter")
+        expect(page).to_have_url("https://github.com/trained-by-humans/pixel-lab-fixture")
+    finally:
+        context.close()
+
+
+@pytest.mark.parametrize("width", [1440, 390, 320])
+@pytest.mark.parametrize("javascript", [True, False])
+def test_custom_repository_icon_in_toolbar(browser, custom_repo_site_url, width, javascript):
+    site_url, icon_path = custom_repo_site_url
+    context = browser.new_context(java_script_enabled=javascript, viewport={"width": width, "height": 900})
+    try:
+        page = context.new_page()
+        page.goto(f"{site_url}/guide/nested/")
+        page.evaluate("document.fonts.ready")
+        repo = page.get_by_role("link", name="Open repository: GitHub", exact=True)
+        expect(repo).to_be_visible()
+        icon = repo.locator("img.header-btn__icon--repo")
+        expect(icon).to_be_visible()
+        expect(icon).to_have_attribute("src", "../../" + icon_path)
+        expect(icon).to_have_attribute("alt", "")
+        expect(icon).to_have_attribute("aria-hidden", "true")
+        icon.evaluate("image => image.decode()")
+        assert icon.evaluate("image => image.naturalWidth > 0")
+        for dimension in ("width", "height"):
+            expect(icon).to_have_css(dimension, "14px")
+        expect(icon).to_have_css("background-color", "rgba(0, 0, 0, 0)")
+        expect(icon).to_have_css("border-top-width", "0px")
+        expect(icon).to_have_css("box-shadow", "none")
+        expect(icon).to_have_css("mask-image", "none")
+        expect(icon).to_have_css("margin-top", "0px")
+        expect(icon).to_have_css("object-fit", "contain")
+        expect(icon).to_have_css("max-width", "none")
+        expect(repo).to_have_css("box-shadow", "none")
+        repo.hover()
+        expect(repo).to_have_css("transform", "matrix(1, 0, 0, 1, -3, -3)")
+        expect(repo).to_have_css("box-shadow", "rgb(101, 67, 33) 3px 3px 0px 0px")
+        expect(icon).to_have_css("box-shadow", "none")
+        page.mouse.move(0, 800)
+        page.keyboard.press("Tab")
+        repo.focus()
+        expect(repo).to_be_focused()
+        expect(repo).to_have_css("box-shadow", "rgb(101, 67, 33) 3px 3px 0px 0px")
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+        page.route("https://github.com/trained-by-humans/pixel-lab-fixture",
+                   lambda route: route.fulfill(content_type="text/html", body="<h1>Repository</h1>"))
+        page.keyboard.press("Enter")
+        expect(page).to_have_url("https://github.com/trained-by-humans/pixel-lab-fixture")
+    finally:
+        context.close()
+
+
+@pytest.mark.parametrize("width", [1440, 850, 390, 320])
+@pytest.mark.parametrize("javascript", [True, False])
+def test_icon_only_repository_button(browser, icon_only_repo_site_url, width, javascript):
+    context = browser.new_context(java_script_enabled=javascript, viewport={"width": width, "height": 900})
+    try:
+        page = context.new_page()
+        page.goto(f"{icon_only_repo_site_url}/guide/nested/")
+        page.evaluate("document.fonts.ready")
+        repo = page.get_by_role("link", name='Open repository: Fixture "source" & code', exact=True)
+        expect(repo).to_be_visible()
+        expect(repo).to_have_attribute("title", 'Open repository: Fixture "source" & code')
+        expect(repo).to_have_attribute("href", "https://github.com/trained-by-humans/pixel-lab-fixture")
+        expect(repo.locator(".header-btn__label")).to_have_count(0)
+        assert repo.text_content().strip() == ""
+        icon = repo.locator(".header-btn__icon--repo")
+        expect(icon).to_be_visible()
+        expect(icon).to_have_attribute("aria-hidden", "true")
+        expect(icon).to_have_css("width", "14px")
+        expect(icon).to_have_css("height", "14px")
+        if icon.evaluate("element => element.tagName") == "IMG":
+            icon.evaluate("image => image.decode()")
+            assert icon.evaluate("image => image.naturalWidth > 0")
+        expect(repo).to_have_css("width", "34px" if width <= 850 else "42px")
+        search = page.get_by_role("button", name="SEARCH", exact=True)
+        search_bounds, repo_bounds = search.bounding_box(), repo.bounding_box()
+        assert search_bounds["height"] == pytest.approx(repo_bounds["height"], abs=1)
+        assert search_bounds["x"] + search_bounds["width"] <= repo_bounds["x"]
+        assert repo_bounds["x"] + repo_bounds["width"] <= width
+        search.focus()
+        page.keyboard.press("Tab")
+        expect(repo).to_be_focused()
+        expect(repo).to_have_css("box-shadow", "rgb(101, 67, 33) 3px 3px 0px 0px")
+        repo.hover()
+        expect(repo).to_have_css("transform", "matrix(1, 0, 0, 1, -3, -3)")
+        expect(icon).to_have_css("box-shadow", "none")
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+        page.route("https://github.com/trained-by-humans/pixel-lab-fixture",
+                   lambda route: route.fulfill(content_type="text/html", body="<h1>Repository</h1>"))
+        page.keyboard.press("Enter")
+        expect(page).to_have_url("https://github.com/trained-by-humans/pixel-lab-fixture")
+    finally:
+        context.close()
 
 
 @pytest.mark.parametrize(("width", "gap", "inset"), [(1440, "14px", "14px"), (390, "8px", "58px")])

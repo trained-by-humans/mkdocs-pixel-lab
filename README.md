@@ -61,14 +61,208 @@ plugins:
   - search
 ```
 
+Toolbar actions appear in the order **Packages → Search → Repository**, with
+optional actions omitted when not configured. At 850px and below, the toolbar
+switches to icon-only buttons alongside the navigation toggle. Accessible
+labels and tooltips remain available. The site
+name stays on one line and truncates with an ellipsis only if space runs out.
+This responsive layout works without JavaScript.
+
+### Repository button
+
+Set MkDocs' `repo_url` to show a repository button in the toolbar:
+
+```yaml
+repo_url: https://github.com/OWNER/REPO
+```
+
+The button opens that URL directly and uses `repo_name` as its label (MkDocs
+normally infers GitHub, GitLab, or Bitbucket), falling back to **Repository**.
+It has a pixelated Git branch icon and the same hover/focus highlight, shadow,
+and lift as the other toolbar buttons. On small screens, only the icon is shown,
+with its accessible label and tooltip preserved. It works without JavaScript.
+
+To show only the repository icon at every screen size, set `show_repo_name`
+to `false` (the default is `true`):
+
+```yaml
+theme:
+  name: pixel-lab
+  show_repo_name: false
+```
+
+The link, custom icon, accessible label, and tooltip are unchanged. This setting
+only hides the visible name; it does not enable or disable the repository button.
+
+`show_repo` is enabled by default. Hide the button without affecting page
+source/edit actions:
+
+```yaml
+theme:
+  name: pixel-lab
+  show_repo: false
+```
+
+The repository button is independent of `edit_uri`, `show_source`, and
+`show_edit`. An absolute edit URL without `repo_url` does not enable it.
+
+#### Custom repository icon
+
+Customize the icon with `theme.icon.repo`, using Material's configuration
+structure:
+
+```yaml
+theme:
+  name: pixel-lab
+  icon:
+    repo: assets/icons/my-repo.svg
+```
+
+Place this file at `docs/assets/icons/my-repo.svg`. Paths are relative to
+`docs_dir` and resolved correctly on nested pages. Full HTTPS URLs and raster
+images such as PNG also work. Pixel Lab uses image paths, not Material's bundled
+icon names (such as `fontawesome/brands/github`).
+
+Custom artwork preserves its original colors and fits in the same 14×14 slot,
+without an extra border, background, or shadow. Button hover, keyboard focus,
+and mobile behavior remain unchanged. Omit `icon.repo` or set it to `null`
+to keep the theme-colored pixelated Git branch icon.
+
+### Custom UI icons
+
+Toolbar and page-action icons share the `theme.icon` settings:
+
+```yaml
+theme:
+  name: pixel-lab
+  icon:
+    repo: assets/icons/repo.svg
+    search: assets/icons/search.svg
+    menu: assets/icons/menu.svg
+    close: assets/icons/close.svg
+    sites: assets/icons/packages.svg
+    dropdown: assets/icons/chevron.svg
+    view: assets/icons/source.svg
+    edit: assets/icons/edit.svg
+```
+
+All values are image paths relative to `docs_dir` or image URLs, not Material
+icon-library names. SVG is recommended; PNG and other browser-supported image
+formats also work. Omit any key, or set it to `null`, to keep its current default.
+Icons do not enable features: `show_repo`, `show_source`, `show_edit`, and site
+navigation settings still control availability.
+
+| Key | Control |
+| --- | --- |
+| `repo` | Repository toolbar button |
+| `search` | Search toolbar button |
+| `menu` / `close` | Open / close the mobile navigation drawer |
+| `sites` | Packages/site-navigation toolbar button |
+| `dropdown` | Its dropdown arrow; still hidden on compact screens |
+| `view` / `edit` | View source / Edit this page beside the main title |
+
+Toolbar images keep their original colors and fit the existing 14×14 slots.
+Page source and edit images are **alpha masks**: transparent areas
+stay empty, and opaque areas receive the theme's foreground and copied hover
+shadow. Use transparent artwork; an opaque white background becomes a solid
+square. Remote mask images must allow cross-origin loading (CORS).
+
+Custom page-action icons use a black silhouette and accent-dark hover/focus
+shadow. Custom icons work without JavaScript. Heading permalinks use a single
+built-in icon or the symbol supplied through [`toc`](#heading-links-and-keyboard-access),
+not `theme.icon`.
+
+Dropdown item artwork continues to use each item's `icon` and `icon_hover`
+under `extra.site_navigation`; these settings do not change item icons, active
+navigation markers, or the site-name/TM branding.
+
+### Page source
+
+GitHub-backed sites show a pixelated **View source** icon immediately after the
+main page title, with no box or background. Like heading anchors, it scales
+with the title and reveals an accent-dark shadow on hover or keyboard focus.
+The icon has an accessible label and hover tooltip. Set MkDocs'
+repository URL and the branch/directory containing your Markdown files:
+
+```yaml
+repo_url: https://github.com/OWNER/REPO
+edit_uri: edit/main/docs/
+```
+
+For `docs/guide/setup.md`, the link opens GitHub's `blob/main/docs/guide/setup.md`
+file view. Set the branch and directory explicitly; MkDocs' GitHub default is
+`edit/master/docs/`. The theme converts the resolved GitHub editor URL to its
+file view for View source, while the Edit this page icon keeps the editor URL.
+
+The link is enabled by default when available. Hide it with:
+
+```yaml
+theme:
+  name: pixel-lab
+  show_source: false
+```
+
+The theme uses MkDocs' `page.edit_url`, honoring `edit_uri_template` and source
+mappings provided by generators. No plugin, Git checkout, or GitHub API request
+is needed. The link is present in built HTML and remains usable with JavaScript
+disabled; the theme's script appends it to the authored H1 without changing
+the heading's text or ID. Generated pages without a source mapping have no
+source link. Set `edit_uri: ""` to disable source links entirely (also remove
+`edit_uri_template` if configured). File-view URLs are inferred only for
+standard `github.com` URLs; other hosts do not display a source link.
+
+#### Edit action
+
+Like MkDocs' built-in themes, Pixel Lab shows an edit action whenever MkDocs
+provides `page.edit_url`. A pixelated pen-nib icon appears beside the
+source icon; no opt-in theme setting is required:
+
+```yaml
+repo_url: https://github.com/OWNER/REPO
+edit_uri: edit/main/docs/
+theme:
+  name: pixel-lab
+```
+
+`show_edit` is enabled by default and independent of `show_source`. Hide only
+the edit icon with:
+
+```yaml
+theme:
+  name: pixel-lab
+  show_edit: false
+```
+
+To disable MkDocs' edit URLs instead, set `edit_uri: ""` and remove any
+`edit_uri_template`. This also removes the inferred View source link.
+
+The edit icon uses the same title-relative sizing, transparent background, hover shadow,
+and keyboard focus styling as the source icon. Its accessible label and tooltip
+are **Edit this page**.
+
+The edit link uses MkDocs' resolved `page.edit_url` unchanged, including
+non-GitHub repositories, custom `edit_uri_template` URLs, and generator source
+mappings. Use your provider's editor path (`edit/main/docs/` for GitHub), not a
+file-view path such as `blob/main/docs/`, when enabling editing. Missing or
+disabled edit URLs omit the icon. No additional plugin or API request is needed.
+
 ### Heading links and keyboard access
 
 Section headings (H2–H6) show a permalink icon after the title. H1 page titles
-keep their IDs without an icon.
+keep their IDs without a heading-permalink icon; the optional source icon is
+separate.
 
-Choose `chain` (the default filled chain icon), `link` (the original link
-icon), or `hash` (the `#` icon) with `theme.permalink_icon`.
-All three use heading-relative sizing.
+Permalinks are generated by Python-Markdown's `toc` extension, not a MkDocs
+plugin. Its settings are preserved: `permalink: false` (or omitting the option)
+produces no links, `permalink: true` uses the theme's solid pixelated link icon,
+and a custom string such as `permalink: "⚓"` displays that symbol as text.
+`permalink_title`, `permalink_leading`, and heading ID settings remain under
+`toc`'s control.
+
+The built-in icon scales with the heading and uses a black silhouette with a
+matching accent-dark shadow on hover or keyboard focus. It works without
+JavaScript. There are no separate theme settings for permalink artwork or fill;
+use `toc` to enable, disable, or customize heading links.
 
 The URL fragment follows the current section as you scroll, without adding
 browser-history entries. Enable visible heading permalinks with:
@@ -76,18 +270,20 @@ browser-history entries. Enable visible heading permalinks with:
 ```yaml
 theme:
   name: pixel-lab
-  permalink_icon: chain # default; or link, hash
-  permalink_fill_color: "var(--accent)" # light accent by default; transparent disables it
 markdown_extensions:
   - toc:
       permalink: true
 ```
 
-The chain's colored body uses `theme.permalink_fill_color` (the light accent by
-default); its openings remain transparent. The black outline stays visible,
-while the shadow appears in the dark accent only on hover or keyboard focus.
-The original `link` and `hash` icons keep their light-accent coloring and
-dark-accent hover; the chain's fill setting does not affect them.
+For a custom symbol and tooltip, configure the extension directly:
+
+```yaml
+markdown_extensions:
+  - toc:
+      permalink: "⚓"
+      permalink_title: "Link to this section"
+      permalink_leading: false
+```
 
 A skip-to-content link, visible focus styles, and labeled navigation regions
 support keyboard use. Escape closes the search panel or open navigation drawer
@@ -440,8 +636,12 @@ inline header hides and the footer links stack vertically.
 Set each item's optional `icon` to an SVG/PNG path relative to the documentation
 directory or an absolute URL. Missing icons use a themed pixel fallback; icons
 appear only in the dropdown. The catalog can also specify an icon. The dropdown
-works without a catalog and marks the configured active item. Use Tab or arrow
-keys to navigate, and Escape to close it. Clicking outside also closes it.
+works without a catalog and marks the configured active item. Mouse hover previews
+the menu; moving into it keeps the preview open, while leaving closes it. Click
+the button to pin it open. A second mouse click returns to the hover preview;
+touch and keyboard activation toggle it open or closed. Pinned Packages and
+active Search take priority over the other button's hover preview.
+Use Tab or arrow keys to navigate, and Escape to close it. Clicking outside also closes it.
 On small screens, the header buttons use icons while keeping accessible labels.
 
 Optionally set `icon_hover` to an animated image URL. It replaces the resting

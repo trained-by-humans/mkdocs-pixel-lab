@@ -1,4 +1,5 @@
 <!doctype html>
+{% from "icons.html" import icon_image, icon_styles with context %}
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -42,7 +43,6 @@
         --accent: {{ config.theme.accent_color }};
         --accent-dark: {{ config.theme.accent_dark_color }};
         --accent-foreground: {{ config.theme.accent_foreground_color }};
-        --permalink-fill-color: {{ config.theme.permalink_fill_color }};
         --header-background: {{ config.theme.header_background }};
         --header-border: {{ config.theme.header_border_color }};
         --header-shadow: {{ config.theme.header_shadow_color }};
@@ -69,15 +69,28 @@
         --alert-caution-surface: {{ config.theme.alert_caution_surface_color }};
       }
     </style>
+    <style id="pixel-lab-icons">{{ icon_styles() }}</style>
     {% for style in config.extra_css %}
       <link rel="stylesheet" href="{{ style | url }}">
     {% endfor %}
   </head>
-  <body data-permalink-icon="{{ config.theme.permalink_icon if config.theme.permalink_icon in ['link', 'hash', 'chain'] else 'chain' }}">
+  {# Match the last registered TOC extension and Python-Markdown's boolean strings. #}
+  {% set toc = namespace(options={}) %}
+  {% for extension in config.markdown_extensions %}
+    {% if extension in ['toc', 'markdown.extensions.toc', 'markdown.extensions.toc:TocExtension'] %}
+      {% set toc.options = config.mdx_configs.get(extension, {}) %}
+    {% endif %}
+  {% endfor %}
+  {% set boolean_strings = ['true', 'yes', 'y', 'on', '1', 'false', 'no', 'n', 'off', '0', 'none'] %}
+  {% set toc_permalink = toc.options.get('permalink', false) %}
+  {% set text_permalink = toc_permalink is string and toc_permalink | lower not in boolean_strings %}
+  {% set leading = toc.options.get('permalink_leading', false) %}
+  {% set leading = leading | lower in ['true', 'yes', 'y', 'on', '1'] if leading is string else leading %}
+  <body data-permalink-style="{{ 'text' if text_permalink else 'icon' }}"{% if leading %} data-permalink-leading="true"{% endif %}>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="header">
-      <button class="header-btn header-btn--menu" id="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-nav">
-        <span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span>
+      <button class="header-btn header-btn--menu" id="nav-toggle" type="button" aria-label="Open navigation" title="Open navigation" aria-expanded="false" aria-controls="mobile-nav">
+        {% call icon_image("menu", "header-btn__icon header-btn__icon--custom") %}<span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span>{% endcall %}
       </button>
       <a class="brand" href="{{ nav.homepage.url | url }}"><span class="brand__name">{{ config.site_name | upper }}</span><sup class="brand-trademark" aria-hidden="true"><svg class="brand-trademark__glyph" viewBox="0 0 928 536" shape-rendering="crispEdges" focusable="false"><g transform="translate(-358 -192)"><path class="brand-trademark__outline" d="M358 192H839V229H871V259H902V287H930V314H958V342H985V314H1013V287H1040V259H1069V229H1099V192H1286V728H1034V614H1015V644H930V614H911V728H498V410H358Z"/><path class="brand-trademark__rim" d="M399 234H815V261H844V288H873V316H901V343H929V370H957V398H985V370H1013V343H1040V316H1068V288H1097V261H1125V234H1243V687H1068V529H1040V557H1013V583H986V610H959V583H932V557H905V529H878V687H722V371H690V687H540V371H399Z"/><path class="brand-trademark__fill" d="M430 267H787V343H662V659H569V343H430ZM815 289H844V316H873V343H901V370H929V398H957V426H985V398H1013V370H1040V343H1068V316H1097V289H1126V267H1214V659H1096V475H1068V502H1040V529H1013V556H986V583H959V556H932V529H905V502H878V475H849V659H750V371H815Z"/></g></svg></sup></a>
       {% set site_navigation = config.extra.get("site_navigation") %}
@@ -94,7 +107,7 @@
       <div class="header-right">
         {% include "site_navigation.html" %}
         <div class="search-shell">
-          <button class="header-btn header-btn--search" id="search-toggle" type="button" aria-label="SEARCH" aria-expanded="false" aria-controls="search-panel"><span class="header-btn__icon" aria-hidden="true">⌕</span><span class="header-btn__label">SEARCH</span></button>
+          <button class="header-btn header-btn--search" id="search-toggle" type="button" aria-label="SEARCH" title="Search documentation" aria-expanded="false" aria-controls="search-panel">{% call icon_image("search", "header-btn__icon header-btn__icon--custom") %}<span class="header-btn__icon header-btn__icon--search" aria-hidden="true"></span>{% endcall %}<span class="header-btn__label">SEARCH</span></button>
           <div class="search-panel" id="search-panel">
             <div class="search-panel__controls">
               <label class="search-label" for="mkdocs-search-query">SEARCH DOCUMENTATION</label>
@@ -103,6 +116,13 @@
             <div id="mkdocs-search-results" class="search-results" data-no-results-text="No matching pages."></div>
           </div>
         </div>
+        {% if config.repo_url and config.theme.show_repo %}
+          {% set repo_label = config.repo_name or "Repository" %}
+          <a class="header-btn header-btn--repo" href="{{ config.repo_url | e }}" aria-label="Open repository: {{ repo_label | e }}" title="Open repository: {{ repo_label | e }}">
+            {% call icon_image("repo", "header-btn__icon header-btn__icon--repo") %}<span class="header-btn__icon header-btn__icon--repo" aria-hidden="true"></span>{% endcall %}
+            {% if config.theme.show_repo_name %}<span class="header-btn__label">{{ repo_label | e }}</span>{% endif %}
+          </a>
+        {% endif %}
       </div>
     </header>
     <nav class="tabs" aria-label="Primary navigation">
@@ -113,7 +133,7 @@
     </nav>
     <div class="drawer-scrim" id="drawer-scrim"></div>
     <aside class="mobile-nav" id="mobile-nav" aria-label="Site navigation" aria-hidden="true">
-      <div class="mobile-nav__header"><span>Navigation</span><button class="header-btn mobile-nav__close" id="nav-close" type="button">× CLOSE</button></div>
+      <div class="mobile-nav__header"><span>Navigation</span><button class="header-btn mobile-nav__close" id="nav-close" type="button">{% call icon_image("close", "header-btn__icon header-btn__icon--custom") %}×{% endcall %} CLOSE</button></div>
       <nav class="mobile-nav__content">
         {% for nav_item in nav %}
           {% set nav_url = nav_item.url or (nav_item.children[0].url if nav_item.children else '') %}
@@ -140,6 +160,7 @@
       {% endif %}
       <main class="main" id="main-content" tabindex="-1">
         {% if page and page.meta and page.meta.crumb %}<div class="crumb">{{ page.meta.crumb | upper }}</div>{% endif %}
+        {% include "page_source.html" %}
         {% if page %}{{ page.content }}{% endif %}
         <footer class="footer">
           {% if site_navigation and site_navigation.get("show_footer", true) and site_navigation.get("catalog") %}

@@ -1,0 +1,26 @@
+{# Toolbar images retain their colors; inline page icons use alpha masks. #}
+{% macro icon_image(key, class_name, size=14) -%}
+  {% set icon = config.theme.icon.get(key) if config.theme.icon is mapping else none %}
+  {% if icon is string and icon | trim %}
+    <img class="{{ class_name | e }}" src="{{ icon | trim | url | e }}" alt="" aria-hidden="true" width="{{ size }}" height="{{ size }}" decoding="async">
+  {% else %}
+    {{ caller() }}
+  {% endif %}
+{%- endmacro %}
+
+{# Preserve literal backslashes before MkDocs normalizes paths, then encode
+   CSS-string delimiters and HTML delimiters before emitting a URL.
+   Ampersands remain literal in style elements, unlike HTML attributes. #}
+{% macro mask_url(path) -%}
+  url("{{ path | trim | replace('\\', '%5C') | url | replace('"', '%22') | replace("'", '%27') | replace('\n', '%0A') | replace('\r', '%0D') | replace('\t', '%09') | replace('<', '%3C') | replace('>', '%3E') | safe }}")
+{%- endmacro %}
+
+{% macro icon_styles() -%}
+  {% set icons = config.theme.icon if config.theme.icon is mapping else {} %}
+  {% for key, selector in [('view', '.page-source'), ('edit', '.page-edit')] %}
+    {% set icon = icons.get(key) %}
+    {% if icon is string and icon | trim %}
+      {{ selector }} { --page-action-mask: {{ mask_url(icon) }}; }
+    {% endif %}
+  {% endfor %}
+{%- endmacro %}

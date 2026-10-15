@@ -95,6 +95,445 @@ def test_navigation_placements(tmp_path, navigation, dropdown, inline, footer):
     assert ('class="package-footer"' in html) is footer
 
 
+@pytest.mark.parametrize("width", [1440, 851, 850, 700, 390, 320])
+def test_toolbar_order_is_packages_search_repository(navigation_page, width):
+    page = navigation_page
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(ORIGIN)
+    page.evaluate("document.fonts.ready")
+    repo = page.get_by_role("link", name="Open repository: GitHub", exact=True)
+    packages = page.get_by_role("button", name="Packages", exact=True)
+    search = page.get_by_role("button", name="SEARCH", exact=True)
+    expect(repo).to_be_visible()
+    assert page.locator(".header-right").evaluate("""element =>
+        [...element.children].map(child =>
+            child.matches('.site-switcher') ? 'packages' :
+            child.matches('.search-shell') ? 'search' : 'repository'
+        )""") == ["packages", "search", "repository"]
+    repo_bounds = repo.bounding_box()
+    package_bounds = packages.bounding_box()
+    search_bounds = search.bounding_box()
+    assert package_bounds["x"] + package_bounds["width"] <= search_bounds["x"]
+    assert search_bounds["x"] + search_bounds["width"] <= repo_bounds["x"]
+    assert repo_bounds["x"] + repo_bounds["width"] <= width - 2
+    packages.focus()
+    page.keyboard.press("Tab")
+    expect(search).to_be_focused()
+    page.keyboard.press("Tab")
+    expect(repo).to_be_focused()
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+
+@pytest.mark.parametrize("width", [1440, 390])
+def test_toolbar_shadows_follow_highlights(navigation_page, width):
+    page = navigation_page
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(ORIGIN)
+    header = page.locator(".header")
+    expect(header).to_have_css("box-shadow", "rgb(40, 124, 53) 0px 4px 0px 0px")
+    for button in header.locator(".header-btn").all():
+        expect(button).to_have_css("box-shadow", "none")
+        expect(button).to_have_css("border-top-width", "2px")
+        expect(button).to_have_css("transform", "none")
+
+    def expect_highlighted(button):
+        expect(button).to_have_css("background-color", "rgb(245, 200, 66)")
+        expect(button).to_have_css("box-shadow", "rgb(101, 67, 33) 3px 3px 0px 0px")
+        expect(button).to_have_css("transform", "matrix(1, 0, 0, 1, -3, -3)")
+
+    def expect_lifted(button, idle_bounds):
+        bounds = button.bounding_box()
+        assert bounds == pytest.approx({
+            **idle_bounds, "x": idle_bounds["x"] - 3, "y": idle_bounds["y"] - 3,
+        })
+
+    packages = page.get_by_role("button", name="Packages", exact=True)
+    package_bounds = packages.bounding_box()
+    packages.hover()
+    expect_highlighted(packages)
+    expect_lifted(packages, package_bounds)
+    panel = page.locator("#site-panel")
+    panel.locator("a").first.hover()
+    expect_highlighted(packages)
+    expect(panel).to_have_css("box-shadow", "rgb(101, 67, 33) 5px 5px 0px 0px")
+    page.mouse.move(5, 800)
+    expect(packages).to_have_css("box-shadow", "none")
+    expect(packages).to_have_css("transform", "none")
+    packages.click()
+    page.mouse.move(5, 800)
+    expect_highlighted(packages)
+
+    search = page.get_by_role("button", name="SEARCH", exact=True)
+    search_bounds = search.bounding_box()
+    search.hover()
+    # Even when its preview is blocked, a hovered button is highlighted.
+    expect(search).to_have_attribute("aria-expanded", "false")
+    expect_highlighted(search)
+    expect_lifted(search, search_bounds)
+    search.click()
+    page.locator("#mkdocs-search-query").hover()
+    expect_highlighted(search)
+    expect(packages).to_have_css("box-shadow", "none")
+    expect(page.locator("#search-panel")).to_have_css("box-shadow", "rgb(101, 67, 33) 5px 5px 0px 0px")
+    page.mouse.move(5, 800)
+    expect_highlighted(search)
+    search.click()
+    page.mouse.move(5, 800)
+    expect(search).to_have_css("box-shadow", "none")
+    expect(search).to_have_css("transform", "none")
+
+    packages.focus()
+    page.keyboard.press("ArrowDown")
+    page.keyboard.press("Escape")
+    expect(packages).to_be_focused()
+    expect(packages).to_have_attribute("aria-expanded", "false")
+    expect_highlighted(packages)
+    page.locator(".main h1").click()
+    expect(packages).to_have_css("box-shadow", "none")
+
+    if width == 390:
+        menu = page.get_by_role("button", name="Open navigation", exact=True)
+        expect(menu).to_have_css("box-shadow", "none")
+        menu.hover()
+        expect_highlighted(menu)
+        menu.click()
+        page.locator("#nav-close").hover()
+        expect_highlighted(menu)
+        expect(page.locator("#nav-close")).to_have_css("box-shadow", "none")
+        expect(page.locator("#nav-close")).to_have_css("transform", "none")
+        page.locator("#nav-close").click()
+        page.locator(".main h1").click()
+        expect(menu).to_have_css("box-shadow", "none")
+    expect(header).to_have_css("box-shadow", "rgb(40, 124, 53) 0px 4px 0px 0px")
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+
+@pytest.mark.parametrize(("width", "button_id"), [
+    (1440, "search-toggle"), (390, "search-toggle"),
+    (1440, "site-toggle"), (390, "site-toggle"), (390, "nav-toggle"),
+])
+def test_lifted_toolbar_button_original_corner_remains_clickable(navigation_page, width, button_id):
+    page = navigation_page
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(ORIGIN)
+    button = page.locator(f"#{button_id}")
+    bounds = button.bounding_box()
+    x = bounds["x"] + bounds["width"] - 1
+    y = bounds["y"] + bounds["height"] - 1
+    # Enter the original bottom-right corner, now outside the lifted face.
+    page.mouse.move(x, y)
+    expect(button).to_have_css("transform", "matrix(1, 0, 0, 1, -3, -3)")
+    assert button.evaluate("element => element.matches(':hover')")
+    page.mouse.click(x, y)
+    expect(button).to_have_attribute("aria-expanded", "true")
+    if button_id == "search-toggle":
+        expect(page.locator(".search-shell")).to_have_class(re.compile(r"\bis-open\b"))
+        expect(page.locator("#mkdocs-search-query")).to_be_focused()
+    elif button_id == "site-toggle":
+        expect(page.locator(".site-switcher")).to_have_class(re.compile(r"\bis-open\b"))
+    else:
+        expect(page.locator("#nav-close")).to_be_visible()
+        return
+    # A pinned button must retain that hit area even after the mouse leaves.
+    page.mouse.move(5, 800)
+    page.mouse.click(x, y)
+    shell = page.locator(".search-shell" if button_id == "search-toggle" else ".site-switcher")
+    expect(shell).not_to_have_class(re.compile(r"\bis-open\b"))
+    expect(shell).to_have_class(re.compile(r"\bis-preview\b"))
+
+
+@pytest.mark.parametrize("width", [1440, 850, 700, 390, 320])
+def test_search_hover_bridge_and_input_activation(navigation_page, width):
+    page = navigation_page
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(ORIGIN)
+    toggle = page.get_by_role("button", name="SEARCH", exact=True)
+    shell = page.locator(".search-shell")
+    panel = page.locator("#search-panel")
+    query = page.locator("#mkdocs-search-query")
+    packages = page.get_by_role("button", name="Packages", exact=True)
+    packages.hover()
+    expect(page.locator("#site-panel")).to_be_visible()
+    toggle.hover()
+    expect(page.locator("#site-panel")).to_be_hidden()
+    expect(panel).to_be_visible()
+    expect(toggle).to_have_attribute("aria-expanded", "true")
+    expect(query).not_to_be_focused()
+    expect(shell).not_to_have_class(re.compile(r"\bis-open\b"))
+    expect(panel).to_have_css("transform", "matrix(1, 0, 0, 1, 0, 0)")
+    button_bounds = toggle.bounding_box()
+    panel_bounds = panel.bounding_box()
+    assert panel_bounds["x"] >= 0
+    assert panel_bounds["x"] + panel_bounds["width"] <= width
+    button_bottom = button_bounds["y"] + button_bounds["height"]
+    gap = panel_bounds["y"] - button_bottom
+    assert gap == pytest.approx(13)
+    x = button_bounds["x"] + button_bounds["width"] / 2
+    for fraction in [0.1, 0.5, 0.9]:
+        page.mouse.move(x, button_bottom + gap * fraction)
+        expect(panel).to_be_visible()
+        expect(toggle).to_have_attribute("aria-expanded", "true")
+    query.hover()
+    expect(panel).to_be_visible()
+    expect(query).not_to_be_focused()
+    page.mouse.move(5, 800)
+    expect(panel).to_be_hidden()
+    expect(toggle).to_have_attribute("aria-expanded", "false")
+
+    toggle.hover()
+    query.click()
+    expect(query).to_be_focused()
+    expect(shell).to_have_class(re.compile(r"\bis-open\b"))
+    page.mouse.move(5, 800)
+    query.fill("nested")
+    expect(panel).to_be_visible()
+    expect(query).to_have_value("nested")
+    page.keyboard.press("Escape")
+    expect(panel).to_be_hidden()
+    expect(toggle).to_be_focused()
+    expect(toggle).to_have_attribute("aria-expanded", "false")
+
+    # A preview can be dismissed without taking focus from the page.
+    page.mouse.move(5, 800)
+    page.locator(".main h1").evaluate("element => { element.tabIndex = -1; element.focus(); }")
+    toggle.hover()
+    expect(panel).to_be_visible()
+    page.keyboard.press("Escape")
+    expect(panel).to_be_hidden()
+    expect(page.locator(".main h1")).to_be_focused()
+
+
+@pytest.mark.parametrize("width", [1440, 390])
+def test_search_second_pointer_click_returns_to_preview(navigation_page, width):
+    page = navigation_page
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(ORIGIN)
+    toggle = page.get_by_role("button", name="SEARCH", exact=True)
+    shell = page.locator(".search-shell")
+    panel = page.locator("#search-panel")
+    query = page.locator("#mkdocs-search-query")
+    idle_color = toggle.evaluate("element => getComputedStyle(element).backgroundColor")
+    for _ in range(2):
+        toggle.hover()
+        expect(panel).to_be_visible()
+        toggle.click()
+        expect(query).to_be_focused()
+        query.fill("nested")
+        toggle.click()
+        expect(query).not_to_be_focused()
+        expect(panel).to_be_visible()
+        expect(shell).to_have_class(re.compile(r"\bis-preview\b"))
+        expect(shell).not_to_have_class(re.compile(r"\bis-open\b"))
+        expect(toggle).to_have_attribute("aria-expanded", "true")
+        query.hover()
+        expect(panel).to_be_visible()
+        expect(query).to_have_value("nested")
+        page.mouse.move(5, 800)
+        expect(panel).to_be_hidden()
+        expect(toggle).to_have_attribute("aria-expanded", "false")
+        expect(toggle).to_have_css("background-color", idle_color)
+
+
+@pytest.mark.parametrize("width", [1440, 390])
+def test_search_explicit_dismissal_and_keyboard_activation(navigation_page, width):
+    page = navigation_page
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(ORIGIN)
+    toggle = page.get_by_role("button", name="SEARCH", exact=True)
+    panel = page.locator("#search-panel")
+    query = page.locator("#mkdocs-search-query")
+    toggle.click()
+    expect(query).to_be_focused()
+    page.keyboard.press("Escape")
+    # Hover and returned keyboard focus must not immediately reopen the panel.
+    expect(toggle).to_be_focused()
+    expect(panel).to_be_hidden()
+    expect(toggle).to_have_attribute("aria-expanded", "false")
+    page.keyboard.press("Enter")
+    expect(query).to_be_focused()
+    expect(panel).to_be_visible()
+    page.keyboard.press("Shift+Tab")
+    expect(toggle).to_be_focused()
+    page.keyboard.press("Enter")
+    expect(panel).to_be_hidden()
+    expect(toggle).to_have_attribute("aria-expanded", "false")
+    page.keyboard.press("Enter")
+    expect(query).to_be_focused()
+    page.keyboard.press("Escape")
+    page.keyboard.press("Space")
+    expect(query).to_be_focused()
+    toggle.click()
+    expect(query).not_to_be_focused()
+    expect(panel).to_be_visible()
+    page.mouse.move(5, 800)
+    expect(panel).to_be_hidden()
+    expect(toggle).to_have_attribute("aria-expanded", "false")
+    toggle.click()
+    expect(query).to_be_focused()
+    page.locator(".main h1").click()
+    expect(panel).to_be_hidden()
+    expect(toggle).to_have_attribute("aria-expanded", "false")
+    toggle.click()
+    expect(query).to_be_focused()
+    page.keyboard.press("Tab")
+    expect(panel).to_be_hidden()
+
+
+@pytest.mark.browser_context_args(has_touch=True)
+def test_search_touch_activation(navigation_page):
+    page = navigation_page
+    page.set_viewport_size({"width": 390, "height": 900})
+    page.goto(ORIGIN)
+    toggle = page.get_by_role("button", name="SEARCH", exact=True)
+    panel = page.locator("#search-panel")
+    page.locator(".search-shell").dispatch_event("pointerenter", {"pointerType": "touch"})
+    expect(panel).to_be_hidden()
+    toggle.tap()
+    expect(page.locator("#mkdocs-search-query")).to_be_focused()
+    expect(panel).to_be_visible()
+    toggle.tap()
+    expect(panel).to_be_hidden()
+
+
+@pytest.mark.parametrize("width", [1440, 390, 320])
+def test_packages_hover_bridge_and_pinning(navigation_page, width):
+    page = navigation_page
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(ORIGIN)
+    toggle = page.get_by_role("button", name="Packages", exact=True)
+    shell = page.locator(".site-switcher")
+    panel = page.locator("#site-panel")
+    title = page.locator(".main h1")
+    title.evaluate("element => { element.tabIndex = -1; element.focus(); }")
+    idle_color = toggle.evaluate("element => getComputedStyle(element).backgroundColor")
+    toggle.hover()
+    expect(panel).to_be_visible()
+    expect(toggle).to_have_attribute("aria-expanded", "true")
+    expect(shell).to_have_class(re.compile(r"\bis-preview\b"))
+    expect(title).to_be_focused()
+    button_bounds = toggle.bounding_box()
+    panel_bounds = panel.bounding_box()
+    button_bottom = button_bounds["y"] + button_bounds["height"]
+    assert panel_bounds["y"] - button_bottom == pytest.approx(13)
+    x = button_bounds["x"] + button_bounds["width"] / 2
+    for offset in [1, 5, 9, 12]:
+        page.mouse.move(x, button_bottom + offset)
+        expect(panel).to_be_visible()
+        expect(toggle).to_have_attribute("aria-expanded", "true")
+    panel.locator("a").first.hover()
+    expect(panel).to_be_visible()
+    expect(title).to_be_focused()
+    expect(toggle).to_have_css("background-color", "rgb(245, 200, 66)")
+    page.mouse.move(5, 800)
+    expect(panel).to_be_hidden()
+    expect(toggle).to_have_attribute("aria-expanded", "false")
+    expect(toggle).to_have_css("background-color", idle_color)
+    toggle.hover()
+    page.keyboard.press("Escape")
+    expect(panel).to_be_hidden()
+    expect(title).to_be_focused()
+
+    toggle.click()
+    expect(shell).to_have_class(re.compile(r"\bis-open\b"))
+    page.mouse.move(5, 800)
+    expect(panel).to_be_visible()
+    toggle.click()
+    expect(panel).to_be_visible()
+    expect(shell).to_have_class(re.compile(r"\bis-preview\b"))
+    expect(shell).not_to_have_class(re.compile(r"\bis-open\b"))
+    page.mouse.move(5, 800)
+    expect(panel).to_be_hidden()
+    expect(toggle).to_have_css("background-color", idle_color)
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+
+@pytest.mark.parametrize("width", [1440, 390])
+def test_pinned_toolbar_panels_take_priority_over_hover(navigation_page, width):
+    page = navigation_page
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(ORIGIN)
+    packages = page.get_by_role("button", name="Packages", exact=True)
+    site_panel = page.locator("#site-panel")
+    search = page.get_by_role("button", name="SEARCH", exact=True)
+    search_panel = page.locator("#search-panel")
+    query = page.locator("#mkdocs-search-query")
+    # Unpinned hover previews can replace each other.
+    search.hover()
+    expect(search_panel).to_be_visible()
+    packages.hover()
+    expect(site_panel).to_be_visible()
+    expect(search_panel).to_be_hidden()
+    packages.click()
+    search.hover()
+    expect(site_panel).to_be_visible()
+    expect(packages).to_have_attribute("aria-expanded", "true")
+    expect(search_panel).to_be_hidden()
+    expect(search).to_have_attribute("aria-expanded", "false")
+    # Explicit activation can switch away from a pinned panel.
+    search.click()
+    expect(query).to_be_focused()
+    expect(site_panel).to_be_hidden()
+    packages.hover()
+    expect(search_panel).to_be_visible()
+    expect(query).to_be_focused()
+    expect(site_panel).to_be_hidden()
+    expect(packages).to_have_attribute("aria-expanded", "false")
+    packages.click()
+    expect(site_panel).to_be_visible()
+    expect(search_panel).to_be_hidden()
+    page.keyboard.press("Escape")
+    expect(site_panel).to_be_hidden()
+    expect(packages).to_be_focused()
+
+
+def test_packages_keyboard_preview_activation_and_dismissal(navigation_page):
+    page = navigation_page
+    page.goto(ORIGIN)
+    toggle = page.get_by_role("button", name="Packages", exact=True)
+    shell = page.locator(".site-switcher")
+    panel = page.locator("#site-panel")
+    for key in ["Enter", "Space"]:
+        toggle.focus()
+        page.keyboard.press(key)
+        expect(shell).to_have_class(re.compile(r"\bis-open\b"))
+        page.keyboard.press(key)
+        expect(panel).to_be_hidden()
+        expect(toggle).to_have_attribute("aria-expanded", "false")
+    toggle.hover()
+    expect(panel).to_be_visible()
+    page.keyboard.press("Tab")
+    expect(panel.locator("a").first).to_be_focused()
+    expect(shell).to_have_class(re.compile(r"\bis-open\b"))
+    page.mouse.move(5, 800)
+    expect(panel).to_be_visible()
+    page.keyboard.press("Escape")
+    expect(panel).to_be_hidden()
+    expect(toggle).to_be_focused()
+    toggle.click()
+    page.locator(".main h1").click()
+    expect(panel).to_be_hidden()
+    toggle.hover()
+    panel.get_by_role("link", name="Core", exact=True).click()
+    expect(page).to_have_url(ORIGIN + "/guide/nested/")
+
+
+@pytest.mark.browser_context_args(has_touch=True)
+def test_packages_touch_activation(navigation_page):
+    page = navigation_page
+    page.set_viewport_size({"width": 390, "height": 900})
+    page.goto(ORIGIN)
+    toggle = page.get_by_role("button", name="Packages", exact=True)
+    panel = page.locator("#site-panel")
+    page.locator(".site-switcher").dispatch_event("pointerenter", {"pointerType": "touch"})
+    expect(panel).to_be_hidden()
+    toggle.tap()
+    expect(panel).to_be_visible()
+    expect(page.locator(".site-switcher")).to_have_class(re.compile(r"\bis-open\b"))
+    toggle.tap()
+    expect(panel).to_be_hidden()
+    expect(toggle).to_have_attribute("aria-expanded", "false")
+
+
 @pytest.mark.parametrize("path", ["/", "/guide/nested/"])
 def test_dropdown_items_and_icons(navigation_page, path):
     page = navigation_page
@@ -168,11 +607,14 @@ def test_dropdown_items_and_icons(navigation_page, path):
     expect(page.locator(".package-inline")).to_have_count(0)
     expect(page.locator(".package-footer a")).to_have_count(2)
     toggle.click()
+    expect(panel).to_be_visible()
+    expect(page.locator(".site-switcher")).to_have_class(re.compile(r"\bis-preview\b"))
+    page.mouse.move(5, 800)
     expect(panel).to_be_hidden()
     expect(toggle).to_have_attribute("aria-expanded", "false")
 
 
-@pytest.mark.parametrize("width", [1440, 850, 600, 390, 320])
+@pytest.mark.parametrize("width", [1440, 851, 850, 700, 601, 600, 390, 320])
 def test_dropdown_responsive_layout(navigation_page, width):
     page = navigation_page
     page.set_viewport_size({"width": width, "height": 900})
@@ -190,11 +632,60 @@ def test_dropdown_responsive_layout(navigation_page, width):
     assert bounds["x"] + bounds["width"] <= width
     assert bounds["width"] <= 224
     assert page.locator(".header").evaluate("e => e.scrollWidth") <= width
-    if width <= 600:
-        expect(toggle.locator(".header-btn__label")).to_be_hidden()
+    for button in [page.locator(".header-btn--repo"), toggle, search]:
+        label = button.locator(".header-btn__label")
+        if width <= 850:
+            expect(label).to_be_hidden()
+            expect(button).to_have_css("width", "34px")
+            expect(button).to_have_css("height", "34px")
+        else:
+            expect(label).to_be_visible()
+    arrow = toggle.locator(".site-switcher__arrow")
+    if width <= 850:
+        expect(arrow).to_be_hidden()
+    else:
+        expect(arrow).to_be_visible()
+    expect(page.locator(".brand__name")).to_have_css("white-space", "nowrap")
+    assert page.locator(".brand").bounding_box()["height"] == pytest.approx(17, abs=1)
     page.mouse.click(5, 500)
     expect(panel).to_be_hidden()
     expect(toggle).to_have_attribute("aria-expanded", "false")
+
+
+@pytest.mark.parametrize("width", [850, 700, 390, 320])
+@pytest.mark.parametrize("repo,packages", [(False, False), (True, False), (False, True), (True, True)])
+def test_compact_toolbar_does_not_depend_on_optional_buttons(navigation_page, width, repo, packages):
+    page = navigation_page
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(ORIGIN)
+    page.evaluate("document.fonts.ready")
+    # Exercise each optional-control combination against the same built page.
+    if not repo:
+        page.locator(".header-btn--repo").evaluate("element => element.remove()")
+    if not packages:
+        page.locator(".site-switcher").evaluate("element => element.remove()")
+    brand = page.locator(".brand")
+    expect(brand).to_have_text("ML-PIPES-SUPERVISION")
+    assert brand.bounding_box()["height"] == pytest.approx(17, abs=1)
+    for label in page.locator(".header-right .header-btn__label").all():
+        expect(label).to_be_hidden()
+    search = page.get_by_role("button", name="SEARCH", exact=True)
+    expect(search).to_be_visible()
+    expect(search).to_have_attribute("title", "Search documentation")
+    expect(search).to_have_css("width", "34px")
+    expect(search).to_have_css("height", "34px")
+    toolbar = page.locator(".header-right").bounding_box()
+    brand_bounds = brand.bounding_box()
+    assert brand_bounds["x"] + brand_bounds["width"] + 10 <= toolbar["x"] + 0.1
+    assert toolbar["x"] + toolbar["width"] <= width - 2
+    assert page.locator(".header").evaluate("element => element.scrollWidth <= element.clientWidth")
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+    search.click()
+    expect(page.locator("#mkdocs-search-query")).to_be_focused()
+    panel = page.locator("#search-panel").bounding_box()
+    assert panel["x"] >= 0
+    assert panel["x"] + panel["width"] <= width
+    page.keyboard.press("Escape")
 
 
 def test_dropdown_keyboard_and_search(navigation_page):
