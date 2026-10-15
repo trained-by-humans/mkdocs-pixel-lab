@@ -7,11 +7,12 @@ Merge snippets into your site's `mkdocs.yml`. Don't create duplicate `theme`,
 
 | Configuration | Owner | Guide |
 | --- | --- | --- |
-| `site_name` | MkDocs | [Branding and footer](../setup/branding.md#site-name) |
+| `site_name` | MkDocs | [Branding](../setup/branding.md#site-name) |
 | `site_description` | MkDocs | [Page metadata](../components/metadata.md#site-defaults) |
 | `site_url` | MkDocs | [MkDocs site URL](https://www.mkdocs.org/user-guide/configuration/#site_url); also used by [analytics](../setup/analytics.md#enable-ga4) and [sitemap plugins](plugins.md) |
 | `nav` | MkDocs | [Navigation](../setup/navigation.md) |
-| `repo_url`, `repo_name`, `edit_uri`, `edit_uri_template` | MkDocs | [Repository and page actions](../setup/repository.md) |
+| `repo_url`, `repo_name` | MkDocs | [Repository link](../setup/repository.md) |
+| `edit_uri`, `edit_uri_template` | MkDocs | [Source and edit links](../setup/page-actions.md) |
 | `theme` palette, visibility flags, icons, favicon, footer | Pixel Lab | [Theme setup](../setup/index.md) |
 | `plugins: [search]` | MkDocs | [Search](../setup/search.md) |
 | `plugins: [pixel-lab/metadata]` | Bundled plugin | [Page metadata](../components/metadata.md) |

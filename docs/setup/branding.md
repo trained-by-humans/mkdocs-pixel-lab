@@ -1,4 +1,4 @@
-# Branding and footer
+# Branding
 
 ## Site name
 

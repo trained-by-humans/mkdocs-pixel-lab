@@ -51,7 +51,7 @@ label.
 | `icon.view` | `null` (code brackets) | Replaces the View source artwork beside the title |
 | `icon.edit` | `null` (pen nib) | Replaces the Edit this page artwork beside the title |
 
-Configure destinations and visibility in [Repository and page actions](repository.md#page-source-and-editing).
+Configure destinations and visibility in [Source and edit links](page-actions.md).
 
 Source and edit icons use the image's alpha channel as a mask. Use artwork
 with a transparent background: an opaque white rectangle becomes a filled

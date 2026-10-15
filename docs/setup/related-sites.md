@@ -63,7 +63,7 @@ screens and don't display item icons.
 
 Set `show_footer: false` to hide these links without changing the header.
 For footer-only links, also set `header_mode: none`.
-For footer text and attribution, see [Branding and footer](branding.md#footer).
+For footer text and attribution, see [Branding](branding.md#footer).
 
 ## Header: inline
 

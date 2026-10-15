@@ -8,11 +8,12 @@ of the documentation website you want to change.
 | Set a shared palette | [Colors](colors.md) |
 | Understand or override typography | [Fonts](fonts.md) |
 | Replace toolbar and page-action artwork | [Icons](icons.md) |
-| Set the site name, favicon, and footer | [Branding and footer](branding.md) |
+| Set the site name, favicon, and footer | [Branding](branding.md) |
 | Arrange sections and pages | [Navigation](navigation.md) |
-| Enable and style section anchor links | [Heading permalinks](heading-permalinks.md) |
 | Enable the search index | [Search](search.md) |
-| Link the repository and page sources | [Repository and page actions](repository.md) |
+| Link to the project repository | [Repository link](repository.md) |
+| Link to page sources and editors | [Source and edit links](page-actions.md) |
+| Enable and style section anchor links | [Heading permalinks](heading-permalinks.md) |
 | Link related projects | [Related sites](related-sites.md) |
 | Configure opt-in analytics | [Analytics and privacy](analytics.md) |
 

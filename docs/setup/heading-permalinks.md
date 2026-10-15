@@ -26,7 +26,7 @@ Headings retain their IDs even when visible permalinks are disabled.
 
 Pixel Lab displays permalink artwork for H2–H6; the H1 retains its ID but
 doesn't display a heading-permalink icon. Optional
-[source/edit actions](repository.md) beside H1 are a separate feature.
+[source/edit actions](page-actions.md) beside H1 are a separate feature.
 For ordinary Markdown heading syntax, see [Text and lists](../components/text.md#headings).
 
 The theme follows the current section in the URL fragment as you scroll,

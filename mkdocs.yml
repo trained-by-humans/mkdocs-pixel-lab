@@ -20,11 +20,12 @@ nav:
       - Colors: setup/colors.md
       - Fonts: setup/fonts.md
       - Icons: setup/icons.md
-      - Branding and footer: setup/branding.md
+      - Branding: setup/branding.md
       - Navigation: setup/navigation.md
-      - Heading permalinks: setup/heading-permalinks.md
       - Search: setup/search.md
-      - Repository and page actions: setup/repository.md
+      - Repository link: setup/repository.md
+      - Source and edit links: setup/page-actions.md
+      - Heading permalinks: setup/heading-permalinks.md
       - Related sites: setup/related-sites.md
       - Analytics and privacy: setup/analytics.md
   - Components:

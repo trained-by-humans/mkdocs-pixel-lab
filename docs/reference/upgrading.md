@@ -28,8 +28,8 @@ actions are shown by default; choose `show_repo`, `show_source`, and
 `show_edit` independently if your site should hide any of them. Use
 `show_repo_name: false` for an icon-only repository button.
 
-See [Repository and page actions](../setup/repository.md) for URL configuration
-and [Icons](../setup/icons.md) for artwork.
+For setup, see [Repository link](../setup/repository.md) and
+[Source and edit links](../setup/page-actions.md); for artwork, see [Icons](../setup/icons.md).
 
 ### Related-site navigation
 

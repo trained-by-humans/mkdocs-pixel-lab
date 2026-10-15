@@ -39,7 +39,7 @@ site_description: Guides and reference for my project.
 | `site_name` | Required; no default | Appended once to the browser title and used as the last title fallback |
 | `site_description` | Not set | Description fallback when no page description is available |
 
-For the header's site name, see [Branding and footer](../setup/branding.md#site-name).
+For the header's site name, see [Branding](../setup/branding.md#site-name).
 
 ## Automatic defaults
 

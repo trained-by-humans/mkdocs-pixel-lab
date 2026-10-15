@@ -19,7 +19,7 @@ images are alpha masks: use transparent backgrounds. See [Icons](../setup/icons.
 ## Source links point at the wrong branch
 
 Set `edit_uri` explicitly for the branch and documentation directory. MkDocs'
-GitHub default uses `master`, not `main`. See [Repository and page actions](../setup/repository.md#page-source-and-editing).
+GitHub default uses `master`, not `main`. See [Source and edit links](../setup/page-actions.md#page-source-and-editing).
 
 ## Search has no results
 

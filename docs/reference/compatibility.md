@@ -26,7 +26,7 @@ Current boundaries include:
 - One configured [palette](../setup/colors.md); no runtime light/dark switch.
 - No separate visible page-contents sidebar or previous/next controls.
 - No built-in localization system or dedicated generated 404 template.
-- [View source](../setup/repository.md#page-source-and-editing) infers file-view URLs for standard `github.com` URLs only;
+- [View source](../setup/page-actions.md#page-source-and-editing) infers file-view URLs for standard `github.com` URLs only;
   edit actions use MkDocs' resolved URLs for other providers too.
 
 ## JavaScript and keyboard behavior

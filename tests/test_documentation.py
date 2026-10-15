@@ -174,6 +174,28 @@ def test_guide_titles_and_overview_links_match_navigation() -> None:
                     assert f"]({source.name})" in overview, (section, source, "missing overview link")
 
 
+def test_repository_and_page_actions_have_separate_setup_guides() -> None:
+    config = load_config(config_file=str(ROOT / "mkdocs.yml"))
+    setup = next(item["Theme setup"] for item in config.nav if "Theme setup" in item)
+    entries = {name: path for item in setup for name, path in item.items()}
+    assert entries["Repository link"] == "setup/repository.md"
+    assert entries["Source and edit links"] == "setup/page-actions.md"
+    assert list(entries).index("Source and edit links") == list(entries).index("Repository link") + 1
+
+    repository = DOCS / entries["Repository link"]
+    actions = DOCS / entries["Source and edit links"]
+    repository_fields = {"`repo_url`", "`repo_name`", "`show_repo`", "`show_repo_name`", "`icon.repo`"}
+    action_fields = {"`edit_uri`", "`edit_uri_template`", "`show_source`", "`show_edit`", "`icon.view`", "`icon.edit`"}
+    repository_parameters = {row[0] for row in parameter_rows(repository)}
+    action_parameters = {row[0] for row in parameter_rows(actions)}
+    assert repository_fields <= repository_parameters
+    assert action_fields <= action_parameters
+    assert repository_fields.isdisjoint(action_parameters)
+    assert action_fields.isdisjoint(repository_parameters)
+    assert "[Source and edit links](page-actions.md)" in repository.read_text()
+    assert "repository.md#repository-button" in actions.read_text()
+
+
 def test_component_appearance_indexes_cover_all_styled_guides() -> None:
     config = load_config(config_file=str(ROOT / "mkdocs.yml"))
     components = next(item["Components"] for item in config.nav if "Components" in item)
@@ -257,7 +279,9 @@ def test_documentation_yaml_examples_are_valid() -> None:
             ]],
         }),
         ("setup/repository.md", {
-            "Repository button": [["show_repo_name: false"]],
+            "Control visibility": [["show_repo_name: false"]],
+        }),
+        ("setup/page-actions.md", {
             "Page source and editing": [["edit_uri: edit/main/docs/"]],
             "Control visibility": [["show_source: true", "show_edit: false"]],
         }),
@@ -506,8 +530,11 @@ def test_main_configuration_tables_stay_with_their_instructions() -> None:
         "setup/search.md": {"Enable search": ("`plugins` → `search`",)},
         "setup/repository.md": {
             "Repository button": ("`repo_url`", "`repo_name`"),
+            "Control visibility": ("`show_repo`", "`show_repo_name`"),
+        },
+        "setup/page-actions.md": {
             "Page source and editing": ("`edit_uri`", "`edit_uri_template`"),
-            "Control visibility": ("`show_repo`", "`show_repo_name`", "`show_source`", "`show_edit`"),
+            "Control visibility": ("`show_source`", "`show_edit`"),
         },
         "setup/related-sites.md": {
             "Items": (
@@ -564,7 +591,7 @@ def test_customization_tables_cover_appearance_not_feature_setup() -> None:
 
 
 def test_feature_guides_use_further_customization(documentation_dir: Path) -> None:
-    for name in ("branding", "navigation", "heading-permalinks", "search", "repository", "related-sites", "analytics"):
+    for name in ("branding", "navigation", "heading-permalinks", "search", "repository", "page-actions", "related-sites", "analytics"):
         source = DOCS / "setup" / f"{name}.md"
         content = source.read_text()
         assert content.count("## Further customization\n") == 1, source
