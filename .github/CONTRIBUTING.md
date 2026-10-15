@@ -59,8 +59,9 @@ in the final customization section.
 Use Parameter / Default / Effect tables beside the relevant
 instructions, with color names beside values and component-specific effects.
 Link to Common attributes in the configuration reference instead of repeating
-explanations of shared theme settings. Distinguish native MkDocs settings and
-CSS from theme options.
+explanations of shared theme settings. Introduce MkDocs settings and CSS
+naturally through their use and configuration path. Reserve explicit
+"not a theme option" contrasts for limitations that readers need to know.
 Configuration defaults in Reference are checked against the theme by tests.
 
 In visible component guides, keep theme settings first under Customization.
@@ -71,7 +72,8 @@ Both CSS scopes use `extra_css`;
 don't describe an HTML wrapper or native HTML authoring as a different styling
 mechanism. Link to the Components overview for stylesheet and `md_in_html` setup.
 
-Give common guidance one home and link to it from other pages. Document nested
+Give common guidance one home and link to it from other pages. Keep only the
+brief context needed locally, rather than recapping the linked guide. Document nested
 shadow behavior in the Components overview, with a brief note in relevant
 container guides; don't repeat it in child-content guides such as media and
 code blocks. Keep component-specific settings with their component.
@@ -150,10 +152,10 @@ Include before-and-after screenshots for visible layout or styling changes.
 
 Theme templates, palette defaults, CSS, JavaScript, and bundled assets live in
 `src/mkdocs_pixel_lab/`. Keep new styling configurable through the existing
-palette instead of introducing per-component hard-coded colors. Update
-`README.md` when public configuration or user-facing behavior changes, and
-extend `tests/fixture_site/` when a new component needs a representative
-example.
+palette instead of introducing per-component hard-coded colors. Update the
+relevant guide in `docs/` when public configuration or user-facing behavior
+changes. Keep `README.md` focused on the overview, quick start, and guide links.
+Extend `tests/fixture_site/` when a new component needs a representative example.
 
 Do not commit virtual environments, generated sites, or distribution artifacts.
 Coordinate version bumps, release tags, and publishing with the maintainers;

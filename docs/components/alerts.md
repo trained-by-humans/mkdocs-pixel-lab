@@ -13,9 +13,6 @@ markdown_extensions:
   - mkdocs_pixel_lab.github_alerts
 ```
 
-This is a Markdown extension, not a plugin. Enable it under
-`markdown_extensions` in `mkdocs.yml`; selecting the theme doesn't enable it.
-
 ## Write an alert
 
 > [!NOTE]
@@ -65,9 +62,6 @@ theme:
   alert_warning_surface_color: "#fff0bf"
 ```
 
-These Pixel Lab parameters belong under `theme` and apply to alerts,
-not admonitions:
-
 | Parameter | Default | Effect |
 | --- | --- | --- |
 | `alert_note_color` | Blue · `#2377c8` | Note rail and title |
@@ -93,8 +87,8 @@ See [Common attributes](../reference/configuration.md#common-attributes).
 
 ### Component-wide overrides
 
-To customize all tip alerts through a [custom stylesheet](index.md#load-custom-css),
-target their component class:
+To customize all tip alerts, add this to your
+[custom stylesheet](index.md#load-custom-css):
 
 ```css
 .gh-alert--tip {
@@ -117,8 +111,7 @@ Wrap each selected alert, following [Scope selected instances](index.md#scope-se
 </div>
 ```
 
-Scope the same CSS variables to `.instance-alert` in your stylesheet.
-Unwrapped tip alerts keep the component defaults:
+Add the scoped rule to your stylesheet:
 
 ```css
 .instance-alert > .gh-alert--tip {

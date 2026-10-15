@@ -1,6 +1,6 @@
 # Fonts
 
-Pixel Lab bundles **Inter** for body text and **IBM Plex Mono** for headings,
+Pixel Lab bundles **Inter** for body text and **IBM Plex Mono** for H1–H3 headings,
 navigation, controls, and code. Font files are served from your site; the theme
 doesn't request Google Fonts or another external font service.
 
@@ -11,15 +11,13 @@ body text and `monospace` for IBM Plex Mono.
 
 ## Override typography with CSS
 
-There is currently no `theme.font` option. Use MkDocs' `extra_css` setting for
-a deliberate CSS override:
+MkDocs supports custom stylesheets through `extra_css`. Use it to load your
+font overrides:
 
 ```yaml
 extra_css:
   - stylesheets/fonts.css
 ```
-
-This is a native MkDocs setting, not a Pixel Lab font option:
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
@@ -37,8 +35,8 @@ h1, h2, h3 {
 }
 ```
 
-These are CSS selectors and properties, not `theme` parameters. Defaults
-below describe the bundled typography before applying the override above:
+Use these CSS selectors to choose which text to style. The defaults below
+describe the bundled typography before overrides:
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
@@ -49,7 +47,7 @@ below describe the bundled typography before applying the override above:
 
 This example changes body text and headings only. Components with their own
 font declarations keep IBM Plex Mono; override their selectors explicitly if
-needed. See [Content tabs](../components/tabs.md#customization) for a tab-label
+needed. See [Content tabs](../components/tabs.md#component-wide-overrides) for a tab-label
 example.
 
 If you supply another font, host its files yourself and define `@font-face` in

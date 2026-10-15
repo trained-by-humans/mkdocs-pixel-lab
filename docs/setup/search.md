@@ -4,18 +4,15 @@ Pixel Lab's toolbar search uses the standard MkDocs search index.
 
 ## Enable search
 
-MkDocs includes `search` by default. If you specify a `plugins` list, include
-it explicitly to keep the search index:
+MkDocs includes its `search` plugin by default. If you specify a `plugins`
+list, include it explicitly to keep the search index:
 
 ```yaml
 plugins:
   - search
 ```
 
-When adding other plugins, keep `search` in the list. No hosted search service
-or API key is required.
-
-This is a native MkDocs plugin, not a Pixel Lab `theme` option:
+No hosted search service or API key is required.
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
@@ -23,6 +20,7 @@ This is a native MkDocs plugin, not a Pixel Lab `theme` option:
 
 See [MkDocs search configuration](https://www.mkdocs.org/user-guide/configuration/#search)
 for index options. Search needs JavaScript to load and query the index.
+If it returns no results, see [Troubleshooting](../reference/troubleshooting.md#search-has-no-results).
 
 ## Use the search panel
 
@@ -34,11 +32,11 @@ button.
 Try the Search button on this website: search for `tabs`, `palette`, or
 `repository`.
 
+For compact toolbar behavior, see [Navigation](navigation.md#responsive-behavior).
+
 ## Further customization
 
-Replace its artwork with [`theme.icon.search`](icons.md). The
-`highlight_color` controls highlighted toolbar buttons, and
-`input_focus_background_color` sets the focused input background:
+To change the highlighted button and focused input backgrounds:
 
 ```yaml
 theme:
@@ -46,8 +44,6 @@ theme:
   highlight_color: "#f5c842"
   input_focus_background_color: "#ffffff"
 ```
-
-These Pixel Lab parameters belong under `theme`:
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
@@ -62,8 +58,5 @@ These Pixel Lab parameters belong under `theme`:
 | `border_color` | Near-black · `#101410` | Button, panel, and input outlines |
 | `shadow_color` | Near-black · `#101410` | Panel shadow and highlighted button's pop-out shadow |
 
-See [Common attributes](../reference/configuration.md#common-attributes).
-
-Toolbar buttons reduce to icons at 850px and below while retaining accessible
-labels and tooltips. Their highlight, lift, and shadow follow the same styling
-as the other toolbar actions.
+See [Icons](icons.md#toolbar-icons) and
+[Common attributes](../reference/configuration.md#common-attributes).

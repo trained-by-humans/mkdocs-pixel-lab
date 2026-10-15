@@ -18,20 +18,16 @@ appearance options configured globally under `theme`.
 
 ## Read a component guide
 
-1. **Enable** any required Markdown extensions once in `mkdocs.yml`.
+1. **Enable** required Markdown extensions in `mkdocs.yml`; selecting the theme
+   doesn't enable them automatically.
 2. **Write** the provided Markdown on a page and compare it with the live example.
-3. Use **Customization** for component defaults, or **Scoped overrides**
-   for selected instances. Metadata has no visible styling, so its guide covers
-   fields and defaults instead.
+3. Use **Customization** for appearance settings and CSS overrides.
 
-Parameter tables sit with the settings they explain: required extensions,
-content fields, and feature behavior stay with the main instructions;
-optional colors and artwork stay under Customization. Both show defaults and
-effects without repeating the main configuration in the appearance section.
+If syntax stays plain text, see [Troubleshooting](../reference/troubleshooting.md#a-component-looks-like-plain-text).
 
-Examples on this site use the default palette. Color snippets show those same
-defaults so you can match each setting to the component you see. Replace the
-values to customize your own site.
+Examples on this site use the default palette. YAML and CSS color snippets
+show those same defaults so you can match each setting to the component you see.
+Replace the values to customize your own site.
 
 ## Customization scopes
 
@@ -59,9 +55,7 @@ extra_css:
 ```
 
 Create `docs/stylesheets/components.css` and add the CSS from the relevant
-component guide. `extra_css` is a native MkDocs setting, not `extra.css` or a
-Pixel Lab theme option. Both component customization and scoped overrides
-use the same stylesheet.
+component guide. Both override scopes use this stylesheet.
 
 ### Scope selected instances
 
@@ -73,8 +67,7 @@ markdown_extensions:
   - md_in_html
 ```
 
-Merge this into your existing extension list rather than replacing it. Put
-the wrapper class around the content you want to style; reuse it wherever
+Put the wrapper class around the content you want to style; reuse it wherever
 the same override should apply. Class names such as `instance-tabs` are
 example names you choose, not built-in theme options.
 
@@ -87,7 +80,6 @@ example names you choose, not built-in theme options.
 
 Tabs, alerts, admonitions, collapsible blocks, and tables can contain other
 content. Pixel Lab removes shadows from nested styled components and media,
-so only the outer container is elevated. Container guides highlight this
-behavior where it matters; child content keeps its normal authoring syntax.
+so only the outer container is elevated.
 
 See [Content tabs](tabs.md#layout-modes) for flush and padded panels.

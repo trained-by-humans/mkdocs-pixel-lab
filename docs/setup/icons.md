@@ -18,22 +18,20 @@ theme:
 ```
 
 For example, `assets/icons/edit.svg` belongs at
-`docs/assets/icons/edit.svg`. Use only the keys you want to replace; omit a
-key or set it to `null` to retain the default.
+`docs/assets/icons/edit.svg`. Use only the keys you want to replace.
 
-These Pixel Lab parameters belong under `theme`. In every row, `null` means
-use the built-in artwork—not hide the action.
+Set icons under `theme.icon`. A `null` value keeps the built-in artwork.
 
 ## Toolbar icons
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
-| `icon.repo` | `null` (Git branch) | Replaces the repository button artwork |
-| `icon.search` | `null` (magnifying glass) | Replaces the search button artwork |
-| `icon.menu` | `null` (menu) | Replaces the mobile navigation open icon |
-| `icon.close` | `null` (close) | Replaces the mobile navigation close icon |
-| `icon.sites` | `null` (pixel grid) | Replaces the related-sites button artwork |
-| `icon.dropdown` | `null` (down arrow) | Replaces the dropdown arrow; remains omitted on compact screens |
+| `icon.repo` | `null` (Git branch) | Replaces the [repository button](repository.md#repository-button) artwork |
+| `icon.search` | `null` (magnifying glass) | Replaces the [search button](search.md#use-the-search-panel) artwork |
+| `icon.menu` | `null` (menu) | Replaces the [mobile navigation](navigation.md#responsive-behavior) open icon |
+| `icon.close` | `null` (close) | Replaces the [mobile navigation](navigation.md#responsive-behavior) close icon |
+| `icon.sites` | `null` (pixel grid) | Replaces the [related-sites button](related-sites.md#header-dropdown) artwork |
+| `icon.dropdown` | `null` (down arrow) | Replaces the [dropdown arrow](related-sites.md#toolbar-icons); remains omitted on compact screens |
 
 SVG is recommended; PNG and other browser-supported image formats also work.
 Toolbar artwork preserves its original colors and fits a 14 × 14 px slot.
@@ -53,6 +51,8 @@ label.
 | `icon.view` | `null` (code brackets) | Replaces the View source artwork beside the title |
 | `icon.edit` | `null` (pen nib) | Replaces the Edit this page artwork beside the title |
 
+Configure destinations and visibility in [Repository and page actions](repository.md#page-source-and-editing).
+
 Source and edit icons use the image's alpha channel as a mask. Use artwork
 with a transparent background: an opaque white rectangle becomes a filled
 rectangle, not empty space. Custom icons receive a black silhouette and a
@@ -61,6 +61,8 @@ image colors.
 
 Remote mask images must allow cross-origin loading (CORS). Local assets avoid
 that dependency. These image and mask styles work without JavaScript.
+
+For sizing or mask problems, see [Troubleshooting](../reference/troubleshooting.md#a-custom-icon-looks-too-small-or-like-a-filled-box).
 
 ## Other artwork
 

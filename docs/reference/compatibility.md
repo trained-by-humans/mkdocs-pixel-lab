@@ -10,6 +10,8 @@ Installing Pixel Lab installs these Python dependencies. Required Markdown
 extensions must still be enabled in `mkdocs.yml`; see the relevant
 [component guide](../components/index.md).
 
+For changes to existing sites between releases, see [Upgrading](upgrading.md).
+
 ## Theme scope
 
 Pixel Lab uses MkDocs navigation, repository URLs, search, and Markdown
@@ -19,17 +21,18 @@ rather than copying Material-specific feature flags.
 
 Current boundaries include:
 
-- Navigation rendering supports up to three levels.
-- Content-tab selection styles support up to eight tabs in a group.
-- One configured palette; no runtime light/dark switch.
+- [Navigation](../setup/navigation.md#responsive-behavior) renders up to three levels.
+- [Content tabs](../components/tabs.md#limits) support selection styles for up to eight tabs in a group.
+- One configured [palette](../setup/colors.md); no runtime light/dark switch.
 - No separate visible page-contents sidebar or previous/next controls.
 - No built-in localization system or dedicated generated 404 template.
-- Source-file view URLs are inferred for standard `github.com` URLs only;
+- [View source](../setup/repository.md#page-source-and-editing) infers file-view URLs for standard `github.com` URLs only;
   edit actions use MkDocs' resolved URLs for other providers too.
 
 ## JavaScript and keyboard behavior
 
-Normal links, heading permalinks, native details, and CSS-driven tab selection
+Normal links, [heading permalinks](../setup/heading-permalinks.md), native
+[collapsible content](../components/details.md), and CSS-driven tab selection
 remain usable without JavaScript. Search, automatic/forced tab layouts, table
 scrolling wrappers, and copy buttons use JavaScript. Without layout detection,
 tab panels retain padding.

@@ -11,9 +11,8 @@ markdown_extensions:
   - pymdownx.details
 ```
 
-Both extensions belong under `markdown_extensions` in `mkdocs.yml`.
 `pymdownx.details` enables the collapsible `???` syntax; `admonition` also
-enables regular `!!!` notes. Neither is enabled just by selecting the theme.
+enables regular `!!!` notes.
 
 For non-collapsible notes with the same styling, see [Admonitions](admonitions.md).
 
@@ -51,12 +50,8 @@ keyboard activation. It works without the theme's JavaScript.
 
 ## Native HTML alternative
 
-This is alternative authoring syntax, not a requirement for customizing the
-component or overriding an instance's appearance.
-
-You can also write `<details><summary>Title</summary>Content</details>` directly.
-Follow [Scope selected instances](index.md#scope-selected-instances) to enable Markdown
-inside HTML, then add `markdown="1"` to the wrapper:
+You can also write `<details>` directly. For Markdown inside the body, enable
+[`md_in_html`](index.md#scope-selected-instances) and add `markdown="1"`:
 
 ```html
 <details markdown="1">
@@ -81,8 +76,6 @@ theme:
   shadow_color: "#101410"
 ```
 
-These Pixel Lab parameters belong under `theme`:
-
 | Parameter | Default | Effect |
 | --- | --- | --- |
 | `highlight_color` | Golden yellow · `#f5c842` | Summary background |
@@ -94,8 +87,8 @@ See [Common attributes](../reference/configuration.md#common-attributes).
 
 ### Component-wide overrides
 
-To customize the summary fill for all collapsible blocks without changing
-admonitions, add this to your [custom stylesheet](index.md#load-custom-css):
+To change every collapsible block's summary fill, add this to your
+[custom stylesheet](index.md#load-custom-css):
 
 ```css
 details > summary {
@@ -117,8 +110,7 @@ Wrap each selected block, following [Scope selected instances](index.md#scope-se
 </div>
 ```
 
-Add this scoped rule to the same stylesheet. Unwrapped collapsible blocks keep
-the component defaults; you don't need to rewrite the blocks as native HTML:
+Add the scoped rule to your stylesheet:
 
 ```css
 .instance-details > details > summary {

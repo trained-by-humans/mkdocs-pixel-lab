@@ -17,17 +17,9 @@ update their pin or lockfile through their normal workflow.
 
 ### Heading permalinks
 
-Use Python-Markdown's `toc` configuration:
-
-```yaml
-markdown_extensions:
-  - toc:
-      permalink: true
-```
-
 Remove the obsolete `theme.permalink_icon` and `theme.permalink_fill_color`
-settings. There is one built-in link icon; use `toc.permalink` for a text-symbol
-replacement or to disable permalinks. See [Heading permalinks](../setup/heading-permalinks.md).
+settings and use Python-Markdown's `toc` configuration instead. See
+[Heading permalinks](../setup/heading-permalinks.md) for setup.
 
 ### Page and repository actions
 
@@ -36,8 +28,8 @@ actions are shown by default; choose `show_repo`, `show_source`, and
 `show_edit` independently if your site should hide any of them. Use
 `show_repo_name: false` for an icon-only repository button.
 
-Check that `edit_uri` names the correct branch and Markdown directory. See
-[Repository and page actions](../setup/repository.md) and [Icons](../setup/icons.md).
+See [Repository and page actions](../setup/repository.md) for URL configuration
+and [Icons](../setup/icons.md) for artwork.
 
 ### Related-site navigation
 

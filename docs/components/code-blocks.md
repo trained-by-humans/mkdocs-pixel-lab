@@ -11,9 +11,6 @@ markdown_extensions:
   - pymdownx.highlight
 ```
 
-Pymdown Extensions and Pygments are installed with Pixel Lab. The extensions
-still need to be enabled in your MkDocs configuration.
-
 ## Write a code block
 
 ```python
@@ -74,8 +71,6 @@ theme:
   highlight_color: "#f5c842"
 ```
 
-These Pixel Lab parameters belong under `theme`:
-
 | Parameter | Default | Effect |
 | --- | --- | --- |
 | `code_background_color` | Near-black · `#101410` | Code block background |
@@ -101,8 +96,8 @@ See [Common attributes](../reference/configuration.md#common-attributes).
 
 ### Component-wide overrides
 
-To customize all highlighted code blocks without changing other component
-types, use their selector in a [custom stylesheet](index.md#load-custom-css):
+To change every highlighted code block's background and text, add this to
+your [custom stylesheet](index.md#load-custom-css):
 
 ```css
 .highlight {
@@ -125,8 +120,7 @@ print("Hello, Pixel Lab!")
 </div>
 ````
 
-Scope the CSS variables to `.instance-code` in the same stylesheet.
-Unwrapped code blocks keep the component defaults:
+Add the scoped rule to your stylesheet:
 
 ```css
 .instance-code > .highlight {

@@ -1,8 +1,8 @@
 # Related sites
 
-Use `extra.site_navigation` to link related projects. Omit it to show no
-related-site navigation. These are Pixel Lab settings in `mkdocs.yml`, not
-native MkDocs `nav` entries or options under `theme`.
+Link related projects through `extra.site_navigation` in `mkdocs.yml`.
+Omit it to show no related-site navigation.
+For pages within the current site, use [Navigation](navigation.md).
 
 ## Items
 
@@ -24,8 +24,7 @@ extra:
 ```
 
 Each item and the catalog need a title and URL. Mark the current project with
-`active: true`; it isn't inferred from the URL. These settings belong under
-`extra.site_navigation`:
+`active: true`; it isn't inferred from the URL.
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
@@ -64,6 +63,7 @@ screens and don't display item icons.
 
 Set `show_footer: false` to hide these links without changing the header.
 For footer-only links, also set `header_mode: none`.
+For footer text and attribution, see [Branding and footer](branding.md#footer).
 
 ## Header: inline
 
@@ -77,8 +77,7 @@ extra:
 ```
 
 The header has one presentation at a time: `inline`, `dropdown` (default), or
-`none`. These settings also belong under `extra.site_navigation` and don't
-change footer visibility:
+`none`. Footer visibility is independent.
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
@@ -103,8 +102,6 @@ extra:
 The dropdown appears when `items` or `catalog` provides links; an empty
 configuration doesn't add a button. It shows every item, followed by the
 optional catalog, regardless of `header_size` or `footer_size`.
-
-This setting belongs under `extra.site_navigation`:
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
@@ -139,8 +136,6 @@ static image; loading failures also leave the resting icon unchanged.
 Static images use a 24 × 24 px slot. Hover-enabled images use 24 × 44 px,
 including vertical breathing room; include that room in both SVG canvases.
 
-These artwork settings belong under `extra.site_navigation`, not `theme`:
-
 | Parameter | Default | Effect |
 | --- | --- | --- |
 | `items[].icon` / `catalog.icon` | Not set (pixel fallback) | Resting artwork in dropdown rows |
@@ -148,8 +143,7 @@ These artwork settings belong under `extra.site_navigation`, not `theme`:
 
 ### Toolbar icons
 
-The button's artwork is configured separately under `theme`, not
-`extra.site_navigation`:
+Customize the button's artwork through `theme.icon`:
 
 ```yaml
 theme:
@@ -164,13 +158,11 @@ theme:
 | `icon.sites` | `null` (pixel grid) | Related-sites toolbar button artwork |
 | `icon.dropdown` | `null` (down arrow) | Toolbar dropdown arrow; hidden on compact screens |
 
-See [Icons](icons.md) for image formats and paths. Icon settings replace
-artwork; they don't enable the dropdown.
+See [Icons](icons.md) for image formats and paths.
 
 ## Further customization
 
-These appearance settings belong under `theme`. Presentation-specific labels,
-limits, and icons are documented above.
+Style related-site links and the dropdown with these `theme` settings:
 
 | Parameter | Default | Effect |
 | --- | --- | --- |

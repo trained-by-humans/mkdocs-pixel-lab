@@ -12,9 +12,6 @@ markdown_extensions:
   - admonition
 ```
 
-Selecting the theme doesn't enable this extension. It belongs under
-`markdown_extensions`, not `plugins` or `theme`.
-
 ## Write an admonition
 
 !!! note "Before you start"
@@ -31,8 +28,7 @@ Indent the body four spaces. The type follows `!!!`; the quoted custom title
 is optional. For example, `!!! note` without a quoted title displays Note.
 Admonition types currently share the same theme styling.
 
-For expandable notes using `???` or `???+`, see
-[Collapsible content](details.md). That syntax requires `pymdownx.details`.
+For expandable notes using `???` or `???+`, see [Collapsible content](details.md).
 
 > [!NOTE]
 >
@@ -53,8 +49,6 @@ theme:
   shadow_color: "#101410"
 ```
 
-These Pixel Lab parameters belong under `theme`:
-
 | Parameter | Default | Effect |
 | --- | --- | --- |
 | `highlight_color` | Golden yellow · `#f5c842` | Admonition title background |
@@ -67,9 +61,8 @@ See [Common attributes](../reference/configuration.md#common-attributes).
 
 ### Component-wide overrides
 
-To customize only admonitions, add this to your
-[custom stylesheet](index.md#load-custom-css). It changes every admonition's
-title fill without changing other component types:
+To change every admonition's title fill, add this to your
+[custom stylesheet](index.md#load-custom-css):
 
 ```css
 .admonition > .admonition-title {
@@ -91,8 +84,7 @@ Wrap each selected admonition, following [Scope selected instances](index.md#sco
 </div>
 ```
 
-Add this scoped rule to the same stylesheet. Titles inside `.instance-admonition`
-change; unwrapped admonitions keep the component defaults:
+Add the scoped rule to your stylesheet:
 
 ```css
 .instance-admonition > .admonition > .admonition-title {

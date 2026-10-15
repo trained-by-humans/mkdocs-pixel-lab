@@ -1,26 +1,25 @@
 # Repository and page actions
 
 The repository button opens the project. View source and Edit this page open
-the current page's source. They use native MkDocs URLs, without a GitHub API
-request or an extra plugin.
+the current page's source. They use MkDocs' repository and edit URLs, without
+a GitHub API request or an extra plugin.
 
 ## Repository button
+
+Set MkDocs' top-level `repo_url` and optional `repo_name` in `mkdocs.yml`:
 
 ```yaml
 repo_url: https://github.com/OWNER/REPO
 repo_name: GitHub
 ```
 
-These are native MkDocs settings, outside `theme`:
-
 | Parameter | Default | Effect |
 | --- | --- | --- |
 | `repo_url` | Not set | Provides the repository destination and enables the toolbar link |
 | `repo_name` | Inferred from `repo_url` | Supplies the repository button's label and accessible name |
 
-`repo_url` enables the toolbar button. `repo_name` supplies its label; MkDocs
-normally infers GitHub, GitLab, or Bitbucket. Hide the name, or the entire
-button, independently:
+MkDocs normally infers GitHub, GitLab, or Bitbucket for the label. To show
+only the icon:
 
 ```yaml
 theme:
@@ -29,12 +28,12 @@ theme:
   show_repo_name: false
 ```
 
-The icon-only version retains its accessible label and tooltip. Compact
-screens always use icon-only toolbar buttons.
+The icon-only version retains its accessible label and tooltip. See
+[Navigation](navigation.md#responsive-behavior) for compact toolbar behavior.
 
 ## Page source and editing
 
-Configure the branch and Markdown directory explicitly:
+Set MkDocs' `edit_uri` to your branch and Markdown directory:
 
 ```yaml
 repo_url: https://github.com/OWNER/REPO
@@ -52,8 +51,6 @@ MkDocs' default GitHub edit path uses `master`; specify `main` if that's your
 branch. Other providers' editor URLs can power editing, but automatic file-view
 URL inference is limited to standard `github.com` URLs.
 
-These are native MkDocs settings, outside `theme`:
-
 | Parameter | Default | Effect |
 | --- | --- | --- |
 | `edit_uri` | Provider-dependent; GitHub uses `edit/master/docs/` | Resolves each Markdown page's editor URL; `""` disables it unless a template supplies the URL |
@@ -67,6 +64,8 @@ These are native MkDocs settings, outside `theme`:
 
 ## Control visibility
 
+Choose which actions to show with the visibility settings under `theme`:
+
 ```yaml
 theme:
   name: pixel-lab
@@ -74,8 +73,7 @@ theme:
   show_edit: false
 ```
 
-These Pixel Lab parameters belong under `theme`. Their defaults are shown
-below; the example above overrides only edit visibility:
+The example hides Edit this page. Defaults for each action are:
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
@@ -84,15 +82,12 @@ below; the example above overrides only edit visibility:
 | `show_source` | `true` | Displays View source when a supported file-view URL can be inferred |
 | `show_edit` | `true` | Displays Edit this page when MkDocs supplies a page edit URL |
 
-`show_source` and `show_edit` both default to `true` when the relevant URLs
-exist. They are independent of `show_repo`. To disable MkDocs edit URLs
-entirely, set `edit_uri: ""` and remove any `edit_uri_template`; this also
-removes the inferred source link.
+To disable MkDocs edit URLs entirely, set `edit_uri: ""` and remove any
+`edit_uri_template`; this also removes the inferred source link.
 
 ## Further customization
 
-Use [`theme.icon.repo`, `theme.icon.view`, and `theme.icon.edit`](icons.md).
-The defaults are a Git branch, code brackets, and a pen nib respectively.
+Customize the artwork and hover shadows with these `theme` settings:
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
@@ -101,13 +96,11 @@ The defaults are a Git branch, code brackets, and a pen nib respectively.
 | `icon.edit` | `null` (pen nib) | Replaces the Edit this page mask |
 | `accent_dark_color` | Dark green · `#287c35` | Source/edit hover and keyboard-focus shadows |
 
-These are Pixel Lab settings under `theme`. Null icons retain the built-in
-artwork, not hide the buttons.
+See [Icons](icons.md) and
+[Common attributes](../reference/configuration.md#common-attributes).
 
-See [Common attributes](../reference/configuration.md#common-attributes).
-
-Page-action artwork scales with the heading. Its hover/focus shadow uses
-`accent_dark_color`. These links remain usable without JavaScript; the theme's
-script moves them immediately after the authored H1 when JavaScript is enabled.
+Page-action artwork scales with the heading. The links remain usable without
+JavaScript; the theme's script moves them immediately after the authored H1
+when JavaScript is enabled.
 
 Heading permalinks are separate: see [Heading permalinks](heading-permalinks.md).

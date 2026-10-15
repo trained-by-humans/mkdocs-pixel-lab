@@ -18,31 +18,12 @@ of the documentation website you want to change.
 
 ## Where configuration belongs
 
-Not every setting is a theme option:
-
-- **MkDocs settings** such as `site_name`, `nav`, and `repo_url` describe the site.
-- **`theme` settings** control Pixel Lab's appearance and theme features.
-- **`markdown_extensions`** enable syntax such as content tabs and heading links.
-- **`plugins`** enable build-time behavior such as search and metadata generation.
-- **`extra` settings** configure related-site navigation and analytics.
-
-The [configuration reference](../reference/configuration.md) lists defaults
-and links to the responsible guide.
-
-Each guide's parameter tables show the default and its effect on that part of
-the site. Main configuration is explained beside the example that enables or
-defines the feature. Further customization sections cover optional changes to
-its appearance, not a second copy of its setup. The Colors, Fonts, and Icons
-guides focus entirely on appearance.
-
-Color defaults match this documentation website. Shared effects are called
-out, and native MkDocs settings and CSS overrides are identified separately
-from Pixel Lab options.
+Use the [configuration map](../reference/configuration.md#configuration-map)
+to find each setting's owner and placement. See
+[Common attributes](../reference/configuration.md#common-attributes) for shared appearance settings.
 
 ## Component customization
 
-Content-specific settings live with their [component guides](../components/index.md).
-For example, the Content tabs guide explains [layout modes](../components/tabs.md#layout-modes)
-alongside the tab syntax, then [selected-tab colors](../components/tabs.md#customization)
-under Customization. Those colors are configured globally under `theme`, but
-you don't have to leave the tab guide to find them.
+Component-specific appearance settings live alongside the syntax in the
+[component guides](../components/index.md), such as
+[selected-tab colors](../components/tabs.md#customization).

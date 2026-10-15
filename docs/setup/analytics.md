@@ -6,6 +6,8 @@ not enable analytics.
 
 ## Enable GA4
 
+Configure the integration under `extra.analytics`:
+
 ```yaml
 site_url: https://example.com/docs/
 extra:
@@ -20,11 +22,6 @@ extra:
 > Use your Web data stream's GA4 Measurement ID, not a Firebase API key or
 > Tag Manager ID.
 
-Google is the only supported provider. Missing or invalid IDs, or a missing
-privacy-policy URL, leave analytics off.
-
-These are Pixel Lab settings under `extra.analytics`, not `theme`:
-
 | Parameter | Default | Effect |
 | --- | --- | --- |
 | `provider` | Not set | Selects the integration; only `google` is supported |
@@ -32,23 +29,20 @@ These are Pixel Lab settings under `extra.analytics`, not `theme`:
 | `privacy_policy` | Not set | Adds the policy link to the prompt and footer; required for analytics |
 | `enabled` | `true` within a configured integration | `false` disables analytics while retaining a configured policy link |
 
-`site_url` is a native MkDocs setting, outside both `extra` and `theme`:
+MkDocs' top-level `site_url` supplies your production address:
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
 | `site_url` | Not set | Defines the production URL used to guard collection; local and alternate-host previews don't collect visits |
 
-Analytics remains off until a supported provider, valid Measurement ID,
-privacy URL, and matching production `site_url` are configured.
+Missing or invalid integration settings leave analytics off.
 
 The prompt appears on HTTPS visits matching `site_url`. Local development
 and alternate-host previews don't collect visits. Allow analytics loads the
-Google tag; Decline doesn't. Analytics settings in the footer lets readers
+Google tag; Decline doesn't. The Analytics settings link in the footer lets readers
 change their choice. Withdrawal attempts to remove the site's GA cookies and
 reloads the page. If browser storage is blocked, consent lasts only for the
 current page.
-
-Set `enabled: false` inside `analytics` to disable collection explicitly.
 
 ## Privacy link
 
@@ -73,8 +67,6 @@ extra:
     privacy_policy: https://example.com/privacy/
     consent_domain: example.com
 ```
-
-This Pixel Lab setting belongs under `extra.analytics`:
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
@@ -101,8 +93,7 @@ and fragments. Reports describe consenting visitors, not all visits.
 
 ## Further customization
 
-The prompt's appearance uses Pixel Lab parameters under `theme`,
-separate from the integration settings above:
+Style the consent prompt with these `theme` settings:
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
@@ -115,6 +106,3 @@ separate from the integration settings above:
 | `shadow_color` | Near-black · `#101410` | Prompt's pixel shadow |
 
 See [Common attributes](../reference/configuration.md#common-attributes).
-
-This documentation site leaves analytics disabled, so it doesn't display the
-consent prompt.

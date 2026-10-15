@@ -35,7 +35,7 @@ python -m pip install mkdocs-pixel-lab
 For a new site, run `mkdocs new .` in an empty project directory. For an
 existing site, keep your current files and navigation.
 
-Select the theme in `mkdocs.yml`:
+Merge this into your site's `mkdocs.yml`:
 
 ```yaml
 site_name: My documentation
@@ -45,12 +45,9 @@ theme:
 
 ## Enable rich Markdown
 
-These extensions power the examples on this website. Enable only the ones
-your pages use:
+Enable the extensions your pages use:
 
 ```yaml
-plugins:
-  - search
 markdown_extensions:
   - admonition
   - mkdocs_pixel_lab.github_alerts
@@ -60,16 +57,10 @@ markdown_extensions:
   - pymdownx.tabbed:
       alternate_style: true
   - md_in_html
-  - toc:
-      permalink: true
 ```
 
-Merge snippets into your existing configuration: use one `theme` block, one
-`plugins` list, and one `markdown_extensions` list. When specifying plugins,
-keep `search` if you want the built-in search index.
-
-The [component guides](components/index.md) explain which extensions each
-component needs and how to write its Markdown.
+Each [component guide](components/index.md) lists its required extensions and
+Markdown syntax.
 
 ## Preview and build
 
@@ -86,7 +77,6 @@ mkdocs build --strict
 ```
 
 For hosting options, follow [MkDocs deployment documentation](https://www.mkdocs.org/user-guide/deploying-your-docs/).
-Pixel Lab doesn't require a special hosting service.
 
 ## Next steps
 
@@ -97,13 +87,5 @@ Pixel Lab doesn't require a special hosting service.
 
 ## Preview this documentation from a checkout
 
-To work on the theme's own website, run these commands from the repository
-root instead of creating another MkDocs project:
-
-```bash
-python -m pip install -e .
-python -m mkdocs serve --watch-theme
-```
-
-The root `mkdocs.yml` builds this website. The separate
-`tests/fixture_site/mkdocs.yml` remains a test fixture.
+To preview or contribute to this website, follow the
+[contributor guide](https://github.com/trained-by-humans/mkdocs-pixel-lab/blob/main/.github/CONTRIBUTING.md#documentation-website).

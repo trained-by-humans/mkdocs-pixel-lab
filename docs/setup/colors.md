@@ -15,10 +15,8 @@ theme:
   header_background: "#4caf50"       # Leaf green: header background
   accent_color: "#4caf50"            # Leaf green: selected tabs and controls
   accent_dark_color: "#287c35"       # Dark green: links and active navigation
-  accent_foreground_color: "#101410" # Green-tinted near-black: text on accents
+  accent_foreground_color: "#101410" # Near-black: text on accents
 ```
-
-These Pixel Lab parameters belong under `theme`:
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
@@ -29,8 +27,7 @@ These Pixel Lab parameters belong under `theme`:
 | `header_border_color` | Dark green via `var(--accent-dark)` | Header's lower border; follows `accent_dark_color` unless overridden |
 | `header_shadow_color` | Dark green via `var(--accent-dark)` | Header shadow; follows `accent_dark_color` unless overridden |
 
-`header_background` accepts any CSS background, including a gradient. Other
-color options accept CSS colors, including `rgba()` and CSS variables. Quote
+Color options accept CSS colors, including `rgba()` and CSS variables. Quote
 hex values so YAML doesn't treat `#` as the beginning of a comment.
 
 ## Set shared surfaces and text
@@ -42,10 +39,10 @@ theme:
   surface_color: "#fffdf2"     # Ivory: panels and buttons
   surface_alt_color: "#e8e4cf" # Pale khaki: table headers and tab strips
   text_color: "#182018"        # Dark green-gray: body text
-  strong_text_color: "#101410" # Green-tinted near-black: control labels
-  muted_text_color: "#5f665d"  # Muted gray-green: secondary text
-  border_color: "#101410"      # Green-tinted near-black: outlines
-  shadow_color: "#101410"      # Green-tinted near-black: pixel shadows
+  strong_text_color: "#101410" # Near-black: control labels
+  muted_text_color: "#5f665d"  # Gray-green: secondary text
+  border_color: "#101410"      # Near-black: outlines
+  shadow_color: "#101410"      # Near-black: pixel shadows
 ```
 
 | Parameter | Default | Effect |
@@ -72,12 +69,14 @@ Each component guide explains exactly which shared and specific colors it uses:
 
 | Component | Appearance settings |
 | --- | --- |
-| [Content tabs](../components/tabs.md#customization) | Selected tab, hover, labels, and panel surfaces |
+| [Text and lists](../components/text.md#customization) | Text, links, quotation rails, and inline code |
 | [Code blocks](../components/code-blocks.md#customization) | Code background, text, and syntax colors |
 | [Alerts](../components/alerts.md#customization) | Semantic rails, titles, and backgrounds |
 | [Admonitions](../components/admonitions.md#customization) | Title fill, body surface, border, and shadow |
-| [Tables](../components/tables.md#customization) | Header fill, rules, border, and shadow |
+| [Content tabs](../components/tabs.md#customization) | Selected tab, hover, labels, and panel surfaces |
 | [Collapsible content](../components/details.md#customization) | Summary fill, border, and shadow |
+| [Tables](../components/tables.md#customization) | Header fill, rules, border, and shadow |
+| [Images and video](../components/media.md#customization) | Media surfaces, frames, and shadows |
 
 For section-link colors, see [Heading permalinks](heading-permalinks.md#further-customization).
 

@@ -51,8 +51,6 @@ theme:
   shadow_color: "#101410"
 ```
 
-These Pixel Lab parameters belong under `theme`:
-
 | Parameter | Default | Effect |
 | --- | --- | --- |
 | `surface_alt_color` | Pale khaki · `#e8e4cf` | Header row background |
@@ -65,8 +63,8 @@ See [Common attributes](../reference/configuration.md#common-attributes).
 
 ### Component-wide overrides
 
-To customize the header fill for all content tables without changing other
-component types, use a [custom stylesheet](index.md#load-custom-css):
+To change every content table's header fill, add this to your
+[custom stylesheet](index.md#load-custom-css):
 
 ```css
 .main th {
@@ -88,8 +86,8 @@ Wrap each selected table, following [Scope selected instances](index.md#scope-se
 </div>
 ```
 
-Scope the header rule to `.instance-table` in the same stylesheet. It keeps working
-when JavaScript adds the scrolling frame; unwrapped tables keep the component defaults:
+Add the scoped rule to your stylesheet. This selector also works after
+JavaScript adds the scrolling frame:
 
 ```css
 .instance-table th {

@@ -30,16 +30,9 @@ features you need.
 
 ## Set up your theme, then build your pages
 
-Start with [Theme setup](setup/index.md) to configure your site's colors, fonts,
-branding, navigation, search, and repository links once.
-
-Then build your documentation one page at a time with [Components](components/index.md).
-Each guide brings together a live example, its Markdown, required extensions,
-and appearance settings—even when those settings live under `theme` in
-`mkdocs.yml`.
-
-For example, [Content tabs](components/tabs.md) covers writing tabs, choosing
-their layout, and changing selected-tab colors in one place.
+Configure your site once with [Theme setup](setup/index.md).
+Then create pages with [Components](components/index.md): live examples,
+Markdown syntax, and component-specific customization.
 
 ## Built for documentation
 

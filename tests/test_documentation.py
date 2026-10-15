@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import re
+from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 import pytest
 import yaml
@@ -21,6 +23,22 @@ GUIDES = sorted(
     if source.name != "index.md"
 )
 PARAMETER_HEADER = "| Parameter | Default | Effect |"
+
+
+class PageLinks(HTMLParser):
+    """Collect rendered destinations and anchors without a browser or network."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.ids: set[str] = set()
+        self.links: list[str] = []
+
+    def handle_starttag(self, tag, attrs) -> None:
+        attributes = dict(attrs)
+        if attributes.get("id"):
+            self.ids.add(attributes["id"])
+        if tag == "a" and attributes.get("href"):
+            self.links.append(attributes["href"])
 
 
 def parameter_rows(source: Path):
@@ -91,6 +109,98 @@ def test_public_documentation_builds_all_pages(documentation_dir: Path) -> None:
     assert not (documentation_dir / "theme-coverage-results.json").exists()
 
 
+def test_readme_links_to_manual_and_keeps_a_minimal_theme_example() -> None:
+    content = (ROOT / "README.md").read_text()
+    guides = set(re.findall(r"\]\((docs/[^)#]+)(?:#[^)]*)?\)", content))
+    assert {
+        "docs/getting-started.md", "docs/setup/index.md",
+        "docs/components/index.md", "docs/reference/configuration.md",
+    } <= guides
+    for guide in guides:
+        assert (ROOT / guide).is_file(), guide
+    examples = re.findall(r"^```yaml\n(.*?)\n```$", content, re.MULTILINE | re.DOTALL)
+    assert len(examples) == 1
+    assert yaml.safe_load(examples[0]) == {"theme": {"name": "pixel-lab"}}
+    for asset in re.findall(r'<img\s+src="([^"]+)"', content):
+        if not asset.startswith("https://"):
+            assert (ROOT / asset).is_file(), asset
+
+
+def test_rendered_internal_links_and_anchors_exist(documentation_dir: Path) -> None:
+    root = documentation_dir.resolve()
+    config = load_config(config_file=str(ROOT / "mkdocs.yml"))
+    site_path = urlsplit(config.site_url).path
+    pages = {}
+    for source in root.rglob("*.html"):
+        parser = PageLinks()
+        parser.feed(source.read_text())
+        pages[source] = parser
+    for source, page in pages.items():
+        for href in page.links:
+            link = urlsplit(href)
+            if link.scheme or link.netloc:
+                continue
+            path = unquote(link.path)
+            if not path:
+                target = source
+            elif path.startswith("/"):
+                assert path.startswith(site_path), (source, href)
+                target = root / path[len(site_path):]
+            else:
+                target = source.parent / path
+            target = target.resolve()
+            assert target.is_relative_to(root), (source, href)
+            if target.is_dir():
+                target /= "index.html"
+            assert target.is_file(), (source, href, "missing destination")
+            if link.fragment and target in pages:
+                assert unquote(link.fragment) in pages[target].ids, (source, href, "missing anchor")
+
+
+def test_guide_titles_and_overview_links_match_navigation() -> None:
+    config = load_config(config_file=str(ROOT / "mkdocs.yml"))
+    for section in ("Theme setup", "Components", "Reference"):
+        entries = next(item[section] for item in config.nav if section in item)
+        overview_path = next((entry["Overview"] for entry in entries if "Overview" in entry), None)
+        overview = (DOCS / overview_path).read_text() if overview_path else None
+        for entry in entries:
+            for name, path in entry.items():
+                source = DOCS / path
+                title = re.search(r"^# (.+)$", source.read_text(), re.MULTILINE)
+                assert title is not None, source
+                assert title[1] == (section if name == "Overview" else name), source
+                if overview is not None and name != "Overview":
+                    assert f"]({source.name})" in overview, (section, source, "missing overview link")
+
+
+def test_component_appearance_indexes_cover_all_styled_guides() -> None:
+    config = load_config(config_file=str(ROOT / "mkdocs.yml"))
+    components = next(item["Components"] for item in config.nav if "Components" in item)
+    styled = [
+        Path(path).name
+        for entry in components for path in entry.values()
+        if "## Customization\n" in (DOCS / path).read_text()
+    ]
+    for source, heading in (
+        (DOCS / "setup/colors.md", "Customize a component"),
+        (DOCS / "reference/configuration.md", "Component appearance"),
+    ):
+        section = guide_section(source, heading)
+        links = re.findall(r"\]\(\.\./components/([^/)]+\.md)#customization\)", section)
+        assert links == styled, (source, "incomplete or inconsistent appearance index")
+
+
+def test_shared_color_names_are_consistent_between_parameter_tables() -> None:
+    names = {}
+    for source in GUIDES:
+        for parameter, default, effect in parameter_rows(source):
+            key = re.fullmatch(r"`([^`]+)`", parameter)
+            if key is None or not (key[1].endswith("_color") or key[1] == "header_background"):
+                continue
+            name = default.split("`", 1)[0].strip()
+            assert names.setdefault(key[1], name) == name, (source, parameter, "inconsistent color name")
+
+
 def test_troubleshooting_has_a_dedicated_reference_page(documentation_dir: Path) -> None:
     config = load_config(config_file=str(ROOT / "mkdocs.yml"))
     reference = next(item["Reference"] for item in config.nav if "Reference" in item)
@@ -131,6 +241,28 @@ def test_documentation_yaml_examples_are_valid() -> None:
     for source in DOCS.rglob("*.md"):
         for match in re.finditer(r"^```yaml\n(.*?)\n```$", source.read_text(), re.MULTILINE | re.DOTALL):
             assert yaml.safe_load(match.group(1)) is not None, source
+
+
+def test_quick_start_rich_markdown_stays_focused_on_components() -> None:
+    section = guide_section(DOCS / "getting-started.md", "Enable rich Markdown")
+    example = re.search(r"```yaml\n(.*?)\n```", section, re.DOTALL)
+    assert example is not None
+    config = yaml.safe_load(example[1])
+    assert set(config) == {"markdown_extensions"}
+    extensions = config["markdown_extensions"]
+    assert extensions
+    assert not any(item == "toc" or isinstance(item, dict) and "toc" in item for item in extensions)
+    assert re.findall(r"\]\(([^)]+)\)", section) == ["components/index.md"]
+
+
+def test_tab_setup_links_to_highlighting_instead_of_repeating_configuration() -> None:
+    section = guide_section(DOCS / "components/tabs.md", "Enable")
+    example = re.search(r"```yaml\n(.*?)\n```", section, re.DOTALL)
+    assert example is not None
+    assert yaml.safe_load(example[1]) == {
+        "markdown_extensions": [{"pymdownx.tabbed": {"alternate_style": True}}],
+    }
+    assert "code-blocks.md#enable" in section
 
 
 def test_color_examples_match_the_site_default_palette() -> None:

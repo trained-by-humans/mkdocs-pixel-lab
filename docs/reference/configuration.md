@@ -20,7 +20,8 @@ Merge snippets into your site's `mkdocs.yml`. Don't create duplicate `theme`,
 | `markdown_extensions` → `toc.permalink` | Python-Markdown | [Heading permalinks](../setup/heading-permalinks.md) |
 | `extra.site_navigation` | Pixel Lab | [Related sites](../setup/related-sites.md) |
 | `extra.analytics` | Pixel Lab | [Analytics and privacy](../setup/analytics.md) |
-| `extra_css`, `extra_javascript` | MkDocs | [Fonts / CSS overrides](../setup/fonts.md#override-typography-with-css) |
+| `extra_css` | MkDocs | [Load custom CSS](../components/index.md#load-custom-css) and [Fonts](../setup/fonts.md#override-typography-with-css) |
+| `extra_javascript` | MkDocs | [MkDocs JavaScript configuration](https://www.mkdocs.org/user-guide/configuration/#extra_javascript) |
 
 ## Common attributes
 
@@ -33,7 +34,7 @@ See [Colors](../setup/colors.md), [Fonts](../setup/fonts.md), and
 [Theme defaults](#theme-defaults) for every theme attribute and its default.
 
 There is no built-in per-page theme palette. Use
-[component-scoped CSS or scoped overrides](../components/index.md#customization-scopes)
+[component-wide or scoped overrides](../components/index.md#customization-scopes)
 when you need a narrower styling scope.
 
 ## Theme defaults
@@ -109,20 +110,17 @@ Null icon values retain the defaults.
 For a token's effect on an individual component, read that component's
 Customization section:
 
-- [Content tabs](../components/tabs.md#customization)
+- [Text and lists](../components/text.md#customization)
 - [Code blocks](../components/code-blocks.md#customization)
 - [Alerts](../components/alerts.md#customization)
 - [Admonitions](../components/admonitions.md#customization)
+- [Content tabs](../components/tabs.md#customization)
 - [Collapsible content](../components/details.md#customization)
 - [Tables](../components/tables.md#customization)
 - [Images and video](../components/media.md#customization)
-- [Text and lists](../components/text.md#customization)
 
-Under Customization, component guides distinguish theme settings,
-**Component-wide overrides** (CSS for all instances), and
-**Scoped overrides** (CSS for selected instances). Both CSS scopes use `extra_css`;
-a wrapper class scopes the selector rather than replacing the component's
-HTML. See [Customization scopes](../components/index.md#customization-scopes).
+[Customization scopes](../components/index.md#customization-scopes) explains
+component-wide and scoped CSS overrides.
 
 For the full set of native settings, use the
 [MkDocs configuration reference](https://www.mkdocs.org/user-guide/configuration/).

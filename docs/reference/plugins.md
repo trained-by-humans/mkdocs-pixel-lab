@@ -2,21 +2,13 @@
 
 Pixel Lab includes three optional build-time plugins. They require no
 additional package, and none is automatically enabled by selecting the theme.
-Keep `search` in the plugin list if your site uses search.
+Keep [Search](../setup/search.md#enable-search) in the plugin list if your site uses it.
 
 ## Page metadata
 
-```yaml
-plugins:
-  - search
-  - pixel-lab/metadata
-```
-
-Generates browser/search title and description defaults from page content
-when explicit front matter is absent. See [Page metadata](../components/metadata.md)
-for front-matter fields, site defaults, and fallback rules.
-
-It doesn't use Git or change sitemap dates.
+`pixel-lab/metadata` generates missing titles and descriptions from page
+content. See [Page metadata](../components/metadata.md#automatic-defaults) for
+setup and fallback rules.
 
 ## Sitemap modification dates
 
@@ -73,9 +65,3 @@ omitted. Without the plugin, Pixel Lab doesn't generate `robots.txt`.
 Crawlers consult robots rules at the domain root. For project-path hosting,
 such as `example.com/project/`, the hosting owner must incorporate these rules
 at `example.com/robots.txt`. Robots rules aren't access control.
-
-## Markdown extensions are separate
-
-`mkdocs_pixel_lab.github_alerts` is a Markdown extension, not a plugin. Add it
-under `markdown_extensions`, as shown in [Alerts](../components/alerts.md).
-Likewise, `toc` and Pymdown Extensions belong under `markdown_extensions`.

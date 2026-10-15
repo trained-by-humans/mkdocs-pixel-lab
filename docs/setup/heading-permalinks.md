@@ -5,8 +5,7 @@ Hover or focus the link beside a section heading on this page to try it.
 
 ## Enable
 
-Heading links come from Python-Markdown's `toc` extension, not a separate
-Pixel Lab plugin:
+Enable permalinks through Python-Markdown's `toc` extension:
 
 ```yaml
 markdown_extensions:
@@ -15,16 +14,13 @@ markdown_extensions:
 ```
 
 MkDocs enables `toc` by default, but visible permalinks are off until you set
-`permalink`. This documentation site explicitly enables them. These are
-Python-Markdown options under `markdown_extensions` → `toc`, not Pixel Lab
-theme parameters:
+`permalink`.
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
 | `permalink` | `false` | Enables visible heading links; `true` uses the built-in link icon, while a string supplies a text symbol |
 
-Omit `permalink` or set it to `false` to disable visible heading links.
-Headings retain their IDs, so links to sections still work.
+Headings retain their IDs even when visible permalinks are disabled.
 
 ## Use heading permalinks
 
@@ -39,11 +35,8 @@ generated heading links themselves don't require it.
 
 ## Further customization
 
-The `toc` settings below apply to heading links across the site.
-
-With heading links enabled, `permalink: true` uses the built-in solid pixelated
-link icon. To replace it with a text symbol and adjust its tooltip or position,
-configure `toc` directly:
+To replace the built-in icon with a text symbol or adjust the tooltip and
+position, configure `toc`:
 
 ```yaml
 markdown_extensions:
@@ -53,19 +46,16 @@ markdown_extensions:
       permalink_leading: false
 ```
 
-`permalink_title`, `permalink_leading`, and heading ID options remain under
-`toc`'s control. There is no `theme.icon.permalink` setting or custom permalink
-image option.
-
-These optional appearance settings also belong under `toc`:
-
 | Parameter | Default | Effect |
 | --- | --- | --- |
 | `permalink_title` | `Permanent link` | Tooltip and accessible title of each heading link |
 | `permalink_leading` | `false` | Places the link after the heading; `true` moves it before the heading |
 
-The built-in icon is a black silhouette. Its copied hover/focus shadow uses
-`accent_dark_color`. This is the default dark green used on this site:
+> [!NOTE]
+>
+> There is no `theme.icon.permalink` setting or custom permalink image option.
+
+To change the built-in icon's hover/focus shadow:
 
 ```yaml
 theme:
@@ -73,17 +63,14 @@ theme:
   accent_dark_color: "#287c35" # Dark green
 ```
 
-These Pixel Lab parameters belong under `theme`:
-
 | Parameter | Default | Effect |
 | --- | --- | --- |
 | `accent_color` | Leaf green · `#4caf50` | Resting text-symbol permalink color; doesn't recolor the built-in black icon |
 | `accent_dark_color` | Dark green · `#287c35` | Built-in icon's hover/focus shadow and hovered text-symbol color |
 
-See [Common attributes](../reference/configuration.md#common-attributes) and the
-[Python-Markdown TOC reference](https://python-markdown.github.io/extensions/toc/)
-for extension options. Enabling `toc` doesn't add a visible page-contents
-sidebar in Pixel Lab.
+See [Common attributes](../reference/configuration.md#common-attributes).
+For more extension options, use the
+[Python-Markdown TOC reference](https://python-markdown.github.io/extensions/toc/).
 
 ### Component-wide overrides
 
@@ -108,14 +95,10 @@ Wrap each selected heading, following [Scope selected instances](../components/i
 </div>
 ```
 
-Scope the CSS variable to `.instance-heading` in the same stylesheet. Unwrapped
-heading links keep the component defaults:
+Add the scoped rule to your stylesheet:
 
 ```css
 .instance-heading > h2 > .headerlink {
   --accent-dark: #287c35; /* Dark green */
 }
 ```
-
-This changes the icon's hover/focus shadow (or a text symbol's hover color),
-not `toc`'s site-wide symbol, title, or positioning options.

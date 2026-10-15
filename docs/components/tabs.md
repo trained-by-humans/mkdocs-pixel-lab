@@ -1,7 +1,7 @@
 # Content tabs
 
 Use tabs for alternative instructions or related examples within a page.
-These are different from the site's primary navigation tabs.
+These are different from the site's [primary navigation tabs](../setup/navigation.md).
 
 ## Enable
 
@@ -9,14 +9,10 @@ These are different from the site's primary navigation tabs.
 markdown_extensions:
   - pymdownx.tabbed:
       alternate_style: true
-  - pymdownx.superfences
-  - pymdownx.highlight
 ```
 
-`pymdownx.tabbed` enables tabs; `alternate_style: true` is required for the
-markup Pixel Lab styles, not an optional visual preset. The other two
-extensions enable the highlighted code examples below. All belong under
-`markdown_extensions` in `mkdocs.yml`.
+`alternate_style: true` is required for the markup Pixel Lab styles.
+For the highlighted examples below, also enable [Code blocks](code-blocks.md#enable).
 
 ## Write tabs
 
@@ -57,7 +53,7 @@ Tab selection uses CSS and remains usable without JavaScript.
 
 Pixel Lab chooses each panel's layout automatically:
 
-- A single code block or table fills the panel **flush**.
+- A single [code block](code-blocks.md) or [table](tables.md) fills the panel **flush**.
 - Prose, multiple blocks, or mixed content use a **padded** inset.
 - Nested tabs are evaluated independently.
 
@@ -96,11 +92,8 @@ presentation.
 
 ### Scoped layout overrides
 
-These wrapper classes override the layout of selected tab groups, not the
-defaults for all tab groups. They don't require replacing the generated tab HTML.
-
-Follow [Scope selected instances](index.md#scope-selected-instances) for Markdown-in-HTML
-setup, then wrap a group in `.tabs-padded` or `.tabs-flush`:
+Wrap selected groups in `.tabs-padded` or `.tabs-flush`, following
+[Scope selected instances](index.md#scope-selected-instances):
 
 <div id="forced-tabs" class="tabs-padded" markdown="1">
 
@@ -136,11 +129,9 @@ These are the default colors used by the examples on this page:
 theme:
   name: pixel-lab
   accent_color: "#4caf50"            # Leaf green
-  accent_foreground_color: "#101410" # Green-tinted near-black
+  accent_foreground_color: "#101410" # Near-black
   tab_hover_color: "#d8d3b8"         # Muted khaki
 ```
-
-These Pixel Lab parameters belong under `theme`:
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
@@ -157,14 +148,13 @@ See [Common attributes](../reference/configuration.md#common-attributes).
 
 ### Component-wide overrides
 
-To customize all tab groups without changing other component types, use a
-[custom stylesheet](index.md#load-custom-css). The `.tabbed-set` selector
-targets every group, rather than only groups inside a wrapper class:
+To change every tab group's colors and label font, add this to your
+[custom stylesheet](index.md#load-custom-css):
 
 ```css
 .tabbed-set {
   --accent: #4caf50;            /* Leaf green */
-  --accent-foreground: #101410; /* Green-tinted near-black */
+  --accent-foreground: #101410; /* Near-black */
   --tab-hover: #d8d3b8;         /* Muted khaki */
 }
 
@@ -191,8 +181,7 @@ Wrap each selected group, following [Scope selected instances](index.md#scope-se
 </div>
 ```
 
-Scope the CSS variables to `.instance-tabs` in the same stylesheet. Unwrapped
-groups keep the component defaults:
+Add the scoped rule to your stylesheet:
 
 ```css
 .instance-tabs > .tabbed-set {

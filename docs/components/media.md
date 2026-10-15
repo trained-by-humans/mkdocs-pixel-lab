@@ -44,8 +44,6 @@ theme:
   shadow_color: "#101410"
 ```
 
-These Pixel Lab parameters belong under `theme`:
-
 | Parameter | Default | Effect |
 | --- | --- | --- |
 | `surface_color` | Ivory · `#fffdf2` | Background behind transparent images and video |
@@ -56,8 +54,8 @@ See [Common attributes](../reference/configuration.md#common-attributes).
 
 ### Component-wide overrides
 
-To customize the frame for all content images and videos without changing
-other component types, use a [custom stylesheet](index.md#load-custom-css):
+To change every content image and video's frame color, add this to your
+[custom stylesheet](index.md#load-custom-css):
 
 ```css
 .main img,
@@ -78,8 +76,7 @@ Wrap the selected media, following [Scope selected instances](index.md#scope-sel
 </div>
 ```
 
-Scope the frame rule to `.instance-media` in the same stylesheet. Unwrapped
-images keep the component defaults; the images still use normal Markdown syntax:
+Add the scoped rule to your stylesheet:
 
 ```css
 .instance-media img {

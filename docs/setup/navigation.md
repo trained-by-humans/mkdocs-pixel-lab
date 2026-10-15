@@ -5,6 +5,8 @@ primary navigation tabs; pages inside the active section appear in the sidebar.
 
 ## Configure navigation
 
+Define your sections with MkDocs' top-level `nav` setting:
+
 ```yaml
 nav:
   - Home: index.md
@@ -15,10 +17,7 @@ nav:
 ```
 
 Navigation paths are relative to `docs_dir`. Labels in `nav` can differ from
-the page's visible heading.
-
-This is a native MkDocs setting at the top level of `mkdocs.yml`, not under
-`theme`:
+the page's visible heading and [browser title](../components/metadata.md#write-metadata).
 
 | Parameter | Default | Effect |
 | --- | --- | --- |
@@ -41,13 +40,17 @@ The active page is marked automatically. A skip-to-content link and visible
 focus styles support keyboard use; Escape closes the drawer and returns focus
 to its toolbar button.
 
+At 850px and below, toolbar buttons reduce to icons while retaining accessible
+labels and tooltips. The site name stays on one line and truncates when space runs out.
+
 Keep hierarchies shallow: Pixel Lab currently renders up to three navigation
 levels. It doesn't provide a separate visible on-page table of contents or
 previous/next page controls.
+Heading anchor links are configured separately in [Heading permalinks](heading-permalinks.md).
 
 ## Further customization
 
-These Pixel Lab parameters belong under `theme`:
+Customize navigation with these `theme` settings:
 
 | Parameter | Default | Effect |
 | --- | --- | --- |

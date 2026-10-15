@@ -1,7 +1,7 @@
 # Text and lists
 
-Headings, basic text, links, quotations, and lists use standard Markdown. No extra
-extension is required.
+Headings, basic text, links, quotations, and lists use standard Markdown.
+No extra extension is required.
 
 ## Headings
 
@@ -80,8 +80,6 @@ theme:
   inline_code_border_color: "rgba(40, 124, 53, 0.45)"
 ```
 
-These Pixel Lab parameters belong under `theme`:
-
 | Parameter | Default | Effect |
 | --- | --- | --- |
 | `text_color` | Dark green-gray · `#182018` | Body text and hovered links |
@@ -95,8 +93,8 @@ See [Common attributes](../reference/configuration.md#common-attributes).
 
 ### Component-wide overrides
 
-To customize the rail for all ordinary quotations without changing other
-component types, use a [custom stylesheet](index.md#load-custom-css):
+To change every ordinary quotation's rail, add this to your
+[custom stylesheet](index.md#load-custom-css):
 
 ```css
 .main blockquote {
@@ -116,8 +114,7 @@ Wrap each selected quotation, following [Scope selected instances](index.md#scop
 </div>
 ```
 
-Scope the rail rule to `.instance-quote` in the same stylesheet. Unwrapped
-quotations keep the component defaults:
+Add the scoped rule to your stylesheet:
 
 ```css
 .instance-quote > blockquote {

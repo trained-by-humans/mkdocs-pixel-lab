@@ -5,26 +5,27 @@ versions and theme limitations, see [Compatibility](compatibility.md).
 
 ## A component looks like plain text
 
-Check that its Markdown extension is enabled, its indentation is correct,
-and the YAML hasn't overwritten another `markdown_extensions` list. For tabs,
-set `alternate_style: true`. For Markdown inside an HTML wrapper, use
-`md_in_html` and `markdown="1"`.
+Check the [component guide](../components/index.md) for required extensions
+and indentation, and don't overwrite another `markdown_extensions` list.
+For tabs, set [`alternate_style: true`](../components/tabs.md#enable).
+For Markdown inside an HTML wrapper, follow
+[Scope selected instances](../components/index.md#scope-selected-instances).
 
 ## A custom icon looks too small or like a filled box
 
 Artwork with internal padding occupies less of the icon slot. Source and edit
-images are alpha masks: use transparent backgrounds. See [Icons](../setup/icons.md).
+images are alpha masks: use transparent backgrounds. See [Icons](../setup/icons.md#page-icons).
 
 ## Source links point at the wrong branch
 
 Set `edit_uri` explicitly for the branch and documentation directory. MkDocs'
-GitHub default uses `master`, not `main`. See [Repository and page actions](../setup/repository.md).
+GitHub default uses `master`, not `main`. See [Repository and page actions](../setup/repository.md#page-source-and-editing).
 
 ## Search has no results
 
 Keep `search` in `plugins`, rebuild the site, and preview through `mkdocs serve`
 instead of opening built files directly with `file://`. Search requires
-JavaScript and its generated index. See [Search](../setup/search.md) for setup.
+JavaScript and its generated index. See [Search](../setup/search.md#enable-search) for setup.
 
 ## A bundled plugin is missing
 
