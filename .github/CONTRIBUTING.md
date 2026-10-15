@@ -80,6 +80,16 @@ code blocks. Keep component-specific settings with their component.
 When a configuration example builds on an earlier snippet, use `hl_lines`
 to highlight added or changed options and leave repeated context unhighlighted.
 
+### Publishing documentation
+
+`.github/workflows/deploy-docs.yml` validates documentation on pull requests
+and pushes to `main`. After validation, main-branch runs publish `build/docs`
+to GitHub Pages. You can also run the workflow manually from `main`.
+
+For the initial repository setup, select **GitHub Actions** under
+**Settings → Pages → Build and deployment → Source**. Pull requests and
+manual runs on other branches validate the site without deploying it.
+
 ### Test fixture
 
 The fixture site exercises the theme's navigation, Markdown components, and
