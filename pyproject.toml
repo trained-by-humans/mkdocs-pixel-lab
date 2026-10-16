@@ -58,6 +58,9 @@ include = [
     "THIRD_PARTY_LICENSES.md",
     "README.md",
     "pyproject.toml",
+    "mkdocs.yml",
+    "docs/**/*.md",
+    "docs/assets",
     "src/mkdocs_pixel_lab",
     "tests",
 ]
