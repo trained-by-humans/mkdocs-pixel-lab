@@ -763,3 +763,26 @@ details > * { max-width: none; }
 @media (max-width: 600px) {
   .site-switcher { position: static; }
 }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+}
+
+.grid.cards > ul,
+.grid.cards > ol {
+  display: contents;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.grid.cards > ul > li,
+.grid.cards > ol > li,
+.card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  box-shadow: 5px 5px 0 var(--shadow);
+  padding: 1rem;
+}
