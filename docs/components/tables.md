@@ -21,7 +21,8 @@ enables Python-Markdown's table extension by default.
 
 ## Wide tables
 
-The theme's script wraps tables in a horizontal scrolling frame. The border
+Small tables keep their natural width. Wider tables fit the available column
+and scroll horizontally inside a frame added by the theme's script. The border
 and shadow stay fixed while the contents scroll. On a narrow screen, try
 scrolling this table sideways:
 

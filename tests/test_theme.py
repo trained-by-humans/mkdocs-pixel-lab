@@ -407,6 +407,136 @@ def test_code_highlighting_colors_and_line_emphasis(page, site_url: str, width: 
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
 
 
+@pytest.mark.parametrize("width", [1440, 390])
+def test_collapsible_and_code_block_alignment(page, site_url: str, width: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(f"{site_url}/guide/code/")
+    blocks = page.locator("#block-alignment")
+    details = blocks.locator(":scope > details")
+    code = blocks.locator(":scope > .highlight > pre")
+    admonition = blocks.locator(":scope > .admonition")
+
+    def assert_aligned():
+        reference = code.bounding_box()
+        shadow = code.evaluate("el => getComputedStyle(el).boxShadow")
+        for block in (details, admonition):
+            bounds = block.bounding_box()
+            assert bounds["x"] == pytest.approx(reference["x"], abs=0.1)
+            assert bounds["x"] + bounds["width"] == pytest.approx(
+                reference["x"] + reference["width"], abs=0.1,
+            )
+            expect(block).to_have_css("box-shadow", shadow)
+
+    expect(details).not_to_have_attribute("open")
+    assert_aligned()
+    summary = details.locator("summary")
+    summary.click()
+    expect(details).to_have_attribute("open", "")
+    assert_aligned()
+    nested_code = details.locator("pre")
+    expect(nested_code).to_be_visible()
+    expect(nested_code).to_have_css("box-shadow", "none")
+    expect(admonition.locator("details")).to_have_css("box-shadow", "none")
+    nested_bounds = nested_code.bounding_box()
+    outer_bounds = details.bounding_box()
+    assert nested_bounds["x"] > outer_bounds["x"]
+    assert nested_bounds["x"] + nested_bounds["width"] < outer_bounds["x"] + outer_bounds["width"]
+
+    summary.focus()
+    summary.press("Enter")
+    expect(details).not_to_have_attribute("open")
+    assert_aligned()
+    if width == 390:
+        assert code.evaluate("el => el.scrollWidth > el.clientWidth")
+        code.evaluate("el => el.scrollLeft = 40")
+        assert code.evaluate("el => el.scrollLeft") > 0
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+
+
+@pytest.mark.parametrize("width", [1920, 1440, 1024, 851, 850, 390, 320])
+@pytest.mark.parametrize("shadow_size", [5, 9])
+def test_full_width_component_edges(page, site_url: str, width: int, shadow_size: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(f"{site_url}/guide/alignment/")
+    page.evaluate("size => document.documentElement.style.setProperty('--content-shadow', `${size}px`)", shadow_size)
+    page.evaluate("document.fonts.ready")
+    boundary = page.locator(".main").evaluate("""el => {
+        const r = el.getBoundingClientRect(), s = getComputedStyle(el);
+        return {left:r.left + parseFloat(s.paddingLeft), right:r.right - parseFloat(s.paddingRight)};
+    }""")
+    selectors = [
+        ".main > .highlight pre", ".main > .gh-alert", ".main > .admonition",
+        ".main > details", ".main > .tabbed-set", "#wide-table .table-scroll",
+        'img[alt="Wide Markdown image"]', 'img[alt="Linked wide Markdown image"]',
+        ".main > video", ".main > .pixel-panel", ".main > .example", "#wide-node .node",
+    ]
+    for selector in selectors:
+        # Compact diagram nodes share the control scale, even when their label wraps.
+        expected_shadow = 3 if selector == "#wide-node .node" else shadow_size
+        components = page.locator(selector)
+        assert components.count() > 0, selector
+        for component in components.all():
+            metrics = component.evaluate("""el => {
+                const r = el.getBoundingClientRect(), s = getComputedStyle(el);
+                const shadow = s.boxShadow.replace(/rgba?\\([^)]+\\)/, '').trim().split(/\\s+/).map(parseFloat);
+                return {left:r.left, right:r.right, shadowX:shadow[0], shadowY:shadow[1]};
+            }""")
+            assert metrics["left"] == pytest.approx(boundary["left"], abs=0.5), selector
+            assert metrics["right"] == pytest.approx(boundary["right"] - expected_shadow, abs=0.5), selector
+            assert metrics["right"] + metrics["shadowX"] == pytest.approx(boundary["right"], abs=0.5), selector
+            assert metrics["shadowX"] == metrics["shadowY"] == expected_shadow, selector
+
+    expect(page.locator("#wide-table .table-shell")).to_have_css("margin-bottom", f"{24 + shadow_size}px")
+
+    quote = page.locator(".main > blockquote")
+    expect(quote).to_have_css("box-shadow", "none")
+    bounds = quote.bounding_box()
+    assert bounds["x"] + bounds["width"] == pytest.approx(boundary["right"], abs=0.5)
+    assert page.locator('#small-table .table-scroll').bounding_box()["width"] < 120
+    assert page.get_by_alt_text("Small image", exact=True).bounding_box()["width"] == 80
+    for component in page.locator(".main > .admonition .gh-alert, .main > .admonition img, .main > .admonition .table-scroll").all():
+        expect(component).to_have_css("box-shadow", "none")
+        assert component.evaluate("""el => {
+            const outer = el.closest('.admonition').getBoundingClientRect();
+            const inner = el.getBoundingClientRect();
+            return inner.left > outer.left && inner.right < outer.right;
+        }""")
+    scroll = page.locator("#wide-table .table-scroll")
+    assert scroll.evaluate("el => el.scrollWidth > el.clientWidth")
+    right_before = scroll.bounding_box()["x"] + scroll.bounding_box()["width"]
+    scroll.evaluate("el => el.scrollLeft = 100")
+    assert scroll.evaluate("el => el.scrollLeft") > 0
+    assert scroll.bounding_box()["x"] + scroll.bounding_box()["width"] == pytest.approx(right_before)
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+
+
+@pytest.mark.parametrize("width", [1440, 390])
+@pytest.mark.parametrize("control_shadow", [3, 4])
+def test_control_shadow_tracks_lift_and_hit_area(page, site_url: str, width: int, control_shadow: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(site_url)
+    page.evaluate("size => document.documentElement.style.setProperty('--control-shadow', `${size}px`)", control_shadow)
+    repo = page.get_by_role("link", name="Open repository: GitHub", exact=True)
+    idle = repo.bounding_box()
+    repo.hover()
+    expect(repo).to_have_css("box-shadow", f"rgb(101, 67, 33) {control_shadow}px {control_shadow}px 0px 0px")
+    lifted = repo.bounding_box()
+    assert lifted["x"] == pytest.approx(idle["x"] - control_shadow)
+    assert lifted["y"] == pytest.approx(idle["y"] - control_shadow)
+    assert repo.evaluate("""el => {
+        const m = new DOMMatrix(getComputedStyle(el, '::after').transform);
+        return [m.m41, m.m42];
+    }""") == [control_shadow, control_shadow]
+    # The bottom-right corner of the original footprint remains clickable.
+    assert page.evaluate("""point => Boolean(document.elementFromPoint(point.x, point.y)
+        ?.closest('.header-btn--repo'))""",
+        {"x": idle["x"] + idle["width"] - 1, "y": idle["y"] + idle["height"] - 1})
+    expect(page.locator(".skip-link")).to_have_css("box-shadow", f"rgb(101, 67, 33) {control_shadow}px {control_shadow}px 0px 0px")
+    # Larger surfaces keep their own weight when the control scale changes.
+    expect(page.locator(".header")).to_have_css("box-shadow", "rgb(40, 124, 53) 0px 4px 0px 0px")
+    expect(page.locator("#search-panel")).to_have_css("box-shadow", "rgb(101, 67, 33) 5px 5px 0px 0px")
+
+
 def test_desktop_experience(page, site_url: str, tmp_path: Path) -> None:
     page.set_viewport_size({"width": 1440, "height": 900})
     page.goto(site_url)
