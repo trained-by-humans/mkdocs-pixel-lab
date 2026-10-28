@@ -5,7 +5,7 @@
 
 :root {
   --sidebar: 220px;
-  --table-shadow: 5px;
+  --content-shadow: 5px;
 }
 
 * { box-sizing: border-box; }
@@ -384,6 +384,10 @@ h3 { font-size: 15px; margin-top: 32px; }
 a { color: var(--accent-dark); }
 a:hover { color: var(--ink); }
 p, li { max-width: 760px; }
+/* Standalone media uses the column width; prose keeps its reading measure. */
+p:has(> img:only-child),
+p:has(> video:only-child),
+p:has(> a:only-child > img:only-child) { max-width: none; }
 .headerlink {
   color: var(--accent);
   display: inline-block;
@@ -435,13 +439,13 @@ pre, .highlight pre {
   --code-padding-end: 84px;
   background: var(--code);
   border: 2px solid var(--border);
-  box-shadow: 5px 5px 0 var(--shadow);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
   color: var(--code-text);
   font: 13px/1.55 "IBM Plex Mono", monospace;
   margin: 18px 0 26px;
   overflow: auto;
   padding: 20px var(--code-padding-end) 20px var(--code-padding-start);
-  max-width: calc(100% - 5px);
+  max-width: calc(100% - var(--content-shadow));
 }
 pre code, .highlight pre code {
   background: transparent;
@@ -486,9 +490,10 @@ blockquote { border-left: 4px solid var(--accent); color: var(--muted); margin: 
   background: var(--alert-surface);
   border: 2px solid var(--border);
   border-left: 6px solid var(--alert-color);
-  box-shadow: 4px 4px 0 var(--shadow);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
   color: var(--ink);
   margin: 24px 0;
+  max-width: calc(100% - var(--content-shadow));
   padding: 14px 18px;
 }
 .gh-alert--note { --alert-color: var(--alert-note); --alert-surface: var(--alert-note-surface); }
@@ -513,13 +518,13 @@ table {
   margin: 24px 5px 29px 0;
   max-width: none;
 }
-.table-shell { margin: 24px 0 29px; max-width: calc(100% - 5px); width: fit-content; }
+.table-shell { margin: 24px 0 29px; max-width: calc(100% - var(--content-shadow)); width: fit-content; }
 /* The card stays fixed (including its pixel shadow); only its table content
    becomes horizontally scrollable when it is too wide for the page. */
 .table-scroll {
   background: var(--surface);
   border: 2px solid var(--border);
-  box-shadow: 5px 5px 0 var(--shadow);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
   max-width: 100%;
   overflow-x: auto;
 }
@@ -529,19 +534,19 @@ th { background: var(--surface2); font-family: "IBM Plex Mono", monospace; }
 img, video {
   background: var(--surface);
   border: 2px solid var(--border);
-  box-shadow: 4px 4px 0 var(--shadow);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
   display: block;
   height: auto;
-  margin: 1.5rem 4px 1.75rem 0;
-  max-width: calc(100% - 4px);
+  margin: 1.5rem var(--content-shadow) 1.75rem 0;
+  max-width: calc(100% - var(--content-shadow));
 }
 
 .admonition, details {
   background: var(--surface);
   border: 2px solid var(--border);
-  box-shadow: 5px 5px 0 var(--shadow);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
   margin: 24px 0;
-  max-width: calc(100% - 5px);
+  max-width: calc(100% - var(--content-shadow));
 }
 .admonition-title, summary {
   background: var(--highlight);
@@ -549,20 +554,23 @@ img, video {
   cursor: pointer;
   font: 700 10px "IBM Plex Mono", monospace;
   margin: 0;
+  max-width: none;
   padding: 8px 12px;
   text-transform: uppercase;
 }
-.admonition > *,
-details > * { max-width: none; }
-.admonition > :not(.admonition-title), details > :not(summary) { margin-left: 14px; margin-right: 14px; }
+.admonition > :not(.admonition-title), details > :not(summary) {
+  margin-left: 14px;
+  margin-right: 14px;
+  max-width: calc(100% - 28px);
+}
 .admonition-title + p { padding-bottom: 14px; }
 
 .tabbed-set {
   background: var(--surface);
   border: 2px solid var(--border);
-  box-shadow: 5px 5px 0 var(--shadow);
-  margin: 28px 5px 36px 0;
-  max-width: calc(100% - 5px);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
+  margin: 28px var(--content-shadow) 36px 0;
+  max-width: calc(100% - var(--content-shadow));
   overflow: hidden;
   position: relative;
 }
@@ -630,7 +638,7 @@ details > * { max-width: none; }
 .tabbed-block[data-tab-layout="flush"] > .table-shell > .table-scroll > table > * > tr > :last-child { border-right: 0; }
 
 .lead { color: var(--muted); font-size: 17px; max-width: 760px; }
-.pixel-panel, .example { background: var(--surface); border: 2px solid var(--border); box-shadow: 5px 5px 0 var(--shadow); }
+.pixel-panel, .example { background: var(--surface); border: 2px solid var(--border); box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow); max-width: calc(100% - var(--content-shadow)); }
 .install { align-items: center; display: flex; gap: 16px; margin: 28px 0; padding: 18px 20px; }
 .install-label { color: var(--accent-dark); font: 700 10px "IBM Plex Mono", monospace; white-space: nowrap; }
 .example { margin-top: 28px; padding: 20px; }
@@ -638,7 +646,7 @@ details > * { max-width: none; }
 .badge { background: var(--accent); border: 2px solid var(--border); color: var(--accent-foreground); font: 700 9px "IBM Plex Mono", monospace; padding: 4px 7px; }
 .badge.orange { background: var(--secondary); }
 .hero-flow { align-items: center; display: flex; flex-wrap: wrap; gap: 7px; margin: 26px 0 12px; }
-.node { background: var(--surface); border: 2px solid var(--border); box-shadow: 3px 3px 0 var(--shadow); font: 700 10px "IBM Plex Mono", monospace; padding: 9px 11px; }
+.node { background: var(--surface); border: 2px solid var(--border); box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow); font: 700 10px "IBM Plex Mono", monospace; max-width: calc(100% - var(--content-shadow)); overflow-wrap: anywhere; padding: 9px 11px; }
 .arrow { color: var(--accent-dark); font-weight: 900; }
 .footer { border-top: 2px solid var(--border); color: var(--muted); font: 11px "IBM Plex Mono", monospace; margin-top: 70px; padding-top: 20px; }
 /* The package lane begins at the footer's padding edge; attribution follows as

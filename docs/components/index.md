@@ -78,6 +78,12 @@ example names you choose, not built-in theme options.
 
 ## Nest components
 
+Full-width components reserve the same space for their pixel shadows, so their
+frames and visible right edges align. Tables and media keep their natural size
+when smaller than the column; when they reach the available width, their outer
+edges align with other full-width components. Standalone Markdown images can
+use the full column width, while ordinary prose keeps its reading width.
+
 Tabs, alerts, admonitions, collapsible blocks, and tables can contain other
 content. Pixel Lab removes shadows from nested styled components and media,
 so only the outer container is elevated.

@@ -453,6 +453,57 @@ def test_collapsible_and_code_block_alignment(page, site_url: str, width: int) -
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
 
 
+@pytest.mark.parametrize("width", [1920, 1440, 1024, 851, 850, 390, 320])
+def test_full_width_component_edges(page, site_url: str, width: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(f"{site_url}/guide/alignment/")
+    page.evaluate("document.fonts.ready")
+    boundary = page.locator(".main").evaluate("""el => {
+        const r = el.getBoundingClientRect(), s = getComputedStyle(el);
+        return {left:r.left + parseFloat(s.paddingLeft), right:r.right - parseFloat(s.paddingRight)};
+    }""")
+    selectors = [
+        ".main > .highlight pre", ".main > .gh-alert", ".main > .admonition",
+        ".main > details", ".main > .tabbed-set", "#wide-table .table-scroll",
+        'img[alt="Wide Markdown image"]', 'img[alt="Linked wide Markdown image"]',
+        ".main > video", ".main > .pixel-panel", ".main > .example", "#wide-node .node",
+    ]
+    for selector in selectors:
+        components = page.locator(selector)
+        assert components.count() > 0, selector
+        for component in components.all():
+            metrics = component.evaluate("""el => {
+                const r = el.getBoundingClientRect(), s = getComputedStyle(el);
+                const shadow = s.boxShadow.replace(/rgba?\\([^)]+\\)/, '').trim().split(/\\s+/).map(parseFloat);
+                return {left:r.left, right:r.right, shadowX:shadow[0], shadowY:shadow[1]};
+            }""")
+            assert metrics["left"] == pytest.approx(boundary["left"], abs=0.5), selector
+            assert metrics["right"] == pytest.approx(boundary["right"] - 5, abs=0.5), selector
+            assert metrics["right"] + metrics["shadowX"] == pytest.approx(boundary["right"], abs=0.5), selector
+            assert metrics["shadowX"] == metrics["shadowY"] == 5, selector
+
+    quote = page.locator(".main > blockquote")
+    expect(quote).to_have_css("box-shadow", "none")
+    bounds = quote.bounding_box()
+    assert bounds["x"] + bounds["width"] == pytest.approx(boundary["right"], abs=0.5)
+    assert page.locator('#small-table .table-scroll').bounding_box()["width"] < 120
+    assert page.get_by_alt_text("Small image", exact=True).bounding_box()["width"] == 80
+    for component in page.locator(".main > .admonition .gh-alert, .main > .admonition img, .main > .admonition .table-scroll").all():
+        expect(component).to_have_css("box-shadow", "none")
+        assert component.evaluate("""el => {
+            const outer = el.closest('.admonition').getBoundingClientRect();
+            const inner = el.getBoundingClientRect();
+            return inner.left > outer.left && inner.right < outer.right;
+        }""")
+    scroll = page.locator("#wide-table .table-scroll")
+    assert scroll.evaluate("el => el.scrollWidth > el.clientWidth")
+    right_before = scroll.bounding_box()["x"] + scroll.bounding_box()["width"]
+    scroll.evaluate("el => el.scrollLeft = 100")
+    assert scroll.evaluate("el => el.scrollLeft") > 0
+    assert scroll.bounding_box()["x"] + scroll.bounding_box()["width"] == pytest.approx(right_before)
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+
+
 def test_desktop_experience(page, site_url: str, tmp_path: Path) -> None:
     page.set_viewport_size({"width": 1440, "height": 900})
     page.goto(site_url)
