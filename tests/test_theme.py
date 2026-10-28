@@ -407,6 +407,52 @@ def test_code_highlighting_colors_and_line_emphasis(page, site_url: str, width: 
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
 
 
+@pytest.mark.parametrize("width", [1440, 390])
+def test_collapsible_and_code_block_alignment(page, site_url: str, width: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(f"{site_url}/guide/code/")
+    blocks = page.locator("#block-alignment")
+    details = blocks.locator(":scope > details")
+    code = blocks.locator(":scope > .highlight > pre")
+    admonition = blocks.locator(":scope > .admonition")
+
+    def assert_aligned():
+        reference = code.bounding_box()
+        shadow = code.evaluate("el => getComputedStyle(el).boxShadow")
+        for block in (details, admonition):
+            bounds = block.bounding_box()
+            assert bounds["x"] == pytest.approx(reference["x"], abs=0.1)
+            assert bounds["x"] + bounds["width"] == pytest.approx(
+                reference["x"] + reference["width"], abs=0.1,
+            )
+            expect(block).to_have_css("box-shadow", shadow)
+
+    expect(details).not_to_have_attribute("open")
+    assert_aligned()
+    summary = details.locator("summary")
+    summary.click()
+    expect(details).to_have_attribute("open", "")
+    assert_aligned()
+    nested_code = details.locator("pre")
+    expect(nested_code).to_be_visible()
+    expect(nested_code).to_have_css("box-shadow", "none")
+    expect(admonition.locator("details")).to_have_css("box-shadow", "none")
+    nested_bounds = nested_code.bounding_box()
+    outer_bounds = details.bounding_box()
+    assert nested_bounds["x"] > outer_bounds["x"]
+    assert nested_bounds["x"] + nested_bounds["width"] < outer_bounds["x"] + outer_bounds["width"]
+
+    summary.focus()
+    summary.press("Enter")
+    expect(details).not_to_have_attribute("open")
+    assert_aligned()
+    if width == 390:
+        assert code.evaluate("el => el.scrollWidth > el.clientWidth")
+        code.evaluate("el => el.scrollLeft = 40")
+        assert code.evaluate("el => el.scrollLeft") > 0
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+
+
 def test_desktop_experience(page, site_url: str, tmp_path: Path) -> None:
     page.set_viewport_size({"width": 1440, "height": 900})
     page.goto(site_url)
