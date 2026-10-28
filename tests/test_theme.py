@@ -454,9 +454,11 @@ def test_collapsible_and_code_block_alignment(page, site_url: str, width: int) -
 
 
 @pytest.mark.parametrize("width", [1920, 1440, 1024, 851, 850, 390, 320])
-def test_full_width_component_edges(page, site_url: str, width: int) -> None:
+@pytest.mark.parametrize("shadow_size", [5, 9])
+def test_full_width_component_edges(page, site_url: str, width: int, shadow_size: int) -> None:
     page.set_viewport_size({"width": width, "height": 900})
     page.goto(f"{site_url}/guide/alignment/")
+    page.evaluate("size => document.documentElement.style.setProperty('--content-shadow', `${size}px`)", shadow_size)
     page.evaluate("document.fonts.ready")
     boundary = page.locator(".main").evaluate("""el => {
         const r = el.getBoundingClientRect(), s = getComputedStyle(el);
@@ -469,6 +471,8 @@ def test_full_width_component_edges(page, site_url: str, width: int) -> None:
         ".main > video", ".main > .pixel-panel", ".main > .example", "#wide-node .node",
     ]
     for selector in selectors:
+        # Compact diagram nodes share the control scale, even when their label wraps.
+        expected_shadow = 3 if selector == "#wide-node .node" else shadow_size
         components = page.locator(selector)
         assert components.count() > 0, selector
         for component in components.all():
@@ -478,9 +482,11 @@ def test_full_width_component_edges(page, site_url: str, width: int) -> None:
                 return {left:r.left, right:r.right, shadowX:shadow[0], shadowY:shadow[1]};
             }""")
             assert metrics["left"] == pytest.approx(boundary["left"], abs=0.5), selector
-            assert metrics["right"] == pytest.approx(boundary["right"] - 5, abs=0.5), selector
+            assert metrics["right"] == pytest.approx(boundary["right"] - expected_shadow, abs=0.5), selector
             assert metrics["right"] + metrics["shadowX"] == pytest.approx(boundary["right"], abs=0.5), selector
-            assert metrics["shadowX"] == metrics["shadowY"] == 5, selector
+            assert metrics["shadowX"] == metrics["shadowY"] == expected_shadow, selector
+
+    expect(page.locator("#wide-table .table-shell")).to_have_css("margin-bottom", f"{24 + shadow_size}px")
 
     quote = page.locator(".main > blockquote")
     expect(quote).to_have_css("box-shadow", "none")
@@ -502,6 +508,33 @@ def test_full_width_component_edges(page, site_url: str, width: int) -> None:
     assert scroll.evaluate("el => el.scrollLeft") > 0
     assert scroll.bounding_box()["x"] + scroll.bounding_box()["width"] == pytest.approx(right_before)
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+
+
+@pytest.mark.parametrize("width", [1440, 390])
+@pytest.mark.parametrize("control_shadow", [3, 4])
+def test_control_shadow_tracks_lift_and_hit_area(page, site_url: str, width: int, control_shadow: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(site_url)
+    page.evaluate("size => document.documentElement.style.setProperty('--control-shadow', `${size}px`)", control_shadow)
+    repo = page.get_by_role("link", name="Open repository: GitHub", exact=True)
+    idle = repo.bounding_box()
+    repo.hover()
+    expect(repo).to_have_css("box-shadow", f"rgb(101, 67, 33) {control_shadow}px {control_shadow}px 0px 0px")
+    lifted = repo.bounding_box()
+    assert lifted["x"] == pytest.approx(idle["x"] - control_shadow)
+    assert lifted["y"] == pytest.approx(idle["y"] - control_shadow)
+    assert repo.evaluate("""el => {
+        const m = new DOMMatrix(getComputedStyle(el, '::after').transform);
+        return [m.m41, m.m42];
+    }""") == [control_shadow, control_shadow]
+    # The bottom-right corner of the original footprint remains clickable.
+    assert page.evaluate("""point => Boolean(document.elementFromPoint(point.x, point.y)
+        ?.closest('.header-btn--repo'))""",
+        {"x": idle["x"] + idle["width"] - 1, "y": idle["y"] + idle["height"] - 1})
+    expect(page.locator(".skip-link")).to_have_css("box-shadow", f"rgb(101, 67, 33) {control_shadow}px {control_shadow}px 0px 0px")
+    # Larger surfaces keep their own weight when the control scale changes.
+    expect(page.locator(".header")).to_have_css("box-shadow", "rgb(40, 124, 53) 0px 4px 0px 0px")
+    expect(page.locator("#search-panel")).to_have_css("box-shadow", "rgb(101, 67, 33) 5px 5px 0px 0px")
 
 
 def test_desktop_experience(page, site_url: str, tmp_path: Path) -> None:
