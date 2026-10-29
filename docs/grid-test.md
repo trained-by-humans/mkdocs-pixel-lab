@@ -1,15 +1,14 @@
-<div class="grid cards" markdown>
+<div class="grid" markdown>
 
-- **Card one**
+<div class="card" markdown>
 
-    Some text and a [link](#).
+```python
+print("this is a very long line of code that should scroll inside the card instead of breaking the layout or overflowing")
+```
 
-- **Card two**
+</div>
 
-    More text.
-
-- **Card three**
-
-    Even more text.
+Short card
+{ .card }
 
 </div>

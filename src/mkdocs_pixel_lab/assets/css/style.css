@@ -786,3 +786,18 @@ details > * { max-width: none; }
   box-shadow: 5px 5px 0 var(--shadow);
   padding: 1rem;
 }
+
+.grid > .card,
+.grid.cards > :is(ul, ol) > li {
+  margin: 0;
+}
+
+.card > :first-child,
+.grid.cards > :is(ul, ol) > li > :first-child { margin-top: 0; }
+.card > :last-child,
+.grid.cards > :is(ul, ol) > li > :last-child { margin-bottom: 0; }
+
+:is(.gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example, .card, :where(.grid.cards > :is(ul, ol) > li))
+  :is(pre, .highlight pre, img, video, .gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example, .node, .card, :where(.grid.cards > :is(ul, ol) > li)) {
+  box-shadow: none;
+}
