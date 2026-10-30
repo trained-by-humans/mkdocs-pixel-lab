@@ -656,8 +656,8 @@ details > * { max-width: none; }
 .footer-links a { color: var(--accent-dark); }
 
 /* A content card owns its elevation. Nested cards, media, and code stay flat. */
-:is(.gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example)
-  :is(pre, .highlight pre, img, video, .gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example, .node) {
+:is(.gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example, .card, :where(.grid.cards > :is(ul, ol) > li))
+  :is(pre, .highlight pre, img, video, .gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example, .node, .card, :where(.grid.cards > :is(ul, ol) > li)) {
   box-shadow: none;
 }
 
@@ -797,7 +797,28 @@ details > * { max-width: none; }
 .card > :last-child,
 .grid.cards > :is(ul, ol) > li > :last-child { margin-bottom: 0; }
 
-:is(.gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example, .card, :where(.grid.cards > :is(ul, ol) > li))
-  :is(pre, .highlight pre, img, video, .gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example, .node, .card, :where(.grid.cards > :is(ul, ol) > li)) {
-  box-shadow: none;
+/* Card hover: color change for everyone, lift only if motion is OK */
+.card:hover,
+.grid.cards > :is(ul, ol) > li:hover {
+  border-color: var(--accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card,
+  .grid.cards > :is(ul, ol) > li {
+    transition: transform 120ms ease, box-shadow 120ms ease;
+  }
+
+  .card:hover,
+  .grid.cards > :is(ul, ol) > li:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 var(--shadow);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .grid.cards > :is(ul, ol) > li {
+    transition: none;
+    transform: none;
+  }
 }
