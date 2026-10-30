@@ -3,6 +3,9 @@
 Content images and videos scale to the available width and receive Pixel Lab's
 border and offset shadow.
 
+Smaller media keep their natural size. Standalone Markdown images can use the
+full content column, while ordinary prose keeps its narrower reading width.
+
 ## Images
 
 ![Three connected cards labeled Source frame, Process signal, and Output result.](../assets/component-preview.svg)

@@ -227,16 +227,19 @@ def test_storage_unavailable_still_requires_opt_in(analytics_browser):
     assert len(google_requests) == 2
 
 
-def test_consent_banner_fits_mobile(analytics_browser):
+@pytest.mark.parametrize("shadow_size", [5, 9])
+def test_consent_banner_fits_mobile(analytics_browser, shadow_size):
     page, _ = analytics_browser
     page.set_viewport_size({"width": 390, "height": 844})
     page.goto(ORIGIN)
+    page.evaluate("size => document.documentElement.style.setProperty('--content-shadow', `${size}px`)", shadow_size)
+    expect(page.locator("#analytics-consent")).to_have_css("box-shadow", f"rgb(101, 67, 33) {shadow_size}px {shadow_size}px 0px 0px")
     banner = page.locator("#analytics-consent").bounding_box()
     assert banner is not None
     assert banner["x"] >= 0
-    assert banner["x"] + banner["width"] <= 390
+    assert banner["x"] + banner["width"] + shadow_size <= 390
     assert banner["y"] >= 0
-    assert banner["y"] + banner["height"] <= 844
+    assert banner["y"] + banner["height"] + shadow_size <= 844
     expect(page.locator(".analytics-consent__actions button")).to_have_text(["Allow analytics", "Decline"])
     for name in ["Allow analytics", "Decline"]:
         expect(page.get_by_role("button", name=name, exact=True)).to_be_visible()

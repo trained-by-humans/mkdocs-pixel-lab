@@ -1,7 +1,7 @@
 .analytics-consent {
   background: var(--surface);
   border: 2px solid var(--border);
-  box-shadow: 5px 5px 0 var(--shadow);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
   bottom: 24px;
   left: 24px;
   margin: 0 auto;

@@ -5,7 +5,12 @@
 
 :root {
   --sidebar: 220px;
-  --table-shadow: 5px;
+  /* Match shadow drawing and reserved space within each component scale.
+     Controls lift subtly; cards carry more weight; icon offsets follow type. */
+  --control-shadow: 3px;
+  --content-shadow: 5px;
+  --header-elevation: 4px;
+  --icon-shadow: 0.07em;
 }
 
 * { box-sizing: border-box; }
@@ -23,7 +28,7 @@ body {
 .skip-link {
   background: var(--highlight);
   border: 2px solid var(--border);
-  box-shadow: 3px 3px 0 var(--shadow);
+  box-shadow: var(--control-shadow) var(--control-shadow) 0 var(--shadow);
   color: var(--strong-text);
   font: 700 11px "IBM Plex Mono", monospace;
   left: 18px;
@@ -41,7 +46,7 @@ body {
   align-items: center;
   background: var(--header-background);
   border-bottom: 3px solid var(--header-border);
-  box-shadow: 0 4px 0 var(--header-shadow);
+  box-shadow: 0 var(--header-elevation) 0 var(--header-shadow);
   display: flex;
   height: 64px;
   padding: 0 28px;
@@ -134,11 +139,11 @@ span.header-btn__icon--search {
 .header-btn--menu:hover,
 .header-btn--menu:focus-visible,
 .header-btn--menu[aria-expanded="true"] {
-  --button-hit-offset: 3px;
+  --button-hit-offset: var(--control-shadow);
   background: var(--highlight);
-  box-shadow: 3px 3px 0 var(--shadow);
+  box-shadow: var(--control-shadow) var(--control-shadow) 0 var(--shadow);
   outline: none;
-  transform: translate(-3px, -3px);
+  transform: translate(calc(-1 * var(--control-shadow)), calc(-1 * var(--control-shadow)));
   /* Keep the hit area above the search panel's animated hover bridge. */
   z-index: 21;
 }
@@ -152,7 +157,7 @@ span.header-btn__icon--search {
 .search-panel {
   background: var(--surface);
   border: 2px solid var(--border);
-  box-shadow: 5px 5px 0 var(--shadow);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
   opacity: 0;
   pointer-events: none;
   position: absolute;
@@ -221,7 +226,7 @@ span.header-btn__icon--search {
 .site-panel {
   background: var(--surface);
   border: 2px solid var(--border);
-  box-shadow: 5px 5px 0 var(--shadow);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
   display: flex;
   flex-direction: column;
   max-height: min(70dvh, 30rem);
@@ -327,7 +332,7 @@ span.header-btn__icon--search {
 .nav li { margin: 2px 0; }
 .nav a { color: var(--ink); display: block; font-size: 13px; padding: 6px 8px 6px 22px; position: relative; text-decoration: none; }
 .nav a::before { left: 8px; }
-.nav a.active { background: var(--surface); border: 2px solid var(--border); box-shadow: 3px 3px 0 var(--shadow); font-weight: 700; }
+.nav a.active { background: var(--surface); border: 2px solid var(--border); box-shadow: var(--control-shadow) var(--control-shadow) 0 var(--shadow); font-weight: 700; }
 
 .main {
   flex: 1 1 auto;
@@ -370,7 +375,7 @@ h1 { font-size: clamp(28px, 4vw, 42px); letter-spacing: -0.06em; line-height: 1.
   mask: var(--page-action-mask) center / contain no-repeat;
 }
 .page-source::before,
-.page-edit::before { background: var(--accent-dark); opacity: 0; transform: translate(0.07em, 0.07em); }
+.page-edit::before { background: var(--accent-dark); opacity: 0; transform: translate(var(--icon-shadow), var(--icon-shadow)); }
 .page-source::after,
 .page-edit::after { background: #000; }
 .page-source:hover::before,
@@ -384,6 +389,10 @@ h3 { font-size: 15px; margin-top: 32px; }
 a { color: var(--accent-dark); }
 a:hover { color: var(--ink); }
 p, li { max-width: 760px; }
+/* Standalone media uses the column width; prose keeps its reading measure. */
+p:has(> img:only-child),
+p:has(> video:only-child),
+p:has(> a:only-child > img:only-child) { max-width: none; }
 .headerlink {
   color: var(--accent);
   display: inline-block;
@@ -416,7 +425,7 @@ p, li { max-width: 760px; }
 [data-permalink-style="icon"] .headerlink::before {
   background: var(--accent-dark);
   opacity: 0;
-  transform: translate(0.07em, 0.07em);
+  transform: translate(var(--icon-shadow), var(--icon-shadow));
 }
 [data-permalink-style="icon"] .headerlink::after { background: #000; }
 [data-permalink-style="icon"] .headerlink:hover::before,
@@ -435,13 +444,13 @@ pre, .highlight pre {
   --code-padding-end: 84px;
   background: var(--code);
   border: 2px solid var(--border);
-  box-shadow: 5px 5px 0 var(--shadow);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
   color: var(--code-text);
   font: 13px/1.55 "IBM Plex Mono", monospace;
   margin: 18px 0 26px;
   overflow: auto;
   padding: 20px var(--code-padding-end) 20px var(--code-padding-start);
-  max-width: calc(100% - 5px);
+  max-width: calc(100% - var(--content-shadow));
 }
 pre code, .highlight pre code {
   background: transparent;
@@ -486,9 +495,10 @@ blockquote { border-left: 4px solid var(--accent); color: var(--muted); margin: 
   background: var(--alert-surface);
   border: 2px solid var(--border);
   border-left: 6px solid var(--alert-color);
-  box-shadow: 4px 4px 0 var(--shadow);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
   color: var(--ink);
   margin: 24px 0;
+  max-width: calc(100% - var(--content-shadow));
   padding: 14px 18px;
 }
 .gh-alert--note { --alert-color: var(--alert-note); --alert-surface: var(--alert-note-surface); }
@@ -510,16 +520,16 @@ blockquote { border-left: 4px solid var(--accent); color: var(--muted); margin: 
 table {
   border-collapse: collapse;
   display: table;
-  margin: 24px 5px 29px 0;
+  margin: 24px var(--content-shadow) calc(24px + var(--content-shadow)) 0;
   max-width: none;
 }
-.table-shell { margin: 24px 0 29px; max-width: calc(100% - 5px); width: fit-content; }
+.table-shell { margin: 24px 0 calc(24px + var(--content-shadow)); max-width: calc(100% - var(--content-shadow)); width: fit-content; }
 /* The card stays fixed (including its pixel shadow); only its table content
    becomes horizontally scrollable when it is too wide for the page. */
 .table-scroll {
   background: var(--surface);
   border: 2px solid var(--border);
-  box-shadow: 5px 5px 0 var(--shadow);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
   max-width: 100%;
   overflow-x: auto;
 }
@@ -529,18 +539,19 @@ th { background: var(--surface2); font-family: "IBM Plex Mono", monospace; }
 img, video {
   background: var(--surface);
   border: 2px solid var(--border);
-  box-shadow: 4px 4px 0 var(--shadow);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
   display: block;
   height: auto;
-  margin: 1.5rem 4px 1.75rem 0;
-  max-width: calc(100% - 4px);
+  margin: 1.5rem var(--content-shadow) 1.75rem 0;
+  max-width: calc(100% - var(--content-shadow));
 }
 
 .admonition, details {
   background: var(--surface);
   border: 2px solid var(--border);
-  box-shadow: 4px 4px 0 var(--shadow);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
   margin: 24px 0;
+  max-width: calc(100% - var(--content-shadow));
 }
 .admonition-title, summary {
   background: var(--highlight);
@@ -548,20 +559,23 @@ img, video {
   cursor: pointer;
   font: 700 10px "IBM Plex Mono", monospace;
   margin: 0;
+  max-width: none;
   padding: 8px 12px;
   text-transform: uppercase;
 }
-.admonition > *,
-details > * { max-width: none; }
-.admonition > :not(.admonition-title), details > :not(summary) { margin-left: 14px; margin-right: 14px; }
+.admonition > :not(.admonition-title), details > :not(summary) {
+  margin-left: 14px;
+  margin-right: 14px;
+  max-width: calc(100% - 28px);
+}
 .admonition-title + p { padding-bottom: 14px; }
 
 .tabbed-set {
   background: var(--surface);
   border: 2px solid var(--border);
-  box-shadow: 5px 5px 0 var(--shadow);
-  margin: 28px 5px 36px 0;
-  max-width: calc(100% - 5px);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
+  margin: 28px var(--content-shadow) 36px 0;
+  max-width: calc(100% - var(--content-shadow));
   overflow: hidden;
   position: relative;
 }
@@ -629,7 +643,7 @@ details > * { max-width: none; }
 .tabbed-block[data-tab-layout="flush"] > .table-shell > .table-scroll > table > * > tr > :last-child { border-right: 0; }
 
 .lead { color: var(--muted); font-size: 17px; max-width: 760px; }
-.pixel-panel, .example { background: var(--surface); border: 2px solid var(--border); box-shadow: 5px 5px 0 var(--shadow); }
+.pixel-panel, .example { background: var(--surface); border: 2px solid var(--border); box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow); max-width: calc(100% - var(--content-shadow)); }
 .install { align-items: center; display: flex; gap: 16px; margin: 28px 0; padding: 18px 20px; }
 .install-label { color: var(--accent-dark); font: 700 10px "IBM Plex Mono", monospace; white-space: nowrap; }
 .example { margin-top: 28px; padding: 20px; }
@@ -637,7 +651,7 @@ details > * { max-width: none; }
 .badge { background: var(--accent); border: 2px solid var(--border); color: var(--accent-foreground); font: 700 9px "IBM Plex Mono", monospace; padding: 4px 7px; }
 .badge.orange { background: var(--secondary); }
 .hero-flow { align-items: center; display: flex; flex-wrap: wrap; gap: 7px; margin: 26px 0 12px; }
-.node { background: var(--surface); border: 2px solid var(--border); box-shadow: 3px 3px 0 var(--shadow); font: 700 10px "IBM Plex Mono", monospace; padding: 9px 11px; }
+.node { background: var(--surface); border: 2px solid var(--border); box-shadow: var(--control-shadow) var(--control-shadow) 0 var(--shadow); font: 700 10px "IBM Plex Mono", monospace; max-width: calc(100% - var(--control-shadow)); overflow-wrap: anywhere; padding: 9px 11px; }
 .arrow { color: var(--accent-dark); font-weight: 900; }
 .footer { border-top: 2px solid var(--border); color: var(--muted); font: 11px "IBM Plex Mono", monospace; margin-top: 70px; padding-top: 20px; }
 /* The package lane begins at the footer's padding edge; attribution follows as

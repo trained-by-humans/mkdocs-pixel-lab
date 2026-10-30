@@ -15,6 +15,7 @@ nav:
       - Media gallery: guide/media.md
       - Tab layouts: guide/tabs.md
       - Code highlighting: guide/code.md
+      - Component alignment: guide/alignment.md
 plugins:
   - search
 markdown_extensions:
