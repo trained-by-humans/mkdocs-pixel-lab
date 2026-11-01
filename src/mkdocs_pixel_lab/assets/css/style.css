@@ -572,6 +572,7 @@ img, video {
 /* A padded fallback also works before enhancement and without JavaScript. */
 details > summary + :not(summary):not(.details-content) { margin-top: 14px; }
 details > :last-child:not(summary):not(.details-content) { margin-bottom: 14px; }
+details > table { display: block; overflow-x: auto; }
 details > .details-content {
   display: flow-root;
   margin: 0;

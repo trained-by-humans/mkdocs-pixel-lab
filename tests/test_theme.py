@@ -759,7 +759,7 @@ def test_details_keep_native_padded_fallback_without_javascript(browser, site_ur
         page = context.new_page()
         page.goto(f"{site_url}/guide/details/")
         page.evaluate("document.documentElement.style.scrollBehavior = 'auto'")
-        for selector in ("#pym-code > details", "#raw-code",
+        for selector in ("#pym-code > details", "#raw-code", "#pym-table > details", "#raw-table",
                          "#pym-padded-code > details", "#raw-flush-mixed"):
             details = page.locator(selector)
             summary = details.locator(":scope > summary")
@@ -769,8 +769,8 @@ def test_details_keep_native_padded_fallback_without_javascript(browser, site_ur
             expect(content).to_be_visible()
             assert content.bounding_box()["x"] == pytest.approx(details.bounding_box()["x"] + 16)
             assert content.bounding_box()["y"] > summary.bounding_box()["y"] + summary.bounding_box()["height"]
-            if width == 320 and selector in ("#pym-code > details", "#raw-code"):
-                scroll = details.locator("pre")
+            if width == 320 and selector in ("#pym-code > details", "#raw-code", "#raw-table"):
+                scroll = details.locator("pre" if "code" in selector else "table")
                 assert scroll.evaluate("el => el.scrollWidth > el.clientWidth")
                 scroll.evaluate("el => el.scrollLeft = 60")
                 assert scroll.evaluate("el => el.scrollLeft") > 0
