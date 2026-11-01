@@ -7,6 +7,7 @@ appearance options configured globally under `theme`.
 | Component | What you'll find |
 | --- | --- |
 | [Text and lists](text.md) | Headings, emphasis, links, quotations, lists, and inline code |
+| [Card grids](cards.md) | Responsive landing pages, list and block cards, and grid spacing |
 | [Code blocks](code-blocks.md) | Syntax highlighting, line emphasis, copying, and code colors |
 | [Alerts](alerts.md) | Predefined callout titles and type-specific colors |
 | [Admonitions](admonitions.md) | Custom-titled notes and shared callout styling |
@@ -78,7 +79,7 @@ example names you choose, not built-in theme options.
 
 ## Nest components
 
-Tabs, alerts, admonitions, collapsible blocks, and tables can contain other
+Cards, tabs, alerts, admonitions, collapsible blocks, and tables can contain other
 content. Pixel Lab removes shadows from nested styled components and media,
 so only the outer container is elevated.
 

@@ -31,6 +31,7 @@ nav:
   - Components:
       - Overview: components/index.md
       - Text and lists: components/text.md
+      - Card grids: components/cards.md
       - Code blocks: components/code-blocks.md
       - Alerts: components/alerts.md
       - Admonitions: components/admonitions.md
@@ -62,6 +63,7 @@ markdown_extensions:
   - pymdownx.tabbed:
       alternate_style: true
   - md_in_html
+  - attr_list
   - toc:
       permalink: true
   - attr_list

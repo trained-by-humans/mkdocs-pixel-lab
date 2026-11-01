@@ -112,6 +112,7 @@ For a token's effect on an individual component, read that component's
 Customization section:
 
 - [Text and lists](../components/text.md#customization)
+- [Card grids](../components/cards.md#customization)
 - [Code blocks](../components/code-blocks.md#customization)
 - [Alerts](../components/alerts.md#customization)
 - [Admonitions](../components/admonitions.md#customization)
