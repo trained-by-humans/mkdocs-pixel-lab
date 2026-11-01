@@ -14,6 +14,7 @@ nav:
       - Overview: guide/nested.md
       - Media gallery: guide/media.md
       - Tab layouts: guide/tabs.md
+      - Details layouts: guide/details.md
       - Code highlighting: guide/code.md
       - Component alignment: guide/alignment.md
 plugins:

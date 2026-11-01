@@ -651,6 +651,139 @@ def test_tabs_keep_padded_fallback_without_javascript(browser, site_url: str) ->
         context.close()
 
 
+@pytest.mark.parametrize("width", [1440, 390, 320])
+def test_details_content_layouts(page, site_url: str, width: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(f"{site_url}/guide/details/")
+    page.evaluate("document.fonts.ready")
+    page.add_style_tag(content="html { scroll-behavior: auto; }")
+    expect(page.locator("#pym-code > details")).not_to_have_attribute("open")
+    expect(page.locator("#pym-table > details")).to_have_attribute("open", "open")
+    expect(page.locator("#raw-code")).to_have_attribute("open", "")
+    expect(page.locator("#raw-table")).not_to_have_attribute("open")
+    for source in ("pym", "raw"):
+        for kind, layout in (("code", "flush"), ("table", "flush"), ("prose", "padded"),
+                             ("mixed", "padded"), ("multiple", "padded"),
+                             ("padded-code", "padded"), ("padded-table", "padded"),
+                             ("flush-mixed", "flush")):
+            fixture = page.locator(f"#{source}-{kind}")
+            details = fixture if source == "raw" else fixture.locator(":scope > details")
+            summary = details.locator(":scope > summary")
+            if details.get_attribute("open") is None:
+                summary.click()
+            body = details.locator(":scope > .details-content")
+            expect(body).to_be_visible()
+            expect(body).to_have_attribute("data-details-layout", layout)
+            inset = 0 if layout == "flush" else 14
+            expect(body).to_have_css("padding-left", f"{inset}px")
+            expect(body).to_have_css("padding-top", f"{inset}px")
+            bounds = body.bounding_box()
+            outer = details.bounding_box()
+            summary_bounds = summary.bounding_box()
+            assert bounds["x"] == pytest.approx(outer["x"] + 2)
+            assert bounds["width"] == pytest.approx(outer["width"] - 4)
+            assert bounds["y"] == pytest.approx(summary_bounds["y"] + summary_bounds["height"])
+            assert bounds["y"] + bounds["height"] == pytest.approx(outer["y"] + outer["height"] - 2)
+            first = body.locator(":scope > *").first
+            last = body.locator(":scope > *").last
+            assert first.bounding_box()["x"] == pytest.approx(bounds["x"] + inset)
+            assert first.bounding_box()["y"] == pytest.approx(bounds["y"] + inset)
+            assert last.bounding_box()["y"] + last.bounding_box()["height"] == pytest.approx(
+                bounds["y"] + bounds["height"] - inset,
+            )
+            for pre in body.locator("pre").all():
+                expect(pre).to_have_css("padding-left", "20px")
+                expect(pre).to_have_css("box-shadow", "none")
+                if layout == "flush":
+                    expect(pre).to_have_css("border-left-width", "0px")
+                    assert pre.bounding_box()["width"] == pytest.approx(bounds["width"])
+            if kind in ("code", "table"):
+                scroll = body.locator("pre" if kind == "code" else ".table-scroll")
+                expect(scroll).to_have_css("border-top-width", "0px")
+                expect(scroll).to_have_css("border-bottom-width", "0px")
+                expect(scroll).to_have_css("box-shadow", "none")
+                assert scroll.bounding_box()["width"] == pytest.approx(bounds["width"])
+                if width < 400:
+                    assert scroll.evaluate("el => el.scrollWidth > el.clientWidth")
+                    scroll.evaluate("el => el.scrollLeft = 60")
+                    assert scroll.evaluate("el => el.scrollLeft") > 0
+                if kind == "table":
+                    cells = body.locator("tr").first.locator("th")
+                    expect(cells.first).to_have_css("border-top-width", "0px")
+                    expect(cells.first).to_have_css("border-left-width", "0px")
+                    expect(cells.last).to_have_css("border-right-width", "0px")
+                elif source == "pym":
+                    button = body.get_by_role("button", name="Copy code to clipboard")
+                    expect(button).to_be_visible()
+            summary.focus()
+            summary.press("Enter")
+            expect(details).not_to_have_attribute("open")
+            expect(body).not_to_be_visible()
+            summary.press("Space")
+            expect(details).to_have_attribute("open", "")
+            expect(body).to_be_visible()
+    expect(page.locator("#raw-text > .details-content")).to_have_attribute("data-details-layout", "padded")
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+
+@pytest.mark.parametrize("width", [1440, 320])
+def test_details_nested_layouts_and_overrides(page, site_url: str, width: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(f"{site_url}/guide/details/")
+    page.evaluate("document.fonts.ready")
+    page.add_style_tag(content="html { scroll-behavior: auto; }")
+    for identifier, layout in (("nested-outer", "flush"), ("nested-inner", "padded"),
+                               ("nested-inherited", "flush"), ("automatic-outer", "padded"),
+                               ("automatic-inner", "flush")):
+        details = page.locator(f"#{identifier}")
+        expect(details.locator(":scope > .details-content")).to_have_attribute("data-details-layout", layout)
+        if identifier not in ("nested-outer", "automatic-outer"):
+            expect(details).to_have_css("box-shadow", "none")
+    tabs = page.locator("#nested-outer .tabbed-block")
+    expect(tabs).to_have_attribute("data-tab-layout", "flush")
+    expect(tabs).to_have_css("padding-left", "0px")
+    expect(page.locator("#details-in-tabs .tabbed-block")).to_have_attribute("data-tab-layout", "flush")
+    expect(page.locator("#details-in-tabs .details-content")).to_have_attribute("data-details-layout", "padded")
+    outer_summary = page.locator("#automatic-outer > summary")
+    outer_summary.click()
+    expect(page.locator("#automatic-inner > .details-content")).not_to_be_visible()
+    outer_summary.click()
+    expect(page.locator("#automatic-inner > .details-content")).to_be_visible()
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+
+
+@pytest.mark.parametrize("width", [1440, 320])
+def test_details_keep_native_padded_fallback_without_javascript(browser, site_url: str, width: int) -> None:
+    context = browser.new_context(java_script_enabled=False, viewport={"width": width, "height": 900})
+    try:
+        page = context.new_page()
+        page.goto(f"{site_url}/guide/details/")
+        page.evaluate("document.documentElement.style.scrollBehavior = 'auto'")
+        for selector in ("#pym-code > details", "#raw-code",
+                         "#pym-padded-code > details", "#raw-flush-mixed"):
+            details = page.locator(selector)
+            summary = details.locator(":scope > summary")
+            if details.get_attribute("open") is None:
+                summary.click()
+            content = details.locator(":scope > :not(summary)").first
+            expect(content).to_be_visible()
+            assert content.bounding_box()["x"] == pytest.approx(details.bounding_box()["x"] + 16)
+            assert content.bounding_box()["y"] > summary.bounding_box()["y"] + summary.bounding_box()["height"]
+            if width == 320 and selector in ("#pym-code > details", "#raw-code"):
+                scroll = details.locator("pre")
+                assert scroll.evaluate("el => el.scrollWidth > el.clientWidth")
+                scroll.evaluate("el => el.scrollLeft = 60")
+                assert scroll.evaluate("el => el.scrollLeft") > 0
+            summary.focus()
+            summary.press("Enter")
+            expect(content).not_to_be_visible()
+            summary.press("Space")
+            expect(content).to_be_visible()
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+    finally:
+        context.close()
+
+
 def test_trademark_glyph_uses_theme_colors(page, site_url: str) -> None:
     page.goto(site_url)
     badge = page.locator(".brand-trademark")

@@ -347,9 +347,8 @@ document.addEventListener("DOMContentLoaded", () => {
     scroll.appendChild(table);
   });
 
-  // Classify direct panel content after tables receive their scrolling wrappers.
-  document.querySelectorAll(".tabbed-content > .tabbed-block").forEach((panel) => {
-    const override = panel.closest(".tabs-padded, .tabs-flush");
+  // Classify direct content after tables receive their scrolling wrappers.
+  const contentLayout = (panel, override, flushClass) => {
     const content = panel.firstElementChild;
     const hasText = Array.from(panel.childNodes).some(
       (node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim(),
@@ -358,8 +357,29 @@ document.addEventListener("DOMContentLoaded", () => {
       content.matches("pre, .table-shell") ||
       (content.matches(".highlight") && content.querySelector("pre"))
     );
-    const flush = override ? override.classList.contains("tabs-flush") : singleBlock;
-    panel.dataset.tabLayout = flush ? "flush" : "padded";
+    const flush = override ? override.classList.contains(flushClass) : singleBlock;
+    return flush ? "flush" : "padded";
+  };
+
+  document.querySelectorAll(".tabbed-content > .tabbed-block").forEach((panel) => {
+    panel.dataset.tabLayout = contentLayout(
+      panel, panel.closest(".tabs-padded, .tabs-flush"), "tabs-flush",
+    );
+  });
+
+  document.querySelectorAll(".main details").forEach((details) => {
+    // Leave the native summary in place so toggling and keyboard access stay native.
+    const summary = details.querySelector(":scope > summary");
+    if (!summary) return;
+    const body = document.createElement("div");
+    body.className = "details-content";
+    Array.from(details.childNodes).forEach((node) => {
+      if (node !== summary) body.appendChild(node);
+    });
+    body.dataset.detailsLayout = contentLayout(
+      body, details.closest(".details-padded, .details-flush"), "details-flush",
+    );
+    details.appendChild(body);
   });
 
   document.querySelectorAll(".tabs-demo").forEach((group) => {

@@ -66,6 +66,20 @@ Pymdown Extensions, and Pygments.
 Starting a new project? Follow [Get started](docs/getting-started.md) for
 environment setup, a new site, and enabling Markdown extensions.
 
+## Expandable content layouts
+
+Expandable `<details>` and `pymdownx.details` blocks automatically show a single
+code block or table flush with the body frame. Prose, multiple blocks, and mixed
+content keep a padded inset. Code retains its internal padding and scrolling.
+
+Use `class="details-padded"` or `class="details-flush"` on a native `<details>`
+element, or on a surrounding `<div markdown="1">` for `???` Markdown blocks.
+The closest override wins; nested details and tabs select their layouts
+independently. Layout selection requires JavaScript; without it, details keep
+a padded body and native mouse and keyboard toggling.
+
+See [Collapsible content](docs/components/details.md#layout-modes) for examples.
+
 ## Documentation
 
 - [Theme setup](docs/setup/index.md): colors, fonts, icons, branding, navigation, search, repository links, and analytics.
