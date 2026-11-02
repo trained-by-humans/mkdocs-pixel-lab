@@ -22,6 +22,8 @@ PyPI. A missing TestPyPI artifact cannot fall back to a PyPI copy.
 ## Promote to PyPI
 
 After staging succeeds, manually dispatch the `Release` workflow from the
-staged tag itself. It validates the tag and version, downloads the staged
-GitHub Release assets, verifies their checksums, and publishes those same
-artifacts to PyPI using the `pypi` environment and trusted publishing.
+staged tag itself. It requires a successful `Stage` workflow for the same
+commit, including TestPyPI verification. It validates the tag and version,
+downloads the staged GitHub Release assets, verifies their checksums, and
+publishes those same artifacts to PyPI using the `pypi` environment and
+trusted publishing.
