@@ -110,4 +110,5 @@ jobs:
           testpypi-venv/bin/python -m pip install --upgrade pip
           testpypi-venv/bin/python -m pip install --retries 5 --timeout 30 --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ "mkdocs-pixel-lab==${package_version}"
           testpypi-venv/bin/python -m pip check
+          testpypi-venv/bin/python -I -c 'from pathlib import Path; import sys; import mkdocs_pixel_lab as package; assert Path(package.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())'
           testpypi-venv/bin/mkdocs build --strict --config-file tests/fixture_site/mkdocs.yml
