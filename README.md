@@ -72,3 +72,4 @@ environment setup, a new site, and enabling Markdown extensions.
 - [Components](docs/components/index.md): Markdown syntax, live examples, required extensions, and appearance settings.
 - [Reference](docs/reference/configuration.md): configuration defaults, [bundled plugins](docs/reference/plugins.md), [compatibility](docs/reference/compatibility.md), and [troubleshooting](docs/reference/troubleshooting.md).
 - [Upgrading](docs/reference/upgrading.md): migration notes and checks for existing sites.
+- [Generator migration](migration/README.md): successor evaluation and proposed ProperDocs and Zensical migration paths.
