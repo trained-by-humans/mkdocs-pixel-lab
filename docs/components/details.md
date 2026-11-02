@@ -126,11 +126,11 @@ For native HTML, place the class on the element:
 ```
 
 > [!NOTE]
+>
 > - For nested details, the nearest details layout class controls the layout.
 > - These classes affect only details; `.tabs-padded` and `.tabs-flush` affect only tabs.
 > - `.details-padded` and `.details-flush` work with or without JavaScript.
-> - Without JavaScript, details stay padded unless you explicitly choose `.details-flush`.
-
+> - Automatic layout requires JavaScript, without it details stay padded.
 
 ## Customization
 
