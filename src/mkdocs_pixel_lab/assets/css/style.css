@@ -563,12 +563,47 @@ img, video {
   padding: 8px 12px;
   text-transform: uppercase;
 }
-.admonition > :not(.admonition-title), details > :not(summary) {
+.admonition > :not(.admonition-title) {
   margin-left: 14px;
   margin-right: 14px;
   max-width: calc(100% - 28px);
 }
 .admonition-title + p { padding-bottom: 14px; }
+/* Details are padded by default. Explicit classes inherit through wrappers;
+   JavaScript marks automatic layouts on the details element itself. */
+.details-padded,
+:where(details[data-details-layout="padded"]) {
+  --details-padding: 14px;
+  --details-inner-border: 2px;
+  --details-table-width: fit-content;
+  --details-cell-border: 1px;
+}
+.details-flush,
+:where(details[data-details-layout="flush"]) {
+  --details-padding: 0px;
+  --details-inner-border: 0px;
+  --details-table-width: 100%;
+  --details-cell-border: 0px;
+}
+details { padding: 0 var(--details-padding, 14px) var(--details-padding, 14px); }
+details > summary { margin: 0 calc(-1 * var(--details-padding, 14px)) var(--details-padding, 14px); }
+details:not([open]) { padding-bottom: 0; }
+details:not([open]) > summary { margin-bottom: 0; }
+details > :not(summary) { margin-left: 0; margin-right: 0; max-width: 100%; }
+details > pre,
+details > .highlight > pre { border-width: var(--details-inner-border, 2px); max-width: 100%; }
+details[open] > summary + *,
+details > summary + .highlight > pre { margin-top: 0; }
+details > :last-child:not(summary),
+details > .highlight:last-child > pre { margin-bottom: 0; }
+details > table { display: block; overflow-x: auto; }
+details > .table-shell { max-width: 100%; width: var(--details-table-width, fit-content); }
+details > .table-shell > .table-scroll { border-width: var(--details-inner-border, 2px); }
+details > .table-shell > .table-scroll > table { min-width: 100%; }
+:is(details > table, details > .table-shell > .table-scroll > table) > :first-child > tr:first-child > * { border-top-width: var(--details-cell-border, 1px); }
+:is(details > table, details > .table-shell > .table-scroll > table) > :last-child > tr:last-child > * { border-bottom-width: var(--details-cell-border, 1px); }
+:is(details > table, details > .table-shell > .table-scroll > table) > * > tr > :first-child { border-left-width: var(--details-cell-border, 1px); }
+:is(details > table, details > .table-shell > .table-scroll > table) > * > tr > :last-child { border-right-width: var(--details-cell-border, 1px); }
 
 .tabbed-set {
   background: var(--surface);

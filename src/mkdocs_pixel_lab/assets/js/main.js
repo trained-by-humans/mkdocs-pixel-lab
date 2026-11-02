@@ -347,19 +347,31 @@ document.addEventListener("DOMContentLoaded", () => {
     scroll.appendChild(table);
   });
 
-  // Classify direct panel content after tables receive their scrolling wrappers.
-  document.querySelectorAll(".tabbed-content > .tabbed-block").forEach((panel) => {
-    const override = panel.closest(".tabs-padded, .tabs-flush");
-    const content = panel.firstElementChild;
+  // Classify direct content after tables receive their scrolling wrappers.
+  const contentLayout = (panel, override = null, flushClass = "tabs-flush") => {
+    const children = Array.from(panel.children).filter((child) => !child.matches("summary"));
+    const content = children[0];
     const hasText = Array.from(panel.childNodes).some(
       (node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim(),
     );
-    const singleBlock = panel.children.length === 1 && !hasText && content && (
+    const singleBlock = children.length === 1 && !hasText && content && (
       content.matches("pre, .table-shell") ||
       (content.matches(".highlight") && content.querySelector("pre"))
     );
-    const flush = override ? override.classList.contains("tabs-flush") : singleBlock;
-    panel.dataset.tabLayout = flush ? "flush" : "padded";
+    const flush = override ? override.classList.contains(flushClass) : singleBlock;
+    return flush ? "flush" : "padded";
+  };
+
+  document.querySelectorAll(".tabbed-content > .tabbed-block").forEach((panel) => {
+    panel.dataset.tabLayout = contentLayout(
+      panel, panel.closest(".tabs-padded, .tabs-flush"), "tabs-flush",
+    );
+  });
+
+  document.querySelectorAll(".main details").forEach((details) => {
+    // Explicit classes are handled by CSS, with or without JavaScript.
+    if (details.closest(".details-padded, .details-flush")) return;
+    details.dataset.detailsLayout = contentLayout(details);
   });
 
   document.querySelectorAll(".tabs-demo").forEach((group) => {

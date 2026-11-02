@@ -62,6 +62,76 @@ This body supports **Markdown**.
 </details>
 ```
 
+## Layout modes
+
+Pixel Lab chooses each expanded body's layout automatically, like
+[content tabs](tabs.md#layout-modes):
+
+- A single [code block](code-blocks.md) or [table](tables.md) fills the body **flush**.
+- Prose, multiple blocks, and mixed content use a **padded** inset.
+- Nested details and tabs select their layouts independently.
+
+Flush content shares the details frame without a duplicate border or surrounding
+gap. Code retains its internal padding, and wide code and tables scroll
+horizontally inside the body.
+
+???+ note "Code without an extra inset"
+
+    ```python
+    print("One code block fills the expanded body")
+    ```
+
+???+ note "A table without an extra inset"
+
+    | Content | Layout |
+    | --- | --- |
+    | Single code block or table | Flush |
+    | Prose or mixed content | Padded |
+
+### Scoped layout overrides
+
+Use `.details-padded` or `.details-flush` directly on a native `<details>`
+element, or wrap selected `???` blocks using
+[Scope selected instances](index.md#scope-selected-instances):
+
+<div class="details-padded" markdown="1">
+
+???+ note "Always padded"
+
+    ```python
+    print("Keep an inset around this block")
+    ```
+
+</div>
+
+````markdown
+<div class="details-padded" markdown="1">
+
+???+ note "Always padded"
+
+    ```python
+    print("Keep an inset around this block")
+    ```
+
+</div>
+````
+
+For native HTML, place the class on the element:
+
+```html
+<details class="details-flush" open>
+<summary>Always flush</summary>
+<pre><code>Keep code's internal padding.</code></pre>
+</details>
+```
+
+> [!NOTE]
+>
+> - For nested details, the nearest details layout class controls the layout.
+> - These classes affect only details; `.tabs-padded` and `.tabs-flush` affect only tabs.
+> - `.details-padded` and `.details-flush` work with or without JavaScript.
+> - Automatic layout requires JavaScript, without it details stay padded.
+
 ## Customization
 
 These theme settings customize all collapsible blocks. Different detail types
