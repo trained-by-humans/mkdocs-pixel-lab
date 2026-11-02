@@ -125,10 +125,12 @@ For native HTML, place the class on the element:
 </details>
 ```
 
-The closest details override wins, including for nested details. Tab overrides
-(`.tabs-padded` and `.tabs-flush`) apply only to tabs; details overrides apply
-only to details. Automatic detection and explicit overrides use JavaScript.
-Without it, details retain a padded presentation and native toggling.
+> [!NOTE]
+> - For nested details, the nearest details layout class controls the layout.
+> - These classes affect only details; `.tabs-padded` and `.tabs-flush` affect only tabs.
+> - `.details-padded` and `.details-flush` work with or without JavaScript.
+> - Without JavaScript, details stay padded unless you explicitly choose `.details-flush`.
+
 
 ## Customization
 

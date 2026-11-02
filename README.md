@@ -75,8 +75,9 @@ content keep a padded inset. Code retains its internal padding and scrolling.
 Use `class="details-padded"` or `class="details-flush"` on a native `<details>`
 element, or on a surrounding `<div markdown="1">` for `???` Markdown blocks.
 The closest override wins; nested details and tabs select their layouts
-independently. Layout selection requires JavaScript; without it, details keep
-a padded body and native mouse and keyboard toggling.
+independently. Explicit overrides work without JavaScript. Automatic layout
+selection requires JavaScript; without it, unspecified layouts stay padded.
+Native mouse and keyboard toggling works in either case.
 
 See [Collapsible content](docs/components/details.md#layout-modes) for examples.
 

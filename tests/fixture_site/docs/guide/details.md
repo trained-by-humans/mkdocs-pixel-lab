@@ -146,6 +146,37 @@ An unwrapped explanation.
 <pre><code>Still keep internal code padding</code></pre>
 </details>
 
+<div id="pym-flush-code" class="details-flush" markdown="1">
+
+???+ note "Flush code without JavaScript"
+
+    ```python
+    print("A long code line scrolls horizontally while the explicit flush layout keeps its internal code padding intact.")
+    ```
+
+</div>
+
+<div id="pym-flush-table" class="details-flush" markdown="1">
+
+???+ note "Flush table without JavaScript"
+
+    | Payload | Result |
+    | --- | --- |
+    | `a_very_long_unbroken_payload_name_to_exercise_horizontal_scrolling_in_a_narrow_details_body` | Isolated object |
+
+</div>
+
+<details id="raw-flush-code" class="details-flush" open>
+<summary>Raw flush code without JavaScript</summary>
+<pre><code>A long code line scrolls horizontally while the explicit flush layout keeps its internal code padding intact.</code></pre>
+</details>
+
+<details id="raw-flush-table" class="details-flush" open>
+<summary>Raw flush table without JavaScript</summary>
+<table><thead><tr><th>Payload</th><th>Result</th></tr></thead>
+<tbody><tr><td>a_very_long_unbroken_payload_name_to_exercise_horizontal_scrolling_in_a_narrow_details_body</td><td>Isolated object</td></tr></tbody></table>
+</details>
+
 ## Nested details and tabs
 
 <div class="details-padded" markdown="1">

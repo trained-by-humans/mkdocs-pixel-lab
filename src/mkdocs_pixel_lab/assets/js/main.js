@@ -348,12 +348,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Classify direct content after tables receive their scrolling wrappers.
-  const contentLayout = (panel, override, flushClass) => {
-    const content = panel.firstElementChild;
+  const contentLayout = (panel, override = null, flushClass = "tabs-flush") => {
+    const children = Array.from(panel.children).filter((child) => !child.matches("summary"));
+    const content = children[0];
     const hasText = Array.from(panel.childNodes).some(
       (node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim(),
     );
-    const singleBlock = panel.children.length === 1 && !hasText && content && (
+    const singleBlock = children.length === 1 && !hasText && content && (
       content.matches("pre, .table-shell") ||
       (content.matches(".highlight") && content.querySelector("pre"))
     );
@@ -368,18 +369,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.querySelectorAll(".main details").forEach((details) => {
-    // Leave the native summary in place so toggling and keyboard access stay native.
-    const summary = details.querySelector(":scope > summary");
-    if (!summary) return;
-    const body = document.createElement("div");
-    body.className = "details-content";
-    Array.from(details.childNodes).forEach((node) => {
-      if (node !== summary) body.appendChild(node);
-    });
-    body.dataset.detailsLayout = contentLayout(
-      body, details.closest(".details-padded, .details-flush"), "details-flush",
-    );
-    details.appendChild(body);
+    // Explicit classes are handled by CSS, with or without JavaScript.
+    if (details.closest(".details-padded, .details-flush")) return;
+    details.dataset.detailsLayout = contentLayout(details);
   });
 
   document.querySelectorAll(".tabs-demo").forEach((group) => {
