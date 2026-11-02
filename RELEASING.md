@@ -15,7 +15,9 @@ the tag, runs CI, builds the wheel and source distribution, and uploads them
 to a GitHub Release with SHA-256 checksums. It then verifies and publishes
 those artifacts to TestPyPI using the `test-pypi` environment and trusted
 publishing, and checks installation with an isolated import and strict
-MkDocs fixture build.
+MkDocs fixture build. The target wheel is downloaded exclusively from
+TestPyPI, then installed locally with runtime dependencies resolved from
+PyPI. A missing TestPyPI artifact cannot fall back to a PyPI copy.
 
 ## Promote to PyPI
 
