@@ -780,7 +780,7 @@ img, video {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
   gap: 1rem;
 }
 
@@ -797,8 +797,13 @@ img, video {
 .card {
   background: var(--surface);
   border: 2px solid var(--border);
-  box-shadow: 5px 5px 0 var(--shadow);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
   padding: 1rem;
+}
+/* List-syntax cards nested in another elevated container stay flat */
+:is(.gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example, .card)
+  .grid.cards > :is(ul, ol) > li {
+  box-shadow: none;
 }
 
 .grid > .card,
@@ -820,13 +825,12 @@ img, video {
 @media (prefers-reduced-motion: no-preference) {
   .card,
   .grid.cards > :is(ul, ol) > li {
-    transition: transform 120ms ease, box-shadow 120ms ease;
+    transition: transform 120ms ease;
   }
 
   .card:hover,
   .grid.cards > :is(ul, ol) > li:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 7px 7px 0 var(--shadow);
   }
 }
 @media (prefers-reduced-motion: reduce) {

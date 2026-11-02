@@ -971,13 +971,16 @@ def test_card_grid_has_no_horizontal_overflow(page, site_url: str, width: int) -
 def test_card_grid_stacks_on_mobile(page, site_url: str) -> None:
     page.set_viewport_size({"width": 360, "height": 900})
     page.goto(f"{site_url}/guide/cards/")
-    lefts = page.evaluate(
-        "[...document.querySelectorAll('.grid.cards > ul > li')]"
-        ".map(el => Math.round(el.getBoundingClientRect().left))"
-    )
-    assert len(lefts) >= 2
-    assert len(set(lefts)) == 1  # one column
-
+    columns_per_grid = page.evaluate("""
+      [...document.querySelectorAll('.grid.cards')].map(grid =>
+        new Set(
+          [...grid.querySelectorAll(':scope > ul > li, :scope > ol > li')]
+            .map(li => Math.round(li.getBoundingClientRect().left))
+        ).size
+      )
+    """)
+    assert len(columns_per_grid) >= 2
+    assert all(count == 1 for count in columns_per_grid)  # each grid is one column
 
 def test_nested_card_has_no_shadow(page, site_url: str) -> None:
     page.goto(f"{site_url}/guide/cards/")
@@ -1009,3 +1012,19 @@ def test_card_link_shows_focus_ring_from_keyboard(page, site_url: str) -> None:
     )
     assert style[0] != "none"
     assert style[1] != "0px"
+
+@pytest.mark.parametrize("width", [320, 360])
+def test_cards_stay_inside_their_containers(page, site_url: str, width: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(f"{site_url}/guide/cards/")
+    outside = page.evaluate("""
+      [...document.querySelectorAll('.grid .card, .grid.cards > ul > li')].filter(card => {
+        const c = card.getBoundingClientRect();
+        const containers = [card.closest('.grid'), card.closest('.pixel-panel')].filter(Boolean);
+        return containers.some(el => {
+          const r = el.getBoundingClientRect();
+          return c.left < r.left - 0.5 || c.right > r.right + 0.5;
+        });
+      }).length
+    """)
+    assert outside == 0

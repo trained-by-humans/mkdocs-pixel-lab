@@ -58,3 +58,17 @@ Inner card two
 </div>
 
 </div>
+
+
+## Padded panel
+
+<div class="pixel-panel" style="padding: 20px" markdown>
+
+<div class="grid cards" markdown>
+
+- **Card one**
+- **Card two**
+
+</div>
+
+</div>
