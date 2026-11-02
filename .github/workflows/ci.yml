@@ -66,4 +66,5 @@ jobs:
           wheel_path="$(find dist -name '*.whl' -print -quit)"
           artifact-venv/bin/python -m pip install "$wheel_path"
           artifact-venv/bin/python -m pip check
+          artifact-venv/bin/python -I -c 'from pathlib import Path; import sys; import mkdocs_pixel_lab as package; assert Path(package.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())'
           artifact-venv/bin/mkdocs build --strict --config-file tests/fixture_site/mkdocs.yml
