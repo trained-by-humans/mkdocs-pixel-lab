@@ -2,7 +2,7 @@
 
 ## List syntax
 
-<div class="grid cards" markdown>
+<div class="grid cards" id="list-cards" markdown="1">
 
 - **Fast setup**
 
@@ -16,7 +16,7 @@
 
 ## Block syntax
 
-<div class="grid" markdown>
+<div class="grid" id="block-cards" markdown="1">
 
 Plain card text
 { .card }
@@ -28,7 +28,7 @@ Card with a [link](#)
 
 ## Code inside a card
 
-<div class="grid" markdown>
+<div class="grid" id="code-cards" markdown="1">
 
 <div class="card" markdown>
 
@@ -45,7 +45,7 @@ Short card
 
 ## Grid inside a panel
 
-<div class="pixel-panel" markdown>
+<div class="pixel-panel" id="nested-block-panel" markdown="1">
 
 <div class="grid" markdown>
 
@@ -59,15 +59,27 @@ Inner card two
 
 </div>
 
-
 ## Padded panel
 
-<div class="pixel-panel" style="padding: 20px" markdown>
+<div class="pixel-panel" id="padded-list-panel" style="padding: 20px" markdown="1">
 
 <div class="grid cards" markdown>
 
 - **Card one**
 - **Card two**
+
+</div>
+
+</div>
+
+## Ordered list inside a panel
+
+<div class="pixel-panel" id="ordered-list-panel" style="padding: 20px" markdown="1">
+
+<div class="grid cards" markdown="1">
+
+1. **First step**
+2. **Second step**
 
 </div>
 
