@@ -100,9 +100,9 @@ using the wheel installed in a clean environment.
 
 ### Preview screenshots
 
-The README uses `tests/snapshots/desktop.png` and
-`tests/snapshots/mobile.png`. Normal test runs capture screenshots in temporary
-directories without replacing these files.
+Normal browser test runs capture desktop and mobile screenshots in temporary
+directories. Saved review screenshots live in `tests/snapshots/desktop.png`
+and `tests/snapshots/mobile.png`.
 
 Only refresh the committed screenshots when the visual change is intentional:
 

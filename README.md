@@ -14,19 +14,6 @@
   Built for modern documentation with responsive navigation, search, and rich Markdown components.
 </p>
 
-## Preview
-
-<table>
-  <tr>
-    <td align="center"><img src="tests/snapshots/desktop.png" alt="Pixel Lab desktop documentation preview" height="480"></td>
-    <td align="center"><img src="tests/snapshots/mobile.png" alt="Pixel Lab mobile documentation preview" height="480"></td>
-  </tr>
-  <tr>
-    <td align="center">Desktop</td>
-    <td align="center">Mobile</td>
-  </tr>
-</table>
-
 ## Demo
 
 Visit [Pixel Lab on GitHub Pages](https://trained-by-humans.github.io/mkdocs-pixel-lab/)
