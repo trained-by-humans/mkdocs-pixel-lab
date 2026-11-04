@@ -18,7 +18,7 @@ For highlighted code inside cards, also enable [Code blocks](code-blocks.md#enab
 Wrap a Markdown list in a `grid cards` container. Each list item becomes a
 card; indent paragraphs and links to keep them inside the same item.
 
-<div class="grid cards" markdown="1">
+<div class="grid cards" markdown>
 
 - **Get up and running**
 
@@ -59,7 +59,7 @@ card; indent paragraphs and links to keep them inside the same item.
 </div>
 
 ```markdown
-<div class="grid cards" markdown="1">
+<div class="grid cards" markdown>
 
 - **Get up and running**
 
@@ -85,9 +85,9 @@ reduced motion enabled, only the border color changes.
 Cards can hold illustrations, prose, links, and code. Each card below is an
 explicit block inside the same grid.
 
-<div class="grid" markdown="1">
+<div class="grid" markdown>
 
-<div class="card" markdown="1">
+<div class="card" markdown>
 
 ### A visual explanation
 
@@ -99,7 +99,7 @@ Walk readers through a workflow with an illustration and a short explanation.
 
 </div>
 
-<div class="card" markdown="1">
+<div class="card" markdown>
 
 ### A practical example
 
@@ -120,9 +120,9 @@ theme:
 Use an explicit `.card` wrapper when one card contains several blocks:
 
 ````markdown
-<div class="grid" markdown="1">
+<div class="grid" markdown>
 
-<div class="card" markdown="1">
+<div class="card" markdown>
 
 ### A practical example
 
@@ -145,7 +145,7 @@ theme:
 
 Short blocks can also become cards, without a surrounding list.
 
-<div class="grid" markdown="1">
+<div class="grid" markdown>
 
 **Keyboard friendly.** Follow ordinary links with Tab and open them with Enter.
 { .card }
@@ -157,7 +157,7 @@ smaller screens.
 </div>
 
 ```markdown
-<div class="grid" markdown="1">
+<div class="grid" markdown>
 
 **Keyboard friendly.** Follow ordinary links with Tab and open them with Enter.
 { .card }
@@ -172,9 +172,9 @@ smaller screens.
 
 A generic grid can arrange content without adding borders, surfaces, or shadows.
 
-<div class="grid" markdown="1">
+<div class="grid" markdown>
 
-<div markdown="1">
+<div markdown>
 
 ### For readers
 
@@ -184,7 +184,7 @@ Browse clear examples, follow related topics, and find the next useful step.
 
 </div>
 
-<div markdown="1">
+<div markdown>
 
 ### For authors
 
@@ -197,9 +197,9 @@ Write with Markdown and combine existing components to suit your content.
 </div>
 
 ```markdown
-<div class="grid" markdown="1">
+<div class="grid" markdown>
 
-<div markdown="1">
+<div markdown>
 
 ### For readers
 
@@ -207,7 +207,7 @@ Browse examples and discover related topics.
 
 </div>
 
-<div markdown="1">
+<div markdown>
 
 ### For authors
 
@@ -262,9 +262,9 @@ content. To adjust these independently, add rules to your
 Wrap a selected grid, following [Scope selected instances](index.md#scope-selected-instances):
 
 ```markdown
-<div class="instance-card-grid" markdown="1">
+<div class="instance-card-grid" markdown>
 
-<div class="grid cards" markdown="1">
+<div class="grid cards" markdown>
 
 - **First topic**
 

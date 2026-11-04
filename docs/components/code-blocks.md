@@ -111,7 +111,7 @@ your [custom stylesheet](index.md#load-custom-css):
 Wrap each selected code block, following [Scope selected instances](index.md#scope-selected-instances):
 
 ````markdown
-<div class="instance-code" markdown="1">
+<div class="instance-code" markdown>
 
 ```python
 print("Hello, Pixel Lab!")

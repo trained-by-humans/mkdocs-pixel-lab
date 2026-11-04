@@ -75,7 +75,7 @@ To change every admonition's title fill, add this to your
 Wrap each selected admonition, following [Scope selected instances](index.md#scope-selected-instances):
 
 ```markdown
-<div class="instance-admonition" markdown="1">
+<div class="instance-admonition" markdown>
 
 !!! note "Before you start"
 

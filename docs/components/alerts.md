@@ -102,7 +102,7 @@ To customize all tip alerts, add this to your
 Wrap each selected alert, following [Scope selected instances](index.md#scope-selected-instances):
 
 ```markdown
-<div class="instance-alert" markdown="1">
+<div class="instance-alert" markdown>
 
 > [!TIP]
 >

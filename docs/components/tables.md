@@ -78,7 +78,7 @@ To change every content table's header fill, add this to your
 Wrap each selected table, following [Scope selected instances](index.md#scope-selected-instances):
 
 ```markdown
-<div class="instance-table" markdown="1">
+<div class="instance-table" markdown>
 
 | Setting | Purpose |
 | --- | --- |

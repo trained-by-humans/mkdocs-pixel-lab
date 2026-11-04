@@ -51,10 +51,10 @@ keyboard activation. It works without the theme's JavaScript.
 ## Native HTML alternative
 
 You can also write `<details>` directly. For Markdown inside the body, enable
-[`md_in_html`](index.md#scope-selected-instances) and add `markdown="1"`:
+[`md_in_html`](index.md#scope-selected-instances) and add `markdown`:
 
 ```html
-<details markdown="1">
+<details markdown>
 <summary>More information</summary>
 
 This body supports **Markdown**.
@@ -94,7 +94,7 @@ Use `.details-padded` or `.details-flush` directly on a native `<details>`
 element, or wrap selected `???` blocks using
 [Scope selected instances](index.md#scope-selected-instances):
 
-<div class="details-padded" markdown="1">
+<div class="details-padded" markdown>
 
 ???+ note "Always padded"
 
@@ -105,7 +105,7 @@ element, or wrap selected `???` blocks using
 </div>
 
 ````markdown
-<div class="details-padded" markdown="1">
+<div class="details-padded" markdown>
 
 ???+ note "Always padded"
 
@@ -171,7 +171,7 @@ details > summary {
 Wrap each selected block, following [Scope selected instances](index.md#scope-selected-instances):
 
 ```markdown
-<div class="instance-details" markdown="1">
+<div class="instance-details" markdown>
 
 ??? note "More information"
 

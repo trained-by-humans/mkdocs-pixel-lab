@@ -107,7 +107,7 @@ To change every ordinary quotation's rail, add this to your
 Wrap each selected quotation, following [Scope selected instances](index.md#scope-selected-instances):
 
 ```markdown
-<div class="instance-quote" markdown="1">
+<div class="instance-quote" markdown>
 
 > Documentation is part of the product.
 

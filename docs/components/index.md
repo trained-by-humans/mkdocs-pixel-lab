@@ -60,7 +60,7 @@ component guide. Both override scopes use this stylesheet.
 
 ### Scope selected instances
 
-The scoped examples use an HTML wrapper with `markdown="1"`. Enable
+The scoped examples use an HTML wrapper with `markdown`. Enable
 `md_in_html` alongside the component's required extensions:
 
 ```yaml

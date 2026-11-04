@@ -16,7 +16,7 @@ For the highlighted examples below, also enable [Code blocks](code-blocks.md#ena
 
 ## Write tabs
 
-<div id="basic-tabs" markdown="1">
+<div id="basic-tabs" markdown>
 
 === "Python"
 
@@ -62,7 +62,7 @@ Pixel Lab chooses each panel's layout automatically:
 > Flush code and table panels use the tab group's frame. Nested content shares
 > its outer shadow; see [Nest components](index.md#nest-components).
 
-<div id="layout-tabs" markdown="1">
+<div id="layout-tabs" markdown>
 
 === "Code only"
 
@@ -95,7 +95,7 @@ presentation.
 Wrap selected groups in `.tabs-padded` or `.tabs-flush`, following
 [Scope selected instances](index.md#scope-selected-instances):
 
-<div id="forced-tabs" class="tabs-padded" markdown="1">
+<div id="forced-tabs" class="tabs-padded" markdown>
 
 === "Always padded"
 
@@ -106,7 +106,7 @@ Wrap selected groups in `.tabs-padded` or `.tabs-flush`, following
 </div>
 
 ````markdown
-<div class="tabs-padded" markdown="1">
+<div class="tabs-padded" markdown>
 
 === "Always padded"
 
@@ -168,7 +168,7 @@ To change every tab group's colors and label font, add this to your
 Wrap each selected group, following [Scope selected instances](index.md#scope-selected-instances):
 
 ```markdown
-<div class="instance-tabs" markdown="1">
+<div class="instance-tabs" markdown>
 
 === "Python"
 

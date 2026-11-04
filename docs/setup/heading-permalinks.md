@@ -88,7 +88,7 @@ navigation colors, use a [custom stylesheet](../components/index.md#load-custom-
 Wrap each selected heading, following [Scope selected instances](../components/index.md#scope-selected-instances):
 
 ```markdown
-<div class="instance-heading" markdown="1">
+<div class="instance-heading" markdown>
 
 ## A specific section
 

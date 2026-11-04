@@ -72,7 +72,7 @@ To change every content image and video's frame color, add this to your
 Wrap the selected media, following [Scope selected instances](index.md#scope-selected-instances):
 
 ```markdown
-<div class="instance-media" markdown="1">
+<div class="instance-media" markdown>
 
 ![Source frame, Process signal, and Output result.](../assets/component-preview.svg)
 
