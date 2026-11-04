@@ -705,8 +705,8 @@ details > .table-shell > .table-scroll > table { min-width: 100%; }
 .footer-links a { color: var(--accent-dark); }
 
 /* A content card owns its elevation. Nested cards, media, and code stay flat. */
-:is(.gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example)
-  :is(pre, .highlight pre, img, video, .gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example, .node) {
+:is(.gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example, .card, :where(.grid.cards > :is(ul, ol) > li))
+  :is(pre, .highlight pre, img, video, .gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example, .node, .card, :where(.grid.cards > :is(ul, ol) > li)) {
   box-shadow: none;
 }
 
@@ -811,4 +811,67 @@ details > .table-shell > .table-scroll > table { min-width: 100%; }
 
 @media (max-width: 600px) {
   .site-switcher { position: static; }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1rem;
+}
+
+.grid.cards > ul,
+.grid.cards > ol {
+  display: contents;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.grid.cards > ul > li,
+.grid.cards > ol > li,
+.card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
+  padding: 1rem;
+}
+/* List-syntax cards nested in another elevated container stay flat */
+:is(.gh-alert, .table-scroll, .admonition, details, .tabbed-set, .pixel-panel, .example, .card)
+  .grid.cards > :is(ul, ol) > li {
+  box-shadow: none;
+}
+
+.grid > .card,
+.grid.cards > :is(ul, ol) > li {
+  margin: 0;
+}
+
+.card > :first-child,
+.grid.cards > :is(ul, ol) > li > :first-child { margin-top: 0; }
+.card > :last-child,
+.grid.cards > :is(ul, ol) > li > :last-child { margin-bottom: 0; }
+
+/* Card hover: color change for everyone, lift only if motion is OK */
+.card:hover,
+.grid.cards > :is(ul, ol) > li:hover {
+  border-color: var(--accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card,
+  .grid.cards > :is(ul, ol) > li {
+    transition: transform 120ms ease;
+  }
+
+  .card:hover,
+  .grid.cards > :is(ul, ol) > li:hover {
+    transform: translate(-2px, -2px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .grid.cards > :is(ul, ol) > li {
+    transition: none;
+    transform: none;
+  }
 }

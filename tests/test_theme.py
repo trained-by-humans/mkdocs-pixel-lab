@@ -1158,3 +1158,74 @@ def test_mobile_navigation_and_skip_link(page, site_url: str, tmp_path: Path) ->
     expect(page).to_have_url(f"{site_url}/guide/media/")
     expect(page.locator(".sidebar")).to_have_count(1)
     expect(page.locator("main video")).to_be_visible()
+
+@pytest.mark.parametrize("width", [360, 768, 1280])
+def test_card_grid_has_no_horizontal_overflow(page, site_url: str, width: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(f"{site_url}/guide/cards/")
+    overflow = page.evaluate(
+        "document.documentElement.scrollWidth - document.documentElement.clientWidth"
+    )
+    assert overflow <= 0
+
+
+def test_card_grid_stacks_on_mobile(page, site_url: str) -> None:
+    page.set_viewport_size({"width": 360, "height": 900})
+    page.goto(f"{site_url}/guide/cards/")
+    columns_per_grid = page.evaluate("""
+      [...document.querySelectorAll('.grid.cards')].map(grid =>
+        new Set(
+          [...grid.querySelectorAll(':scope > ul > li, :scope > ol > li')]
+            .map(li => Math.round(li.getBoundingClientRect().left))
+        ).size
+      )
+    """)
+    assert len(columns_per_grid) >= 2
+    assert all(count == 1 for count in columns_per_grid)  # each grid is one column
+
+def test_nested_card_has_no_shadow(page, site_url: str) -> None:
+    page.goto(f"{site_url}/guide/cards/")
+    outer = page.evaluate(
+        "getComputedStyle(document.querySelector('.pixel-panel')).boxShadow"
+    )
+    inner = page.evaluate(
+        "getComputedStyle(document.querySelector('.pixel-panel .card')).boxShadow"
+    )
+    assert outer != "none"
+    assert inner == "none"
+
+
+def test_card_link_shows_focus_ring_from_keyboard(page, site_url: str) -> None:
+    page.goto(f"{site_url}/guide/cards/")
+    for _ in range(60):
+        page.keyboard.press("Tab")
+        in_card = page.evaluate(
+            "document.activeElement.tagName === 'A' && "
+            "document.activeElement.closest('.card') !== null"
+        )
+        if in_card:
+            break
+    else:
+        pytest.fail("Tab never reached a link inside a card")
+    style = page.evaluate(
+        "(() => { const s = getComputedStyle(document.activeElement); "
+        "return [s.outlineStyle, s.outlineWidth]; })()"
+    )
+    assert style[0] != "none"
+    assert style[1] != "0px"
+
+@pytest.mark.parametrize("width", [320, 360])
+def test_cards_stay_inside_their_containers(page, site_url: str, width: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(f"{site_url}/guide/cards/")
+    outside = page.evaluate("""
+      [...document.querySelectorAll('.grid .card, .grid.cards > ul > li')].filter(card => {
+        const c = card.getBoundingClientRect();
+        const containers = [card.closest('.grid'), card.closest('.pixel-panel')].filter(Boolean);
+        return containers.some(el => {
+          const r = el.getBoundingClientRect();
+          return c.left < r.left - 0.5 || c.right > r.right + 0.5;
+        });
+      }).length
+    """)
+    assert outside == 0

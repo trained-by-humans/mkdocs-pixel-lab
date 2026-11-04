@@ -72,3 +72,42 @@ environment setup, a new site, and enabling Markdown extensions.
 - [Components](docs/components/index.md): Markdown syntax, live examples, required extensions, and appearance settings.
 - [Reference](docs/reference/configuration.md): configuration defaults, [bundled plugins](docs/reference/plugins.md), [compatibility](docs/reference/compatibility.md), and [troubleshooting](docs/reference/troubleshooting.md).
 - [Upgrading](docs/reference/upgrading.md): migration notes and checks for existing sites.
+
+## Card grids
+
+Enable `attr_list` and `md_in_html` in `mkdocs.yml`:
+
+Enable the `attr_list` and `md_in_html` Markdown extensions in `mkdocs.yml`.
+
+**List syntax**
+
+```markdown
+<div class="grid cards" markdown>
+
+- **Title**
+
+    Text and [links](#).
+
+</div>
+```
+
+**Block syntax:** add `{ .card }` under a simple block.
+
+```markdown
+<div class="grid" markdown>
+
+Some text
+{ .card }
+
+</div>
+```
+
+**Complex content (code, images):** wrap it in a card div.
+
+```markdown
+<div class="card" markdown>
+...content...
+</div>
+```
+
+**Spacing:** the grid provides gaps and cards provide inner padding. To add space around a grid, wrap it in a padded container or give it a margin. The grid also works directly on the page without any wrapper.
