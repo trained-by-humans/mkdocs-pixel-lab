@@ -77,7 +77,8 @@ card; indent paragraphs and links to keep them inside the same item.
 ```
 
 Links remain ordinary links: use Tab to reach them and Enter to open them.
-Hover feedback respects the reader's reduced-motion preference.
+On hover, cards lift while their shadow's outer edges stay anchored. With
+reduced motion enabled, only the border color changes.
 
 ## Rich content
 
