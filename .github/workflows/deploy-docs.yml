@@ -4,8 +4,28 @@ run-name: "Docs: ${{ github.event.pull_request.title || github.head_ref || githu
 
 on:
   pull_request:
+    paths:
+      - 'docs/**'
+      - 'src/mkdocs_pixel_lab/**'
+      - 'assets/**'
+      - 'mkdocs.yml'
+      - 'pyproject.toml'
+      - 'README.md'
+      - 'tests/test_documentation.py'
+      - 'tests/test_docs_workflow.py'
+      - '.github/workflows/deploy-docs.yml'
   push:
     branches: [main]
+    paths:
+      - 'docs/**'
+      - 'src/mkdocs_pixel_lab/**'
+      - 'assets/**'
+      - 'mkdocs.yml'
+      - 'pyproject.toml'
+      - 'README.md'
+      - 'tests/test_documentation.py'
+      - 'tests/test_docs_workflow.py'
+      - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
 permissions:

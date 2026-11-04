@@ -184,10 +184,21 @@ Do not commit virtual environments, generated sites, or distribution artifacts.
 
 ### GitHub Pages
 
-[deploy-docs.yml](workflows/deploy-docs.yml) validates documentation on pull
-requests and pushes to `main`. After validation, main-branch runs publish
-`build/docs` to GitHub Pages. You can also run the workflow manually from `main`.
-Pull requests and manual runs on other branches validate without deploying.
+[deploy-docs.yml](workflows/deploy-docs.yml) builds and publishes the documentation:
+
+| Event | Build and validate | Deploy to GitHub Pages |
+| --- | --- | --- |
+| PR or `main` push with only unrelated changes | Skipped | Skipped |
+| PR with relevant changes | Yes | No |
+| Push to `main` with relevant changes | Yes | Yes |
+| Manual run from `main` | Yes | Yes |
+| Manual run from another branch | Yes | No |
+
+Relevant changes are documentation, theme source, site/package configuration,
+README and its assets, documentation tests, or the Pages
+workflow. Any `pyproject.toml` change counts, including a version-only bump.
+PR filtering uses the overall PR diff, not just the latest commit. Deployment
+publishes `build/docs` after validation succeeds.
 
 For the initial repository setup, select **GitHub Actions** under
 **Settings → Pages → Build and deployment → Source**.

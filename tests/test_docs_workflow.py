@@ -1,5 +1,6 @@
 """Keep documentation validation separate from privileged Pages deployment."""
 
+from fnmatch import fnmatchcase
 from pathlib import Path
 
 import pytest
@@ -24,11 +25,46 @@ def test_docs_workflow_validates_prs_and_main(docs_workflow: dict) -> None:
     triggers = docs_workflow["on"]
     assert set(triggers) == {"pull_request", "push", "workflow_dispatch"}
     assert triggers["push"]["branches"] == ["main"]
+    assert triggers["pull_request"]["paths"] == triggers["push"]["paths"]
     assert docs_workflow["permissions"] == {"contents": "read"}
     build = docs_workflow["jobs"]["build"]
     assert "if" not in build and "permissions" not in build
     checkout = next(step for step in build["steps"] if step.get("uses", "").startswith("actions/checkout@"))
     assert "ref" not in checkout.get("with", {})
+
+
+@pytest.mark.parametrize("event", ["pull_request", "push"])
+@pytest.mark.parametrize(("path", "should_build"), [
+    ("docs/index.md", True),
+    ("docs/components/cards.md", True),
+    ("docs/assets/component-preview.svg", True),
+    ("src/mkdocs_pixel_lab/base.html", True),
+    ("src/mkdocs_pixel_lab/assets/css/style.css", True),
+    ("src/mkdocs_pixel_lab/assets/js/main.js", True),
+    ("src/mkdocs_pixel_lab/metadata.py", True),
+    ("assets/pixel-lab-logo.svg", True),
+    ("mkdocs.yml", True),
+    ("pyproject.toml", True),
+    ("README.md", True),
+    ("LICENSE", False),
+    ("THIRD_PARTY_LICENSES.md", False),
+    ("tests/test_documentation.py", True),
+    ("tests/test_docs_workflow.py", True),
+    (".github/workflows/deploy-docs.yml", True),
+    ("tests/test_theme.py", False),
+    ("tests/fixture_site/docs/guide/cards.md", False),
+    ("tests/snapshots/desktop.png", False),
+    (".github/CONTRIBUTING.md", False),
+    (".github/workflows/ci.yml", False),
+    (".github/workflows/stage-release.yml", False),
+    (".github/workflows/publish-release.yml", False),
+    ("RELEASING.md", False),
+])
+def test_docs_workflow_filters_site_dependencies(
+    docs_workflow: dict, event: str, path: str, should_build: bool,
+) -> None:
+    patterns = docs_workflow["on"][event]["paths"]
+    assert any(fnmatchcase(path, pattern) for pattern in patterns) == should_build
 
 
 def test_docs_workflow_tests_the_checked_out_theme(docs_workflow: dict) -> None:
