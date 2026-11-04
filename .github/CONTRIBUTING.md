@@ -1,11 +1,9 @@
 # Contributing
 
-Thanks for contributing to `mkdocs-pixel-lab`.
+## Set up your checkout
 
-## Development setup
-
-Clone the repository, create and activate a Python 3.10+ virtual environment,
-then install the theme in editable mode with its test dependencies:
+Use Python 3.10 or newer. Clone the repository and install the theme in editable
+mode with its test dependencies:
 
 ```bash
 git clone https://github.com/trained-by-humans/mkdocs-pixel-lab.git
@@ -16,194 +14,175 @@ python -m pip install -e '.[test]'
 python -m playwright install chromium
 ```
 
-On Windows PowerShell, activate the environment with
-`.venv\Scripts\Activate.ps1` instead. On Linux, Chromium may also need system
-dependencies; use `python -m playwright install --with-deps chromium`.
+On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1`. On Linux,
+use `python -m playwright install --with-deps chromium` if browser system
+dependencies are missing. Run the remaining commands from the repository root.
 
-Run the commands below from the repository root.
+### Where changes belong
 
-## Repository layout
+- [Theme source](../src/mkdocs_pixel_lab/): templates, palette defaults, CSS,
+  JavaScript, fonts, icons, and plugins.
+- [Public documentation](../docs/) and [site configuration](../mkdocs.yml):
+  user guides and live examples.
+- [Tests](../tests/) and [fixture site](../tests/fixture_site/): automated
+  checks and examples used to exercise the theme.
+- [Workflows](workflows/): CI, documentation deployment, and releases.
 
-| What to change | Location |
-| --- | --- |
-| Templates, palette defaults, CSS, JavaScript, and bundled assets | [`src/mkdocs_pixel_lab/`](../src/mkdocs_pixel_lab/) |
-| Public documentation and site configuration | [`docs/`](../docs/) and [`mkdocs.yml`](../mkdocs.yml) |
-| Automated tests | [`tests/`](../tests/) |
-| Representative component examples | [`tests/fixture_site/`](../tests/fixture_site/) |
-| README screenshots | [`tests/snapshots/`](../tests/snapshots/) |
-| CI, documentation deployment, and releases | [`workflows/`](workflows/) |
+## Check your changes
 
-## Local preview
-
-The commands below print the local preview URL and reload when theme templates
-or assets change. Check desktop and mobile layouts, keyboard navigation,
-focus styles, and reduced-motion behavior when relevant. Local previews
-don't collect analytics.
-
-If the default port is busy, append `--dev-addr 127.0.0.1:8010` to either
-command and open `http://127.0.0.1:8010`. Choose another available port if
-needed; `127.0.0.1` keeps the preview local to your machine.
-
-### Documentation website
-
-The public theme manual lives in `docs/` and uses the root `mkdocs.yml`.
-
-```bash
-python -m mkdocs serve --watch-theme
-```
-
-### Test fixture
-
-The fixture site exercises the theme's navigation, Markdown components, and
-media layouts. It is a development and test site, not the published manual.
-
-```bash
-python -m mkdocs serve --config-file tests/fixture_site/mkdocs.yml --watch-theme
-```
-
-## Validation
-
-Run the full suite before submitting a change:
+For code or behavior changes, run the full suite before submitting:
 
 ```bash
 python -m pytest -q
 ```
 
-The suite builds documentation and fixture sites and runs headless Chromium
-checks. Add or update tests for behavior changes. While developing, run a
-focused module:
+The suite builds sites and runs headless Chromium checks. During development,
+you can focus on a module with `python -m pytest tests/test_theme.py -q`.
 
-```bash
-python -m pytest tests/test_theme.py -q
-```
+For CI workflow changes, run `python -m pytest tests/test_ci_workflow.py -q`.
 
-### Documentation checks
-
-Validate the manual's pages, examples, internal links, and deployment workflow:
-
-```bash
-python -m mkdocs build --strict
-python -m pytest tests/test_documentation.py tests/test_docs_workflow.py -q
-```
-
-### Fixture build
-
-Validate the component fixture separately:
+To check the fixture build on its own:
 
 ```bash
 python -m mkdocs build --strict --config-file tests/fixture_site/mkdocs.yml
 ```
 
-CI tests Python 3.10, 3.11, 3.12, and 3.13. It also builds the wheel and source
-distribution, checks them with `twine check`, and strictly builds the fixture
-using the wheel installed in a clean environment.
+### Review visual changes
 
-### Preview screenshots
+Check desktop and mobile layouts, keyboard navigation, focus styles, and
+reduced-motion behavior. Include before-and-after screenshots with visual PRs.
 
-Normal browser test runs capture desktop and mobile screenshots in temporary
-directories. Saved review screenshots live in `tests/snapshots/desktop.png`
-and `tests/snapshots/mobile.png`.
-
-Only refresh the committed screenshots when the visual change is intentional:
+Browser tests normally save screenshots to temporary directories. To update
+the saved desktop and mobile review images in `tests/snapshots/`:
 
 ```bash
 UPDATE_SNAPSHOTS=1 python -m pytest tests/test_theme.py -q
 ```
 
-Review both images before including them in a pull request. These screenshots
-are reviewable previews, not automatic pixel-diff assertions.
+Review both images before committing them. They are review screenshots, not
+automatic pixel-diff assertions.
 
-## Documentation guidelines
+## Preview the test fixture
 
-### Organize guides
+```bash
+python -m mkdocs serve --config-file tests/fixture_site/mkdocs.yml --watch-theme
+```
 
-- Keep site-wide configuration in **Theme setup**, including heading permalinks.
-- Keep Markdown syntax, component behavior, and component-specific appearance
-  in **Components**, even when appearance settings live under `theme`.
-  Ordinary Markdown heading syntax belongs in **Text and lists**.
-- Explain main configuration beside the example that enables or defines the
-  feature. Use **Further customization** for optional appearance refinements
-  in setup guides, and **Customization** in component guides.
-- Don't repeat feature-enabling settings or content fields in customization
-  sections. Features without appearance options, such as metadata, don't need
-  an appearance section.
-- For features with multiple presentations, explain presentation-specific
-  artwork alongside that presentation. Keep common appearance attributes in
-  the final customization section.
+The fixture exercises navigation, components, and media separately from the
+published manual. Preview servers print a local URL and reload after changes.
+If the port is busy, append `--dev-addr 127.0.0.1:8010` and use the printed URL.
+Local previews don't collect analytics.
 
-### Configuration examples
+## Update documentation
 
-- Use **Parameter / Default / Effect** tables beside the relevant instructions,
-  with color names beside values and component-specific effects.
-- Keep configuration defaults aligned with the theme; tests check Reference
-  against the implementation.
-- Introduce MkDocs settings and CSS through their use and configuration path.
-  Reserve explicit "not a theme option" contrasts for meaningful limitations.
-- When an example builds on an earlier snippet, use `hl_lines` to highlight
-  added or changed options and leave repeated context unhighlighted.
+### Documentation website
 
-### CSS overrides
+Preview the public manual locally:
 
-Keep theme settings first under Customization, followed by **Component-wide
-overrides** for CSS targeting all instances and **Scoped overrides** for
-selected instances. Wrapper classes can be reused for one or several instances.
+```bash
+python -m mkdocs serve --watch-theme
+```
 
-Both CSS scopes use `extra_css`; an HTML wrapper supplies a styling target,
-not a different styling mechanism. Link to the
-[Components overview](../docs/components/index.md#customization-scopes) for
-stylesheet and `md_in_html` setup.
+Build the site and run its documentation and Pages workflow checks:
 
-### Shared guidance
+```bash
+python -m mkdocs build --strict
+python -m pytest tests/docs -q
+```
 
-Give common guidance one home and link to it elsewhere, keeping only the
-brief context needed locally. Keep component-specific settings with their
-component.
+### Structure and examples
 
-Link to [Common attributes](../docs/reference/configuration.md#common-attributes)
-for shared theme settings rather than repeating explanations of colors,
-fonts, and icons.
+- Put site-wide settings in **Theme setup**. Put component syntax, behavior,
+  and appearance in **Components**. Ordinary Markdown headings belong in
+  **Text and lists**; permalink settings belong in **Theme setup**.
+- Explain how to enable and use a feature beside its live example. Keep
+  `README.md` focused on the overview, quick start, highlights, and guide links.
+- Use **Customization** for component appearance and **Further customization**
+  for optional refinements in setup guides. Keep shared appearance settings
+  together; explain presentation-specific artwork beside its presentation.
+- Document parameters with **Parameter / Default / Effect** tables, including
+  color names and component-specific effects. Match defaults to the theme.
+- When extending a configuration example, use `hl_lines` to highlight only
+  the added or changed options. Keep enabling settings in the setup section.
+  Features without appearance settings, such as metadata, don't need a
+  Customization section.
 
-Document nested-shadow behavior in the Components overview. Keep a brief note
-in relevant container guides, not in child-content guides such as media and
-code blocks.
+### Styling and shared guidance
 
-## Pull requests
+- Use the existing palette to keep new styling configurable.
+- In Customization, put theme settings first, then **Component-wide overrides**,
+  then **Scoped overrides**. Both CSS scopes use `extra_css`; reusable wrapper
+  classes select instances. Link to
+  [Customization scopes](../docs/components/index.md#customization-scopes) for
+  stylesheet and `md_in_html` setup.
+- Give shared guidance one home. Link to
+  [Common attributes](../docs/reference/configuration.md#common-attributes)
+  instead of repeating shared color, font, and icon settings.
+- Explain nested shadows in the Components overview, with brief notes in
+  container guides. Keep that guidance out of child-content guides such as
+  media and code blocks.
 
-Keep changes focused and describe what changed, why, and how you verified it.
-Include before-and-after screenshots for visible layout or styling changes.
+## Submit a pull request
 
-Keep new styling configurable through the existing palette instead of
-introducing per-component hard-coded colors. Update the relevant guide when
-public configuration or user-facing behavior changes, and extend the fixture
-when a new component needs a representative example. Keep `README.md` focused
-on the overview, quick start, and guide links.
+Keep changes focused. Explain what changed, why, and how you checked it.
+Update the relevant guide when user-facing behavior changes, extend fixture
+examples for new components, and add regression tests for behavior changes.
 
-Do not commit virtual environments, generated sites, or distribution artifacts.
+Keep virtual environments, generated sites, and distribution artifacts out
+of commits.
 
-## Publishing
+## Workflow summary
 
-### GitHub Pages
+### CI
 
-[deploy-docs.yml](workflows/deploy-docs.yml) builds and publishes the documentation:
+[CI](workflows/ci.yml) tests Python 3.10–3.13, validates distribution artifacts,
+and builds the fixture using the installed wheel.
 
-| Event | Build and validate | Deploy to GitHub Pages |
+Excluded paths: `docs/**`, `tests/docs/**`, root `mkdocs.yml`,
+`.github/CONTRIBUTING.md`, and `RELEASING.md`.
+
+| Event | Result |
+| --- | --- |
+| PR targeting `main` or push to `main`: all changed files are excluded | Skip |
+| PR targeting `main` or push to `main`: any other file changes | Run full CI |
+| Release staging calls CI | Always run full CI |
+
+### Pages
+
+[Pages](workflows/deploy-docs.yml) validates and builds the public manual.
+Relevant inputs are `docs/**`, `tests/docs/**`, `src/mkdocs_pixel_lab/**`,
+`assets/**`, `mkdocs.yml`, `pyproject.toml`, `README.md`, and the Pages workflow.
+
+| Event | Build and validate | Deploy site |
 | --- | --- | --- |
-| PR or `main` push with only unrelated changes | Skipped | Skipped |
-| PR with relevant changes | Yes | No |
-| Push to `main` with relevant changes | Yes | Yes |
-| Manual run from `main` | Yes | Yes |
-| Manual run from another branch | Yes | No |
+| PR or `main` push with only unrelated changes | Skip | No |
+| PR with any relevant change | Run | No |
+| Push to `main` with any relevant change | Run | Yes |
+| Manual run from `main` | Run | Yes |
+| Manual run from another branch | Run | No |
 
-Relevant changes are documentation, theme source, site/package configuration,
-README and its assets, documentation tests, or the Pages
-workflow. Any `pyproject.toml` change counts, including a version-only bump.
-PR filtering uses the overall PR diff, not just the latest commit. Deployment
-publishes `build/docs` after validation succeeds.
+PR filters use the overall PR diff. Any `pyproject.toml` edit counts, including
+version-only bumps. Deployment follows successful validation.
 
-For the initial repository setup, select **GitHub Actions** under
+For initial Pages setup, select **GitHub Actions** under
 **Settings → Pages → Build and deployment → Source**.
 
-### Package releases
+### Stage
 
-Coordinate version bumps, release tags, and publishing with the maintainers;
-normal contributions do not require PyPI credentials.
+[Stage](workflows/stage-release.yml) prepares release artifacts and verifies
+their installation from TestPyPI.
+
+| Event | Result |
+| --- | --- |
+| Push a `v<version>` tag matching `pyproject.toml` | Run full CI, stage GitHub Release assets, publish to TestPyPI, and verify installation |
+
+### Release
+
+[Release](workflows/publish-release.yml) promotes the staged artifacts to PyPI.
+
+| Event | Result |
+| --- | --- |
+| Manual run from a successfully staged release tag | Verify staging and artifact checksums, then publish to PyPI |
+
+Coordinate releases with the maintainers and follow [Releasing](../RELEASING.md)
+for staging and promotion. Normal contributions don't require PyPI credentials.

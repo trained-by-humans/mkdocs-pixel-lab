@@ -14,7 +14,7 @@ from mkdocs.commands.build import build
 from mkdocs.config import load_config
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 DOCS = ROOT / "docs"
 GUIDES = sorted(
     source

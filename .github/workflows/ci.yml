@@ -5,8 +5,20 @@ run-name: "CI: ${{ github.event.pull_request.title || github.head_ref || github.
 on:
   pull_request:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - 'tests/docs/**'
+      - 'mkdocs.yml'
+      - '.github/CONTRIBUTING.md'
+      - 'RELEASING.md'
   push:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - 'tests/docs/**'
+      - 'mkdocs.yml'
+      - '.github/CONTRIBUTING.md'
+      - 'RELEASING.md'
   workflow_call:
 
 permissions:

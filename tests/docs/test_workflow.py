@@ -7,7 +7,7 @@ import pytest
 import yaml
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 MAIN_ONLY = "${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}"
 
 
@@ -48,8 +48,9 @@ def test_docs_workflow_validates_prs_and_main(docs_workflow: dict) -> None:
     ("README.md", True),
     ("LICENSE", False),
     ("THIRD_PARTY_LICENSES.md", False),
-    ("tests/test_documentation.py", True),
-    ("tests/test_docs_workflow.py", True),
+    ("tests/docs/test_site.py", True),
+    ("tests/docs/test_workflow.py", True),
+    ("tests/docs/test_new_guide.py", True),
     (".github/workflows/deploy-docs.yml", True),
     ("tests/test_theme.py", False),
     ("tests/fixture_site/docs/guide/cards.md", False),
@@ -71,7 +72,7 @@ def test_docs_workflow_tests_the_checked_out_theme(docs_workflow: dict) -> None:
     steps = docs_workflow["jobs"]["build"]["steps"]
     commands = [step["run"] for step in steps if "run" in step]
     install = "python -m pip install -e '.[test]'"
-    tests = "python -m pytest tests/test_documentation.py tests/test_docs_workflow.py -q"
+    tests = "python -m pytest tests/docs -q"
     build = "python -m mkdocs build --strict"
     assert commands.index(install) < commands.index(tests) < commands.index(build)
     assert commands.index(build) < commands.index("git diff --exit-code")

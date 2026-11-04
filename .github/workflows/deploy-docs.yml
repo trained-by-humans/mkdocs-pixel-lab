@@ -11,8 +11,7 @@ on:
       - 'mkdocs.yml'
       - 'pyproject.toml'
       - 'README.md'
-      - 'tests/test_documentation.py'
-      - 'tests/test_docs_workflow.py'
+      - 'tests/docs/**'
       - '.github/workflows/deploy-docs.yml'
   push:
     branches: [main]
@@ -23,8 +22,7 @@ on:
       - 'mkdocs.yml'
       - 'pyproject.toml'
       - 'README.md'
-      - 'tests/test_documentation.py'
-      - 'tests/test_docs_workflow.py'
+      - 'tests/docs/**'
       - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
@@ -55,7 +53,7 @@ jobs:
         run: python -m pip install -e '.[test]'
 
       - name: Test documentation and workflow
-        run: python -m pytest tests/test_documentation.py tests/test_docs_workflow.py -q
+        run: python -m pytest tests/docs -q
 
       - name: Build documentation
         run: python -m mkdocs build --strict
