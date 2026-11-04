@@ -33,6 +33,11 @@ Visit [Pixel Lab on GitHub Pages](https://trained-by-humans.github.io/mkdocs-pix
 to see the theme in action. The documentation site uses Pixel Lab itself and
 includes examples of its components.
 
+## What’s new
+
+- **[Card grids](docs/components/cards.md)** — Build responsive landing pages and section indexes with Markdown cards, images, code, and customizable spacing.
+- **[Collapsible layout modes](docs/components/details.md#layout-modes)** — Display code and tables flush with the container, or use padded layouts for prose and mixed content.
+
 ## Features
 
 - A tastefully designed, retro-inspired theme with pixel-art assets, crisp borders, and playful shadows.
@@ -72,42 +77,3 @@ environment setup, a new site, and enabling Markdown extensions.
 - [Components](docs/components/index.md): Markdown syntax, live examples, required extensions, and appearance settings.
 - [Reference](docs/reference/configuration.md): configuration defaults, [bundled plugins](docs/reference/plugins.md), [compatibility](docs/reference/compatibility.md), and [troubleshooting](docs/reference/troubleshooting.md).
 - [Upgrading](docs/reference/upgrading.md): migration notes and checks for existing sites.
-
-## Card grids
-
-Enable `attr_list` and `md_in_html` in `mkdocs.yml`:
-
-Enable the `attr_list` and `md_in_html` Markdown extensions in `mkdocs.yml`.
-
-**List syntax**
-
-```markdown
-<div class="grid cards" markdown>
-
-- **Title**
-
-    Text and [links](#).
-
-</div>
-```
-
-**Block syntax:** add `{ .card }` under a simple block.
-
-```markdown
-<div class="grid" markdown>
-
-Some text
-{ .card }
-
-</div>
-```
-
-**Complex content (code, images):** wrap it in a card div.
-
-```markdown
-<div class="card" markdown>
-...content...
-</div>
-```
-
-**Spacing:** the grid provides gaps and cards provide inner padding. To add space around a grid, wrap it in a padded container or give it a margin. The grid also works directly on the page without any wrapper.

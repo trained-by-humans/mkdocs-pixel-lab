@@ -1159,6 +1159,7 @@ def test_mobile_navigation_and_skip_link(page, site_url: str, tmp_path: Path) ->
     expect(page.locator(".sidebar")).to_have_count(1)
     expect(page.locator("main video")).to_be_visible()
 
+
 @pytest.mark.parametrize("width", [360, 768, 1280])
 def test_card_grid_has_no_horizontal_overflow(page, site_url: str, width: int) -> None:
     page.set_viewport_size({"width": width, "height": 900})
@@ -1183,16 +1184,78 @@ def test_card_grid_stacks_on_mobile(page, site_url: str) -> None:
     assert len(columns_per_grid) >= 2
     assert all(count == 1 for count in columns_per_grid)  # each grid is one column
 
-def test_nested_card_has_no_shadow(page, site_url: str) -> None:
+
+@pytest.mark.parametrize("panel_id", ["nested-block-panel", "padded-list-panel", "ordered-list-panel"])
+def test_nested_card_has_no_shadow(page, site_url: str, panel_id: str) -> None:
+    page.emulate_media(reduced_motion="no-preference")
     page.goto(f"{site_url}/guide/cards/")
-    outer = page.evaluate(
-        "getComputedStyle(document.querySelector('.pixel-panel')).boxShadow"
+    panel = page.locator(f"#{panel_id}")
+    expect(panel).not_to_have_css("box-shadow", "none")
+    cards = panel.locator(".card, .grid.cards > :is(ul, ol) > li")
+    expect(cards).to_have_count(2)
+    for card in cards.all():
+        expect(card).to_have_css("box-shadow", "none")
+        card.hover()
+        expect(card).to_have_css("transform", "matrix(1, 0, 0, 1, -2, -2)")
+        expect(card).to_have_css("box-shadow", "none")
+
+
+@pytest.mark.parametrize("selector", ["#list-cards > ul > li", "#block-cards > .card"])
+@pytest.mark.parametrize("shadow_size", [5, 9])
+def test_card_shadow_tracks_theme_token(page, site_url: str, selector: str, shadow_size: int) -> None:
+    page.emulate_media(reduced_motion="no-preference")
+    page.goto(f"{site_url}/guide/cards/")
+    page.evaluate("size => document.documentElement.style.setProperty('--content-shadow', `${size}px`)", shadow_size)
+    card = page.locator(selector).first
+    expected = f"rgb(101, 67, 33) {shadow_size}px {shadow_size}px 0px 0px"
+    expect(card).to_have_css("box-shadow", expected)
+    bounds = card.bounding_box()
+    card.hover()
+    expect(card).to_have_css("transform", "matrix(1, 0, 0, 1, -2, -2)")
+    lifted_shadow = shadow_size + 2
+    expect(card).to_have_css("box-shadow", f"rgb(101, 67, 33) {lifted_shadow}px {lifted_shadow}px 0px 0px")
+    hovered = card.bounding_box()
+    assert hovered["x"] + hovered["width"] + lifted_shadow == pytest.approx(
+        bounds["x"] + bounds["width"] + shadow_size, abs=0.1,
     )
-    inner = page.evaluate(
-        "getComputedStyle(document.querySelector('.pixel-panel .card')).boxShadow"
+    assert hovered["y"] + hovered["height"] + lifted_shadow == pytest.approx(
+        bounds["y"] + bounds["height"] + shadow_size, abs=0.1,
     )
-    assert outer != "none"
-    assert inner == "none"
+
+
+@pytest.mark.parametrize("selector", ["#list-cards > ul > li", "#block-cards > .card"])
+@pytest.mark.parametrize("motion", ["no-preference", "reduce"])
+def test_card_hover_respects_reduced_motion(page, site_url: str, selector: str, motion: str) -> None:
+    page.emulate_media(reduced_motion=motion)
+    page.goto(f"{site_url}/guide/cards/")
+    card = page.locator(selector).first
+    expect(card).to_have_css("transform", "none")
+    card.hover()
+    expect(card).to_have_css("border-top-color", "rgb(76, 175, 80)")
+    if motion == "reduce":
+        expect(card).to_have_css("transition-duration", "0s")
+        expect(card).to_have_css("transform", "none")
+        expect(card).to_have_css("box-shadow", "rgb(101, 67, 33) 5px 5px 0px 0px")
+    else:
+        expect(card).to_have_css("transform", "matrix(1, 0, 0, 1, -2, -2)")
+
+
+@pytest.mark.parametrize("width", [320, 390, 1280])
+def test_long_code_scrolls_inside_card(page, site_url: str, width: int) -> None:
+    page.set_viewport_size({"width": width, "height": 900})
+    page.goto(f"{site_url}/guide/cards/")
+    card = page.locator("#code-cards > .card").first
+    code = card.locator("pre")
+    expect(code).to_have_css("overflow-x", "auto")
+    expect(code).to_have_css("box-shadow", "none")
+    assert code.evaluate("el => el.scrollWidth > el.clientWidth")
+    bounds = card.bounding_box()
+    code_bounds = code.bounding_box()
+    assert code_bounds["x"] > bounds["x"]
+    assert code_bounds["x"] + code_bounds["width"] < bounds["x"] + bounds["width"]
+    code.evaluate("el => el.scrollLeft = 60")
+    assert code.evaluate("el => el.scrollLeft") > 0
+    assert card.bounding_box() == bounds
 
 
 def test_card_link_shows_focus_ring_from_keyboard(page, site_url: str) -> None:
@@ -1214,12 +1277,13 @@ def test_card_link_shows_focus_ring_from_keyboard(page, site_url: str) -> None:
     assert style[0] != "none"
     assert style[1] != "0px"
 
+
 @pytest.mark.parametrize("width", [320, 360])
 def test_cards_stay_inside_their_containers(page, site_url: str, width: int) -> None:
     page.set_viewport_size({"width": width, "height": 900})
     page.goto(f"{site_url}/guide/cards/")
     outside = page.evaluate("""
-      [...document.querySelectorAll('.grid .card, .grid.cards > ul > li')].filter(card => {
+      [...document.querySelectorAll('.grid .card, .grid.cards > :is(ul, ol) > li')].filter(card => {
         const c = card.getBoundingClientRect();
         const containers = [card.closest('.grid'), card.closest('.pixel-panel')].filter(Boolean);
         return containers.some(el => {

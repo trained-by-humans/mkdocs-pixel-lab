@@ -70,6 +70,7 @@ Each component guide explains exactly which shared and specific colors it uses:
 | Component | Appearance settings |
 | --- | --- |
 | [Text and lists](../components/text.md#customization) | Text, links, quotation rails, and inline code |
+| [Card grids](../components/cards.md#customization) | Card surfaces, borders, shadows, and hover accents |
 | [Code blocks](../components/code-blocks.md#customization) | Code background, text, and syntax colors |
 | [Alerts](../components/alerts.md#customization) | Semantic rails, titles, and backgrounds |
 | [Admonitions](../components/admonitions.md#customization) | Title fill, body surface, border, and shadow |

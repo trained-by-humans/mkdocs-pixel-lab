@@ -830,9 +830,10 @@ details > .table-shell > .table-scroll > table { min-width: 100%; }
 .grid.cards > ul > li,
 .grid.cards > ol > li,
 .card {
+  --card-lift: 0px;
   background: var(--surface);
   border: 2px solid var(--border);
-  box-shadow: var(--content-shadow) var(--content-shadow) 0 var(--shadow);
+  box-shadow: calc(var(--content-shadow) + var(--card-lift)) calc(var(--content-shadow) + var(--card-lift)) 0 var(--shadow);
   padding: 1rem;
 }
 /* List-syntax cards nested in another elevated container stay flat */
@@ -860,12 +861,14 @@ details > .table-shell > .table-scroll > table { min-width: 100%; }
 @media (prefers-reduced-motion: no-preference) {
   .card,
   .grid.cards > :is(ul, ol) > li {
-    transition: transform 120ms ease;
+    transition: transform 120ms ease, box-shadow 120ms ease;
   }
 
   .card:hover,
   .grid.cards > :is(ul, ol) > li:hover {
-    transform: translate(-2px, -2px);
+    /* Compensate for the lift so the shadow's outer edges stay anchored. */
+    --card-lift: 2px;
+    transform: translate(calc(-1 * var(--card-lift)), calc(-1 * var(--card-lift)));
   }
 }
 @media (prefers-reduced-motion: reduce) {
