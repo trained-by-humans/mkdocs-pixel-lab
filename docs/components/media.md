@@ -58,7 +58,7 @@ See [Common attributes](../reference/configuration.md#common-attributes).
 ### Component-wide overrides
 
 To change every content image and video's frame color, add this to your
-[custom stylesheet](index.md#load-custom-css):
+[custom stylesheet](customization.md#load-custom-css):
 
 ```css
 .main img,
@@ -69,7 +69,7 @@ To change every content image and video's frame color, add this to your
 
 ### Scoped overrides
 
-Wrap the selected media, following [Scope selected instances](index.md#scope-selected-instances):
+Wrap the selected media, following [Scope selected instances](customization.md#scope-selected-instances):
 
 ```markdown
 <div class="instance-media" markdown>

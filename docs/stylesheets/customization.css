@@ -1,0 +1,8 @@
+/* Live example for Components → Customization.
+   The rule requires an explicit wrapper, so other tables keep their defaults. */
+
+/* Selected table headers: add class="instance-table" to a Markdown wrapper. */
+.instance-table th {
+  background: #e60012;
+  color: #ffffff;
+}

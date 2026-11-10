@@ -244,7 +244,7 @@ See [Common attributes](../reference/configuration.md#common-attributes).
 
 The grid provides gaps between items, and cards provide padding around their
 content. To adjust these independently, add rules to your
-[custom stylesheet](index.md#load-custom-css):
+[custom stylesheet](customization.md#load-custom-css):
 
 ```css
 .grid {
@@ -259,7 +259,7 @@ content. To adjust these independently, add rules to your
 
 ### Scoped overrides
 
-Wrap a selected grid, following [Scope selected instances](index.md#scope-selected-instances):
+Wrap a selected grid, following [Scope selected instances](customization.md#scope-selected-instances):
 
 ```markdown
 <div class="instance-card-grid" markdown>

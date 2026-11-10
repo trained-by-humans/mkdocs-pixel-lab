@@ -20,7 +20,7 @@ GUIDES = sorted(
     source
     for section in ("setup", "components")
     for source in (DOCS / section).glob("*.md")
-    if source.name != "index.md"
+    if source.name not in {"index.md", "customization.md"}
 )
 PARAMETER_HEADER = "| Parameter | Default | Effect |"
 YAML_EXAMPLE = re.compile(r"^```yaml(?:[ \t]+[^\n]*)?\n(.*?)\n```$", re.MULTILINE | re.DOTALL)
@@ -351,6 +351,10 @@ def test_color_examples_match_the_site_default_palette() -> None:
     for key, value in colors.items():
         assert config.theme[key] == value, key
     for source in DOCS.rglob("*.md"):
+        # The customization tutorial deliberately demonstrates an alternate palette.
+        # Component reference guides continue to document the site's defaults.
+        if source == DOCS / "components/customization.md":
+            continue
         for match in YAML_EXAMPLE.finditer(source.read_text()):
             example = yaml.safe_load(match.group(1))
             if not isinstance(example, dict):
@@ -362,7 +366,7 @@ def test_color_examples_match_the_site_default_palette() -> None:
 
 def test_components_have_syntax_and_relevant_appearance_options() -> None:
     for source in (DOCS / "components").glob("*.md"):
-        if source.name == "index.md":
+        if source.name in {"index.md", "customization.md"}:
             continue
         content = source.read_text()
         if source.name == "metadata.md":
@@ -400,8 +404,8 @@ def test_component_and_scoped_overrides_render(
     assert "### Override an instance" not in customization
     assert PARAMETER_HEADER in theme_settings
     assert "```css\n" not in theme_settings
-    assert "index.md#load-custom-css" in component_scope
-    assert "index.md#scope-selected-instances" in scoped_overrides
+    assert "customization.md#load-custom-css" in component_scope
+    assert "customization.md#scope-selected-instances" in scoped_overrides
     all_css = re.findall(r"```css\n(.*?)\n```", component_scope, re.DOTALL)
     scoped_css = re.findall(r"```css\n(.*?)\n```", scoped_overrides, re.DOTALL)
     assert all_css and scoped_css
@@ -474,22 +478,40 @@ def test_nested_shadow_guidance_belongs_to_container_guides(documentation_dir: P
 
 
 def test_common_stylesheet_and_wrapper_setup_is_centralized() -> None:
-    overview = DOCS / "components/index.md"
-    scopes = guide_section(overview, "Customization scopes")
-    assert "extra_css:" in scopes
-    assert "  - md_in_html\n" in scopes
-    assert "**Component-wide overrides**" in scopes
-    assert "**Scoped overrides**" in scopes
-    assert "one or several instances" in scopes
-    assert "### Scope selected instances\n" in scopes
-    assert "Override an instance" not in scopes
+    tutorial = DOCS / "components/customization.md"
+    component_scope = guide_section(tutorial, "Component overrides")
+    instance_scope = guide_section(tutorial, "Instance overrides")
+    assert "extra_css:" in component_scope
+    assert "  - md_in_html\n" in instance_scope
+    assert "### Load custom CSS\n" in component_scope
+    assert "### Scope selected instances\n" in instance_scope
+    overview = guide_section(DOCS / "components/index.md", "Customization scopes")
+    assert "[Customization](customization.md)" in overview
+    assert "extra_css:" not in overview and "markdown_extensions:" not in overview
     for source in (DOCS / "components").glob("*.md"):
-        if source.name == "index.md":
+        if source == tutorial:
             continue
         for match in YAML_EXAMPLE.finditer(source.read_text()):
             example = yaml.safe_load(match[1])
             assert "extra_css" not in example, source
             assert example.get("markdown_extensions") != ["md_in_html"], source
+
+
+def test_customization_examples_use_the_linked_stylesheet(documentation_dir: Path) -> None:
+    source = DOCS / "components/customization.md"
+    stylesheet = DOCS / "stylesheets/customization.css"
+    css = stylesheet.read_text()
+    config = load_config(config_file=str(ROOT / "mkdocs.yml"))
+    assert "stylesheets/customization.css" in config.extra_css
+    assert "[example CSS source](../stylesheets/customization.css)" in source.read_text()
+    # Live recipes must use the CSS readers can open and copy.
+    instance_scope = guide_section(source, "Instance overrides")
+    recipes = re.findall(r"```css\n(.*?)\n```", instance_scope, re.DOTALL)
+    assert recipes and all(recipe in css for recipe in recipes)
+    rendered = (documentation_dir / "components/customization/index.html").read_text()
+    assert '<div class="instance-table">' in rendered
+    assert 'href="../../stylesheets/customization.css"' in rendered
+    assert (documentation_dir / "stylesheets/customization.css").read_text() == css
 
 
 def test_appearance_guides_link_to_common_attributes(documentation_dir: Path) -> None:

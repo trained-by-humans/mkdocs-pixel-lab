@@ -51,7 +51,7 @@ keyboard activation. It works without the theme's JavaScript.
 ## Native HTML alternative
 
 You can also write `<details>` directly. For Markdown inside the body, enable
-[`md_in_html`](index.md#scope-selected-instances) and add `markdown`:
+[`md_in_html`](customization.md#scope-selected-instances) and add `markdown`:
 
 ```html
 <details markdown>
@@ -92,7 +92,7 @@ horizontally inside the body.
 
 Use `.details-padded` or `.details-flush` directly on a native `<details>`
 element, or wrap selected `???` blocks using
-[Scope selected instances](index.md#scope-selected-instances):
+[Scope selected instances](customization.md#scope-selected-instances):
 
 <div class="details-padded" markdown>
 
@@ -158,7 +158,7 @@ See [Common attributes](../reference/configuration.md#common-attributes).
 ### Component-wide overrides
 
 To change every collapsible block's summary fill, add this to your
-[custom stylesheet](index.md#load-custom-css):
+[custom stylesheet](customization.md#load-custom-css):
 
 ```css
 details > summary {
@@ -168,7 +168,7 @@ details > summary {
 
 ### Scoped overrides
 
-Wrap each selected block, following [Scope selected instances](index.md#scope-selected-instances):
+Wrap each selected block, following [Scope selected instances](customization.md#scope-selected-instances):
 
 ```markdown
 <div class="instance-details" markdown>

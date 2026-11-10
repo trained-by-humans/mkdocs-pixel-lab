@@ -9,7 +9,7 @@ Check the [component guide](../components/index.md) for required extensions
 and indentation, and don't overwrite another `markdown_extensions` list.
 For tabs, set [`alternate_style: true`](../components/tabs.md#enable).
 For Markdown inside an HTML wrapper, follow
-[Scope selected instances](../components/index.md#scope-selected-instances).
+[Scope selected instances](../components/customization.md#scope-selected-instances).
 
 ## A custom icon looks too small or like a filled box
 

@@ -40,6 +40,7 @@ nav:
       - Tables: components/tables.md
       - Images and video: components/media.md
       - Page metadata: components/metadata.md
+      - Customization: components/customization.md
   - Reference:
       - Configuration: reference/configuration.md
       - Bundled plugins: reference/plugins.md
@@ -50,6 +51,9 @@ nav:
 plugins:
   - search
   - pixel-lab/metadata
+
+extra_css:
+  - stylesheets/customization.css
 
 markdown_extensions:
   - admonition

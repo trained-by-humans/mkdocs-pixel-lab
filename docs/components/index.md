@@ -26,56 +26,25 @@ appearance options configured globally under `theme`.
 
 If syntax stays plain text, see [Troubleshooting](../reference/troubleshooting.md#a-component-looks-like-plain-text).
 
-Examples on this site use the default palette. YAML and CSS color snippets
-show those same defaults so you can match each setting to the component you see.
-Replace the values to customize your own site.
+Individual component guides use the default palette. Their YAML and CSS color
+snippets show those same defaults so you can match each setting to what you see.
+The Customization guide includes live examples with deliberately different colors.
 
 ## Customization scopes
 
-**Customization** groups the component's theme settings and CSS overrides.
-
-See [Common attributes](../reference/configuration.md#common-attributes) for
-theme settings, and the component guide for the specific mapping.
-
-**Component-wide overrides** style all instances of a component using CSS
-selectors such as `.admonition` or `.tabbed-set`, loaded through `extra_css`.
-
-**Scoped overrides** change selected instances while leaving the component's
-defaults and unselected instances unchanged. Use a wrapper class to limit
-where the CSS applies. Apply the class to one or several instances.
-The wrapper supplies a styling target; it doesn't replace the component's
-generated HTML or its normal Markdown syntax.
+The [Customization](customization.md) guide explains how to choose between
+theme settings, overrides for every instance of a component, and overrides
+for selected instances. It includes live examples and links to their CSS.
 
 ### Load custom CSS
 
-Register a stylesheet once in `mkdocs.yml`:
-
-```yaml
-extra_css:
-  - stylesheets/components.css
-```
-
-Create `docs/stylesheets/components.css` and add the CSS from the relevant
-component guide. Both override scopes use this stylesheet.
+Follow [Load custom CSS](customization.md#load-custom-css) to create and
+register a stylesheet once, then add the rules from each component guide.
 
 ### Scope selected instances
 
-The scoped examples use an HTML wrapper with `markdown`. Enable
-`md_in_html` alongside the component's required extensions:
-
-```yaml
-markdown_extensions:
-  - md_in_html
-```
-
-Put the wrapper class around the content you want to style; reuse it wherever
-the same override should apply. Class names such as `instance-tabs` are
-example names you choose, not built-in theme options.
-
-> [!TIP]
->
-> Scoped CSS variables inherit into nested content. If a change should affect
-> only one element, target that element's CSS property directly instead.
+Follow [Scope selected instances](customization.md#scope-selected-instances)
+for the Markdown extension setup and named wrappers used by the scoped examples.
 
 ## Nest components
 

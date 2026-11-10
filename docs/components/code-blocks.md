@@ -97,7 +97,7 @@ See [Common attributes](../reference/configuration.md#common-attributes).
 ### Component-wide overrides
 
 To change every highlighted code block's background and text, add this to
-your [custom stylesheet](index.md#load-custom-css):
+your [custom stylesheet](customization.md#load-custom-css):
 
 ```css
 .highlight {
@@ -108,7 +108,7 @@ your [custom stylesheet](index.md#load-custom-css):
 
 ### Scoped overrides
 
-Wrap each selected code block, following [Scope selected instances](index.md#scope-selected-instances):
+Wrap each selected code block, following [Scope selected instances](customization.md#scope-selected-instances):
 
 ````markdown
 <div class="instance-code" markdown>

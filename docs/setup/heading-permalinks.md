@@ -75,7 +75,7 @@ For more extension options, use the
 ### Component-wide overrides
 
 To customize the hover/focus shadow for all heading links without changing
-navigation colors, use a [custom stylesheet](../components/index.md#load-custom-css):
+navigation colors, use a [custom stylesheet](../components/customization.md#load-custom-css):
 
 ```css
 .headerlink {
@@ -85,7 +85,7 @@ navigation colors, use a [custom stylesheet](../components/index.md#load-custom-
 
 ### Scoped overrides
 
-Wrap each selected heading, following [Scope selected instances](../components/index.md#scope-selected-instances):
+Wrap each selected heading, following [Scope selected instances](../components/customization.md#scope-selected-instances):
 
 ```markdown
 <div class="instance-heading" markdown>

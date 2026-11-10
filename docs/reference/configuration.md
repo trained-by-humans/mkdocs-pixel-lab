@@ -21,7 +21,7 @@ Merge snippets into your site's `mkdocs.yml`. Don't create duplicate `theme`,
 | `markdown_extensions` → `toc.permalink` | Python-Markdown | [Heading permalinks](../setup/heading-permalinks.md) |
 | `extra.site_navigation` | Pixel Lab | [Related sites](../setup/related-sites.md) |
 | `extra.analytics` | Pixel Lab | [Analytics and privacy](../setup/analytics.md) |
-| `extra_css` | MkDocs | [Load custom CSS](../components/index.md#load-custom-css) and [Fonts](../setup/fonts.md#override-typography-with-css) |
+| `extra_css` | MkDocs | [Load custom CSS](../components/customization.md#load-custom-css) and [Fonts](../setup/fonts.md#override-typography-with-css) |
 | `extra_javascript` | MkDocs | [MkDocs JavaScript configuration](https://www.mkdocs.org/user-guide/configuration/#extra_javascript) |
 
 ## Common attributes
@@ -35,7 +35,7 @@ See [Colors](../setup/colors.md), [Fonts](../setup/fonts.md), and
 [Theme defaults](#theme-defaults) for every theme attribute and its default.
 
 There is no built-in per-page theme palette. Use
-[component-wide or scoped overrides](../components/index.md#customization-scopes)
+[component-wide or scoped overrides](../components/customization.md)
 when you need a narrower styling scope.
 
 ## Theme defaults
@@ -121,7 +121,7 @@ Customization section:
 - [Tables](../components/tables.md#customization)
 - [Images and video](../components/media.md#customization)
 
-[Customization scopes](../components/index.md#customization-scopes) explains
+[Customization scopes](../components/customization.md) explains
 component-wide and scoped CSS overrides.
 
 For the full set of native settings, use the

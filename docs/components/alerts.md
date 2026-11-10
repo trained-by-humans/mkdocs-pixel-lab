@@ -88,7 +88,7 @@ See [Common attributes](../reference/configuration.md#common-attributes).
 ### Component-wide overrides
 
 To customize all tip alerts, add this to your
-[custom stylesheet](index.md#load-custom-css):
+[custom stylesheet](customization.md#load-custom-css):
 
 ```css
 .gh-alert--tip {
@@ -99,7 +99,7 @@ To customize all tip alerts, add this to your
 
 ### Scoped overrides
 
-Wrap each selected alert, following [Scope selected instances](index.md#scope-selected-instances):
+Wrap each selected alert, following [Scope selected instances](customization.md#scope-selected-instances):
 
 ```markdown
 <div class="instance-alert" markdown>
