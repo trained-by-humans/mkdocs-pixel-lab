@@ -50,72 +50,42 @@ The supported types are `NOTE`, `TIP`, `IMPORTANT`, `WARNING`, and `CAUTION`.
 
 ## Customization
 
-Each alert type has a rail/title color and a surface color. These theme
-settings customize every alert of that type:
+Use the properties and selectors below to customize this component, following the
+[Customization](customization.md) guide.
 
-```yaml
-theme:
-  name: pixel-lab
-  alert_tip_color: "#287c35"
-  alert_tip_surface_color: "#e7f5df"
-  alert_warning_color: "#a65f00"
-  alert_warning_surface_color: "#fff0bf"
-```
+### Component properties
 
-| Parameter | Default | Effect |
+These CSS variables take their default values from the corresponding theme settings.
+
+| Property | Description | Theme setting | Default |
+| --- | --- | --- | --- |
+| `--alert-note` | Note rail and title | `alert_note_color` | Blue · `#2377c8` |
+| `--alert-note-surface` | Note background | `alert_note_surface_color` | Pale blue · `#e4f2ff` |
+| `--alert-tip` | Tip rail and title | `alert_tip_color` | Dark green · `#287c35` |
+| `--alert-tip-surface` | Tip background | `alert_tip_surface_color` | Pale green · `#e7f5df` |
+| `--alert-important` | Important rail and title | `alert_important_color` | Purple · `#6d28d9` |
+| `--alert-important-surface` | Important background | `alert_important_surface_color` | Pale lavender · `#f0e8ff` |
+| `--alert-warning` | Warning rail and title | `alert_warning_color` | Amber brown · `#a65f00` |
+| `--alert-warning-surface` | Warning background | `alert_warning_surface_color` | Pale yellow · `#fff0bf` |
+| `--alert-caution` | Caution rail and title | `alert_caution_color` | Dark red · `#b42318` |
+| `--alert-caution-surface` | Caution background | `alert_caution_surface_color` | Pale pink · `#ffe3df` |
+| `--ink` | Body text | `text_color` | Dark green-gray · `#182018` |
+| `--border` | Frame, except the type-specific left rail | `border_color` | Near-black · `#101410` |
+| `--shadow` | Frame's pixel shadow | `shadow_color` | Near-black · `#101410` |
+
+Each alert type maps its colors to `--alert-color` for the rail and title, and
+`--alert-surface` for the background. Override these two properties on `.gh-alert`
+or a type selector such as `.gh-alert--tip` to customize the corresponding alerts.
+
+See [Colors](../setup/colors.md) for palette configuration and
+[Fonts](../setup/fonts.md) for typography defaults and overrides.
+
+### Component styles
+
+Use these selectors to style the alert frame, body, title, and individual types.
+
+| Selector | CSS properties | Description |
 | --- | --- | --- |
-| `alert_note_color` | Blue · `#2377c8` | Note rail and title |
-| `alert_note_surface_color` | Pale blue · `#e4f2ff` | Note background |
-| `alert_tip_color` | Dark green · `#287c35` | Tip rail and title |
-| `alert_tip_surface_color` | Pale green · `#e7f5df` | Tip background |
-| `alert_important_color` | Purple · `#6d28d9` | Important rail and title |
-| `alert_important_surface_color` | Pale lavender · `#f0e8ff` | Important background |
-| `alert_warning_color` | Amber brown · `#a65f00` | Warning rail and title |
-| `alert_warning_surface_color` | Pale yellow · `#fff0bf` | Warning background |
-| `alert_caution_color` | Dark red · `#b42318` | Caution rail and title |
-| `alert_caution_surface_color` | Pale pink · `#ffe3df` | Caution background |
-
-For the body text, outline, and shadow:
-
-| Parameter | Default | Effect |
-| --- | --- | --- |
-| `text_color` | Dark green-gray · `#182018` | Alert body text |
-| `border_color` | Near-black · `#101410` | Alert outline, except the type-specific left rail |
-| `shadow_color` | Near-black · `#101410` | Alert pixel shadow |
-
-See [Common attributes](../reference/configuration.md#common-attributes).
-
-### Component-wide overrides
-
-To customize all tip alerts, add this to your
-[custom stylesheet](customization.md#load-custom-css):
-
-```css
-.gh-alert--tip {
-  --alert-color: #287c35;   /* Dark green */
-  --alert-surface: #e7f5df; /* Pale green */
-}
-```
-
-### Scoped overrides
-
-Wrap each selected alert, following [Scope selected instances](customization.md#scope-selected-instances):
-
-```markdown
-<div class="instance-alert" markdown>
-
-> [!TIP]
->
-> Keep the configuration in one place.
-
-</div>
-```
-
-Add the scoped rule to your stylesheet:
-
-```css
-.instance-alert > .gh-alert--tip {
-  --alert-color: #287c35;   /* Dark green */
-  --alert-surface: #e7f5df; /* Pale green */
-}
-```
+| `.gh-alert` | `background`, `border`, `border-left`, `box-shadow`, `color`, `padding`, `margin` | The alert surface, frame, rail, text, and spacing |
+| `.gh-alert__title` | `color`, `font-family`, `font-size`, `text-transform`, `gap`, `margin` | Title typography, spacing, and the gap beside its icon |
+| `.gh-alert--note, .gh-alert--tip, .gh-alert--important, .gh-alert--warning, .gh-alert--caution` | `--alert-color`, `--alert-surface` | Rail/title and background colors for each alert type |

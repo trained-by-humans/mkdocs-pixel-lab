@@ -134,56 +134,32 @@ For native HTML, place the class on the element:
 
 ## Customization
 
-These theme settings customize all collapsible blocks. Different detail types
-currently share the same styling:
+Use the properties and selectors below to customize this component, following the
+[Customization](customization.md) guide.
 
-```yaml
-theme:
-  name: pixel-lab
-  highlight_color: "#f5c842"
-  surface_color: "#fffdf2"
-  border_color: "#101410"
-  shadow_color: "#101410"
-```
+### Component properties
 
-| Parameter | Default | Effect |
+These CSS variables take their default values from the corresponding theme settings.
+
+| Property | Description | Theme setting | Default |
+| --- | --- | --- | --- |
+| `--highlight` | Summary background | `highlight_color` | Golden yellow · `#f5c842` |
+| `--surface` | Expanded body background | `surface_color` | Ivory · `#fffdf2` |
+| `--border` | Frame and summary divider | `border_color` | Near-black · `#101410` |
+| `--shadow` | Frame's pixel shadow | `shadow_color` | Near-black · `#101410` |
+
+Summary and body text inherit the page's `text_color`. Set `color` on `details`
+to change it locally. All detail types share these styles.
+
+See [Colors](../setup/colors.md) for palette configuration and
+[Fonts](../setup/fonts.md) for typography defaults and overrides.
+
+### Component styles
+
+Use these selectors to style the frame and summary. For the expanded content
+inset and flush presentation, see [Layout modes](#layout-modes).
+
+| Selector | CSS properties | Description |
 | --- | --- | --- |
-| `highlight_color` | Golden yellow · `#f5c842` | Summary background |
-| `surface_color` | Ivory · `#fffdf2` | Expanded body background |
-| `border_color` | Near-black · `#101410` | Frame and summary divider |
-| `shadow_color` | Near-black · `#101410` | Outer pixel shadow |
-
-See [Common attributes](../reference/configuration.md#common-attributes).
-
-### Component-wide overrides
-
-To change every collapsible block's summary fill, add this to your
-[custom stylesheet](customization.md#load-custom-css):
-
-```css
-details > summary {
-  background: #f5c842; /* Golden yellow */
-}
-```
-
-### Scoped overrides
-
-Wrap each selected block, following [Scope selected instances](customization.md#scope-selected-instances):
-
-```markdown
-<div class="instance-details" markdown>
-
-??? note "More information"
-
-    Keep the configuration in one place.
-
-</div>
-```
-
-Add the scoped rule to your stylesheet:
-
-```css
-.instance-details > details > summary {
-  background: #f5c842; /* Golden yellow */
-}
-```
+| `details` | `background`, `border`, `box-shadow`, `margin`, `color` | The whole collapsible block, including its frame and inherited text color |
+| `details > summary` | `background`, `border-bottom`, `font-family`, `font-size`, `padding` | Summary fill, divider, typography, and inset |

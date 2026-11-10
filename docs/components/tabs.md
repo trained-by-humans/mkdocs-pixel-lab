@@ -122,77 +122,39 @@ nested groups. Forced layout also relies on the theme's JavaScript.
 
 ## Customization
 
-Tab colors are configured site-wide under `theme`, not in the tab's Markdown.
-These are the default colors used by the examples on this page:
+Use the properties and selectors below to customize this component, following the
+[Customization](customization.md) guide.
 
-```yaml
-theme:
-  name: pixel-lab
-  accent_color: "#4caf50"            # Leaf green
-  accent_foreground_color: "#101410" # Near-black
-  tab_hover_color: "#d8d3b8"         # Muted khaki
-```
+### Component properties
 
-| Parameter | Default | Effect |
+These CSS variables take their default values from the corresponding theme settings.
+
+| Property | Description | Theme setting | Default |
+| --- | --- | --- | --- |
+| `--accent` | Selected tab background | `accent_color` | Leaf green · `#4caf50` |
+| `--accent-foreground` | Selected tab text and marker | `accent_foreground_color` | Near-black · `#101410` |
+| `--tab-hover` | Unselected tab background on hover | `tab_hover_color` | Muted khaki · `#d8d3b8` |
+| `--muted` | Unselected tab text | `muted_text_color` | Gray-green · `#5f665d` |
+| `--surface2` | Tab-strip background | `surface_alt_color` | Pale khaki · `#e8e4cf` |
+| `--surface` | Panel background | `surface_color` | Ivory · `#fffdf2` |
+| `--border` | Frame and label dividers | `border_color` | Near-black · `#101410` |
+| `--shadow` | Frame's pixel shadow | `shadow_color` | Near-black · `#101410` |
+
+Panel text inherits the page's `text_color`. To change it for a tab group,
+set `color` on `.tabbed-set`. See [Colors](../setup/colors.md) for palette
+configuration and [Fonts](../setup/fonts.md) for typography defaults and overrides.
+
+### Component styles
+
+Use these selectors to style the frame, labels, and panels in your custom CSS.
+The variables above control the selection and hover colors.
+
+| Selector | CSS properties | Description |
 | --- | --- | --- |
-| `accent_color` | Leaf green · `#4caf50` | Selected tab background |
-| `accent_foreground_color` | Near-black · `#101410` | Selected tab text and marker |
-| `tab_hover_color` | Muted khaki · `#d8d3b8` | Unselected tab background on hover |
-| `muted_text_color` | Gray-green · `#5f665d` | Unselected tab text |
-| `surface_alt_color` | Pale khaki · `#e8e4cf` | Tab-strip background |
-| `surface_color` | Ivory · `#fffdf2` | Panel background |
-| `border_color` | Near-black · `#101410` | Frame and label dividers |
-| `shadow_color` | Near-black · `#101410` | Outer pixel shadow |
-
-See [Common attributes](../reference/configuration.md#common-attributes).
-
-### Component-wide overrides
-
-To change every tab group's colors and label font, add this to your
-[custom stylesheet](customization.md#load-custom-css):
-
-```css
-.tabbed-set {
-  --accent: #4caf50;            /* Leaf green */
-  --accent-foreground: #101410; /* Near-black */
-  --tab-hover: #d8d3b8;         /* Muted khaki */
-}
-
-.tabbed-labels > label {
-  font-family: system-ui, sans-serif;
-}
-```
-
-### Scoped overrides
-
-Wrap each selected group, following [Scope selected instances](customization.md#scope-selected-instances):
-
-```markdown
-<div class="instance-tabs" markdown>
-
-=== "Python"
-
-    Use Python for this example.
-
-=== "Shell"
-
-    Use a shell for this example.
-
-</div>
-```
-
-Add the scoped rule to your stylesheet:
-
-```css
-.instance-tabs > .tabbed-set {
-  --accent: #4caf50;            /* Leaf green */
-  --accent-foreground: #101410; /* Near-black */
-  --tab-hover: #d8d3b8;         /* Muted khaki */
-}
-```
-
-For layout rather than color changes, see
-[Scoped layout overrides](#scoped-layout-overrides).
+| `.tabbed-set` | `background`, `border`, `box-shadow`, `margin`, `color` | The whole tab group, including its frame and panel text |
+| `.tabbed-labels` | `background`, `border-bottom` | The strip behind the labels and its divider above the panel |
+| `.tabbed-labels > label` | `font-family`, `font-size`, `font-weight`, `text-transform`, `padding`, `border-right` | Label typography, spacing, and dividers |
+| `.tabbed-content > .tabbed-block` | `padding` | The content inset in padded panels; see [Layout modes](#layout-modes) for flush panels |
 
 ## Limits
 

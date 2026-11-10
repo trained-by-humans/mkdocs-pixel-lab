@@ -57,74 +57,49 @@ HTTPS or localhost.
 
 ## Customization
 
-These theme settings customize all code blocks:
+Use the properties and selectors below to customize this component, following the
+[Customization](customization.md) guide.
 
-```yaml
-theme:
-  name: pixel-lab
-  code_background_color: "#101410"
-  code_text_color: "#e9f1d8"
-  code_keyword_color: "#72d572"
-  code_string_color: "#f5cf54"
-  code_function_color: "#4cc4d2"
-  code_comment_color: "#7f8978"
-  highlight_color: "#f5c842"
-```
+### Component properties
 
-| Parameter | Default | Effect |
-| --- | --- | --- |
-| `code_background_color` | Near-black · `#101410` | Code block background |
-| `code_text_color` | Pale green · `#e9f1d8` | Default code text |
-| `code_keyword_color` | Light green · `#72d572` | Styled keyword token classes |
-| `code_string_color` | Golden yellow · `#f5cf54` | Styled string token classes |
-| `code_function_color` | Cyan · `#4cc4d2` | Function names |
-| `code_comment_color` | Gray-green · `#7f8978` | Comments |
-| `highlight_color` | Golden yellow · `#f5c842` | Emphasized-line tint and copy-button hover/focus fill |
-| `surface_color` | Ivory · `#fffdf2` | Copy-button background |
-| `strong_text_color` | Near-black · `#101410` | Copy-button text |
-| `accent_color` | Leaf green · `#4caf50` | Successful-copy button background |
-| `accent_foreground_color` | Near-black · `#101410` | Successful-copy button text |
-| `accent_dark_color` | Dark green · `#287c35` | Copy-button hover/focus outline |
-| `border_color` | Near-black · `#101410` | Block and copy-button outlines |
-| `shadow_color` | Near-black · `#101410` | Block's pixel shadow |
+These CSS variables take their default values from the corresponding theme settings.
+
+| Property | Description | Theme setting | Default |
+| --- | --- | --- | --- |
+| `--code` | Code block background | `code_background_color` | Near-black · `#101410` |
+| `--code-text` | Default code text | `code_text_color` | Pale green · `#e9f1d8` |
+| `--code-keyword` | Styled keywords | `code_keyword_color` | Light green · `#72d572` |
+| `--code-string` | Styled strings | `code_string_color` | Golden yellow · `#f5cf54` |
+| `--code-function` | Function names | `code_function_color` | Cyan · `#4cc4d2` |
+| `--code-comment` | Comments | `code_comment_color` | Gray-green · `#7f8978` |
+| `--highlight` | Emphasized-line tint and copy-button hover/focus background | `highlight_color` | Golden yellow · `#f5c842` |
+| `--surface` | Copy-button background | `surface_color` | Ivory · `#fffdf2` |
+| `--strong-text` | Copy-button text | `strong_text_color` | Near-black · `#101410` |
+| `--accent` | Successful-copy button background | `accent_color` | Leaf green · `#4caf50` |
+| `--accent-foreground` | Successful-copy button text | `accent_foreground_color` | Near-black · `#101410` |
+| `--accent-dark` | Copy-button hover/focus outline | `accent_dark_color` | Dark green · `#287c35` |
+| `--border` | Block and copy-button outlines | `border_color` | Near-black · `#101410` |
+| `--shadow` | Block's pixel shadow | `shadow_color` | Near-black · `#101410` |
 
 Syntax colors apply to the Pygments token classes styled by the theme, not
-every possible token independently.
+every possible token independently. Inline code has separate surface and border
+styles; see [Text and lists](text.md#customization).
 
-Inline code has separate surface/border styling: see [Text and lists](text.md#customization).
-See [Common attributes](../reference/configuration.md#common-attributes).
+See [Colors](../setup/colors.md) for palette configuration and
+[Fonts](../setup/fonts.md) for typography defaults and overrides.
 
-### Component-wide overrides
+### Component styles
 
-To change every highlighted code block's background and text, add this to
-your [custom stylesheet](customization.md#load-custom-css):
+Use these selectors to style the code area, highlighted tokens, and copy button.
 
-```css
-.highlight {
-  --code: #101410;      /* Near-black */
-  --code-text: #e9f1d8; /* Pale green */
-}
-```
-
-### Scoped overrides
-
-Wrap each selected code block, following [Scope selected instances](customization.md#scope-selected-instances):
-
-````markdown
-<div class="instance-code" markdown>
-
-```python
-print("Hello, Pixel Lab!")
-```
-
-</div>
-````
-
-Add the scoped rule to your stylesheet:
-
-```css
-.instance-code > .highlight {
-  --code: #101410;      /* Near-black */
-  --code-text: #e9f1d8; /* Pale green */
-}
-```
+| Selector | CSS properties | Description |
+| --- | --- | --- |
+| `pre, .highlight pre` | `background`, `color`, `font-family`, `font-size`, `padding`, `border`, `box-shadow` | The code area, its typography, inset, and frame |
+| `.highlight .k, .highlight .kn, .highlight .kd` | `color` | Keyword tokens |
+| `.highlight .s, .highlight .sa, .highlight .s1, .highlight .s2` | `color` | String tokens |
+| `.highlight .nf, .highlight .fm` | `color` | Function-name tokens |
+| `.highlight .c, .highlight .c1, .highlight .cm` | `color` | Comment tokens |
+| `.highlight .hll` | `background` | The tint behind emphasized lines |
+| `.code-copy` | `background`, `color`, `border`, `font-family`, `padding`, `top`, `right` | The copy button and its position inside the code block |
+| `.code-copy:hover, .code-copy:focus-visible` | `background`, `outline` | Copy-button hover and keyboard-focus appearance |
+| `.code-copy.is-copied` | `background`, `color` | The copy button after a successful copy |

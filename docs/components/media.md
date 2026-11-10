@@ -37,52 +37,27 @@ Adjust it if your page depth or URL layout differs.
 
 ## Customization
 
-These theme settings customize all content media:
+Use the properties and selectors below to customize this component, following the
+[Customization](customization.md) guide.
 
-```yaml
-theme:
-  name: pixel-lab
-  surface_color: "#fffdf2"
-  border_color: "#101410"
-  shadow_color: "#101410"
-```
+### Component properties
 
-| Parameter | Default | Effect |
+These CSS variables take their default values from the corresponding theme settings.
+
+| Property | Description | Theme setting | Default |
+| --- | --- | --- | --- |
+| `--surface` | Background behind transparent images and video | `surface_color` | Ivory · `#fffdf2` |
+| `--border` | Image and video frames | `border_color` | Near-black · `#101410` |
+| `--shadow` | Offset pixel shadows | `shadow_color` | Near-black · `#101410` |
+
+See [Colors](../setup/colors.md) for palette configuration.
+
+### Component styles
+
+Use these selectors to style media in the page content.
+
+| Selector | CSS properties | Description |
 | --- | --- | --- |
-| `surface_color` | Ivory · `#fffdf2` | Background behind transparent images and video |
-| `border_color` | Near-black · `#101410` | Image and video frames |
-| `shadow_color` | Near-black · `#101410` | Offset pixel shadows |
-
-See [Common attributes](../reference/configuration.md#common-attributes).
-
-### Component-wide overrides
-
-To change every content image and video's frame color, add this to your
-[custom stylesheet](customization.md#load-custom-css):
-
-```css
-.main img,
-.main video {
-  border-color: #101410; /* Near-black */
-}
-```
-
-### Scoped overrides
-
-Wrap the selected media, following [Scope selected instances](customization.md#scope-selected-instances):
-
-```markdown
-<div class="instance-media" markdown>
-
-![Source frame, Process signal, and Output result.](../assets/component-preview.svg)
-
-</div>
-```
-
-Add the scoped rule to your stylesheet:
-
-```css
-.instance-media img {
-  border-color: #101410; /* Near-black */
-}
-```
+| `.main img, .main video` | `background`, `border`, `box-shadow`, `margin`, `max-width` | Shared media surfaces, frames, shadows, spacing, and width limits |
+| `.main img` | `width`, `height`, `object-fit` | Image dimensions and how the image fits an explicitly sized box |
+| `.main video` | `width`, `height`, `object-fit` | Video dimensions and how the video fits an explicitly sized box |

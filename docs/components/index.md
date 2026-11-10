@@ -22,12 +22,12 @@ appearance options configured globally under `theme`.
 1. **Enable** required Markdown extensions in `mkdocs.yml`; selecting the theme
    doesn't enable them automatically.
 2. **Write** the provided Markdown on a page and compare it with the live example.
-3. Use **Customization** for appearance settings and CSS overrides.
+3. Use **Customization** to find component properties, theme defaults, and CSS selectors.
 
 If syntax stays plain text, see [Troubleshooting](../reference/troubleshooting.md#a-component-looks-like-plain-text).
 
-Individual component guides use the default palette. Their YAML and CSS color
-snippets show those same defaults so you can match each setting to what you see.
+Individual component guides use the default palette. Their property tables
+show those defaults so you can match each setting to what you see.
 The Customization guide includes live examples with deliberately different colors.
 
 ## Customization scopes
@@ -39,12 +39,13 @@ for selected instances. It includes live examples and links to their CSS.
 ### Load custom CSS
 
 Follow [Load custom CSS](customization.md#load-custom-css) to create and
-register a stylesheet once, then add the rules from each component guide.
+register a stylesheet once, then write rules using the properties and selectors
+listed in each component guide.
 
 ### Scope selected instances
 
 Follow [Scope selected instances](customization.md#scope-selected-instances)
-for the Markdown extension setup and named wrappers used by the scoped examples.
+for the Markdown extension setup and named wrappers used for instance overrides.
 
 ## Nest components
 

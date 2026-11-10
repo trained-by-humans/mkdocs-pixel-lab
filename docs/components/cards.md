@@ -220,77 +220,33 @@ Write with Markdown and combine existing components.
 
 ## Customization
 
-Cards use the theme's shared surface, border, shadow, and accent colors:
+Use the properties and selectors below to customize this component, following the
+[Customization](customization.md) guide.
 
-```yaml
-theme:
-  name: pixel-lab
-  surface_color: "#fffdf2"
-  border_color: "#101410"
-  shadow_color: "#101410"
-  accent_color: "#4caf50"
-```
+### Component properties
 
-| Parameter | Default | Effect |
+These CSS variables take their default values from the corresponding theme settings.
+
+| Property | Description | Theme setting | Default |
+| --- | --- | --- | --- |
+| `--surface` | Card background | `surface_color` | Ivory · `#fffdf2` |
+| `--border` | Card outline | `border_color` | Near-black · `#101410` |
+| `--shadow` | Card's pixel shadow | `shadow_color` | Near-black · `#101410` |
+| `--accent` | Card border on hover | `accent_color` | Leaf green · `#4caf50` |
+
+Card text inherits the page's `text_color`. Set `color` on the card selector
+below to change it locally.
+
+See [Colors](../setup/colors.md) for palette configuration and
+[Fonts](../setup/fonts.md) for typography defaults and overrides.
+
+### Component styles
+
+Use these selectors to style the grid and its cards. The card selectors cover
+both block cards and cards written as list items.
+
+| Selector | CSS properties | Description |
 | --- | --- | --- |
-| `surface_color` | Ivory · `#fffdf2` | Card background |
-| `border_color` | Near-black · `#101410` | Card outlines |
-| `shadow_color` | Near-black · `#101410` | Card shadows |
-| `accent_color` | Leaf green · `#4caf50` | Card border on hover |
-
-See [Common attributes](../reference/configuration.md#common-attributes).
-
-### Component-wide overrides
-
-The grid provides gaps between items, and cards provide padding around their
-content. To adjust these independently, add rules to your
-[custom stylesheet](customization.md#load-custom-css):
-
-```css
-.grid {
-  gap: 1.25rem;
-}
-
-.card,
-.grid.cards > :is(ul, ol) > li {
-  padding: 1.25rem;
-}
-```
-
-### Scoped overrides
-
-Wrap a selected grid, following [Scope selected instances](customization.md#scope-selected-instances):
-
-```markdown
-<div class="instance-card-grid" markdown>
-
-<div class="grid cards" markdown>
-
-- **First topic**
-
-    A short introduction.
-
-- **Second topic**
-
-    Another useful starting point.
-
-</div>
-
-</div>
-```
-
-Add the scoped rules to your stylesheet:
-
-```css
-.instance-card-grid {
-  padding: 20px;
-}
-
-.instance-card-grid > .grid {
-  gap: 1.5rem;
-}
-```
-
-Space around a grid can come from its container's padding or the grid's own
-margins. Choose the surrounding space to suit the page; a grid can also sit
-directly in the content column without a wrapper.
+| `.grid` | `grid-template-columns`, `gap`, `margin` | The number and width of columns, gaps between cards, and space around the grid |
+| `.card, .grid.cards > :is(ul, ol) > li` | `background`, `border`, `box-shadow`, `padding`, `color` | The card surface, frame, content inset, and inherited text color |
+| `.card:hover, .grid.cards > :is(ul, ol) > li:hover` | `border-color` | The card outline on hover |

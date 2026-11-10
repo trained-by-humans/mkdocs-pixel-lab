@@ -40,58 +40,36 @@ the script-created scrolling frame.
 
 ## Customization
 
-These theme settings customize all tables:
+Use the properties and selectors below to customize this component, following the
+[Customization](customization.md) guide.
 
-```yaml
-theme:
-  name: pixel-lab
-  surface_alt_color: "#e8e4cf"
-  surface_color: "#fffdf2"
-  subtle_border_color: "rgba(16, 20, 16, 0.3)"
-  border_color: "#101410"
-  shadow_color: "#101410"
-```
+### Component properties
 
-| Parameter | Default | Effect |
+These CSS variables take their default values from the corresponding theme settings.
+
+| Property | Description | Theme setting | Default |
+| --- | --- | --- | --- |
+| `--surface2` | Header background | `surface_alt_color` | Pale khaki · `#e8e4cf` |
+| `--surface` | Scrolling frame background | `surface_color` | Ivory · `#fffdf2` |
+| `--subtle-border` | Cell dividers | `subtle_border_color` | Near-black at 30% · `rgba(16, 20, 16, 0.3)` |
+| `--border` | Scrolling frame outline | `border_color` | Near-black · `#101410` |
+| `--shadow` | Scrolling frame's fixed pixel shadow | `shadow_color` | Near-black · `#101410` |
+
+Cell text inherits the page's `text_color`. Set `color` on `table` to change it
+locally.
+
+See [Colors](../setup/colors.md) for palette configuration and
+[Fonts](../setup/fonts.md) for typography defaults and overrides.
+
+### Component styles
+
+Use these selectors to style the table and the scrolling frame added by the
+theme script. The frame keeps its border and shadow fixed while the cells scroll.
+
+| Selector | CSS properties | Description |
 | --- | --- | --- |
-| `surface_alt_color` | Pale khaki · `#e8e4cf` | Header row background |
-| `surface_color` | Ivory · `#fffdf2` | Scrolling frame background |
-| `subtle_border_color` | Near-black at 30% · `rgba(16, 20, 16, 0.3)` | Cell rules |
-| `border_color` | Near-black · `#101410` | Outer frame |
-| `shadow_color` | Near-black · `#101410` | Fixed pixel shadow |
-
-See [Common attributes](../reference/configuration.md#common-attributes).
-
-### Component-wide overrides
-
-To change every content table's header fill, add this to your
-[custom stylesheet](customization.md#load-custom-css):
-
-```css
-.main th {
-  background: #e8e4cf; /* Pale khaki */
-}
-```
-
-### Scoped overrides
-
-Wrap each selected table, following [Scope selected instances](customization.md#scope-selected-instances):
-
-```markdown
-<div class="instance-table" markdown>
-
-| Setting | Purpose |
-| --- | --- |
-| `show_repo` | Show the repository button |
-
-</div>
-```
-
-Add the scoped rule to your stylesheet. This selector also works after
-JavaScript adds the scrolling frame:
-
-```css
-.instance-table th {
-  background: #e8e4cf; /* Pale khaki */
-}
-```
+| `table` | `border-collapse`, `color` | The table layout and inherited cell text color |
+| `.table-shell` | `margin`, `width`, `max-width` | Space around the scrolling frame and its width limits |
+| `.table-scroll` | `background`, `border`, `box-shadow` | The fixed frame around the scrolling table |
+| `th, td` | `border`, `padding`, `text-align` | Cell dividers, content inset, and alignment |
+| `th` | `background`, `font-family`, `font-weight` | Header fill and typography |

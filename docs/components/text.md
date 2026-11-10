@@ -67,57 +67,40 @@ title, use [Admonitions](admonitions.md).
 
 ## Customization
 
-These theme settings customize text throughout the site:
+Use the properties and selectors below to customize this component, following the
+[Customization](customization.md) guide.
 
-```yaml
-theme:
-  name: pixel-lab
-  text_color: "#182018"
-  muted_text_color: "#5f665d"
-  accent_color: "#4caf50"
-  accent_dark_color: "#287c35"
-  surface_alt_color: "#e8e4cf"
-  inline_code_border_color: "rgba(40, 124, 53, 0.45)"
-```
+### Component properties
 
-| Parameter | Default | Effect |
+These CSS variables take their default values from the corresponding theme settings.
+
+| Property | Description | Theme setting | Default |
+| --- | --- | --- | --- |
+| `--ink` | Body text and hovered links | `text_color` | Dark green-gray · `#182018` |
+| `--muted` | Quotation text | `muted_text_color` | Gray-green · `#5f665d` |
+| `--accent` | Quotation's left rail | `accent_color` | Leaf green · `#4caf50` |
+| `--accent-dark` | Link text | `accent_dark_color` | Dark green · `#287c35` |
+| `--surface2` | Inline code background | `surface_alt_color` | Pale khaki · `#e8e4cf` |
+| `--inline-code-border` | Inline code border | `inline_code_border_color` | Dark green at 45% · `rgba(40, 124, 53, 0.45)` |
+| `--border` | H2 heading divider | `border_color` | Near-black · `#101410` |
+
+Body text inherits its font and color from the page. Set `font-family` or
+`color` on a content wrapper to change those defaults locally; headings, links,
+quotations, and code also have their own style rules.
+
+See [Colors](../setup/colors.md) for palette configuration and
+[Fonts](../setup/fonts.md) for typography defaults and overrides.
+
+### Component styles
+
+Use these selectors to style text within the page content.
+
+| Selector | CSS properties | Description |
 | --- | --- | --- |
-| `text_color` | Dark green-gray · `#182018` | Body text and hovered links |
-| `muted_text_color` | Gray-green · `#5f665d` | Quotation text |
-| `accent_color` | Leaf green · `#4caf50` | Quotation's left rail |
-| `accent_dark_color` | Dark green · `#287c35` | Link text |
-| `surface_alt_color` | Pale khaki · `#e8e4cf` | Inline code background |
-| `inline_code_border_color` | Dark green at 45% · `rgba(40, 124, 53, 0.45)` | Inline code border |
-
-See [Common attributes](../reference/configuration.md#common-attributes).
-
-### Component-wide overrides
-
-To change every ordinary quotation's rail, add this to your
-[custom stylesheet](customization.md#load-custom-css):
-
-```css
-.main blockquote {
-  border-left-color: #4caf50; /* Leaf green */
-}
-```
-
-### Scoped overrides
-
-Wrap each selected quotation, following [Scope selected instances](customization.md#scope-selected-instances):
-
-```markdown
-<div class="instance-quote" markdown>
-
-> Documentation is part of the product.
-
-</div>
-```
-
-Add the scoped rule to your stylesheet:
-
-```css
-.instance-quote > blockquote {
-  border-left-color: #4caf50; /* Leaf green */
-}
-```
+| `.main` | `color`, `font-family`, `line-height` | Text defaults within the content column |
+| `.main h1, .main h2, .main h3` | `font-family`, `font-size`, `font-weight`, `text-transform`, `margin` | Page and section heading typography and spacing |
+| `.main h2` | `border-bottom`, `padding-bottom` | The divider beneath second-level headings |
+| `.main p, .main li` | `max-width`, `line-height`, `margin` | Paragraph and list-item reading width, line spacing, and margins |
+| `.main a, .main a:hover` | `color`, `text-decoration` | Content link appearance and hover state |
+| `.main blockquote` | `border-left`, `color`, `padding-left`, `margin` | Quotation rail, text, inset, and surrounding space |
+| `.main :not(pre) > code` | `background`, `border`, `font-family`, `font-size`, `padding` | Inline code fill, frame, typography, and inset |

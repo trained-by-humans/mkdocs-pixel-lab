@@ -3,6 +3,6 @@
 
 /* Selected table headers: add class="instance-table" to a Markdown wrapper. */
 .instance-table th {
-  background: #e60012;
+  --surface2: #e60012;
   color: #ffffff;
 }

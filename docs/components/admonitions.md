@@ -37,57 +37,33 @@ For expandable notes using `???` or `???+`, see [Collapsible content](details.md
 
 ## Customization
 
-These theme settings customize all admonitions. Admonitions don't use the
-type-specific `alert_*` colors:
+Use the properties and selectors below to customize this component, following the
+[Customization](customization.md) guide.
 
-```yaml
-theme:
-  name: pixel-lab
-  highlight_color: "#f5c842"
-  surface_color: "#fffdf2"
-  border_color: "#101410"
-  shadow_color: "#101410"
-```
+### Component properties
 
-| Parameter | Default | Effect |
+These CSS variables take their default values from the corresponding theme settings.
+
+| Property | Description | Theme setting | Default |
+| --- | --- | --- | --- |
+| `--highlight` | Title background | `highlight_color` | Golden yellow · `#f5c842` |
+| `--surface` | Body background | `surface_color` | Ivory · `#fffdf2` |
+| `--border` | Frame and title divider | `border_color` | Near-black · `#101410` |
+| `--shadow` | Frame's pixel shadow | `shadow_color` | Near-black · `#101410` |
+
+Title and body text inherit the page's `text_color`. Set `color` on `.admonition`
+to change it locally. All admonition types share these styles; they don't use the
+type-specific `alert_*` colors.
+
+See [Colors](../setup/colors.md) for palette configuration and
+[Fonts](../setup/fonts.md) for typography defaults and overrides.
+
+### Component styles
+
+Use these selectors to style the frame, title, and body.
+
+| Selector | CSS properties | Description |
 | --- | --- | --- |
-| `highlight_color` | Golden yellow · `#f5c842` | Admonition title background |
-| `surface_color` | Ivory · `#fffdf2` | Admonition body background |
-| `text_color` | Dark green-gray · `#182018` | Admonition body text |
-| `border_color` | Near-black · `#101410` | Admonition outline and title divider |
-| `shadow_color` | Near-black · `#101410` | Admonition pixel shadow |
-
-See [Common attributes](../reference/configuration.md#common-attributes).
-
-### Component-wide overrides
-
-To change every admonition's title fill, add this to your
-[custom stylesheet](customization.md#load-custom-css):
-
-```css
-.admonition > .admonition-title {
-  background: #f5c842; /* Golden yellow */
-}
-```
-
-### Scoped overrides
-
-Wrap each selected admonition, following [Scope selected instances](customization.md#scope-selected-instances):
-
-```markdown
-<div class="instance-admonition" markdown>
-
-!!! note "Before you start"
-
-    Keep the configuration in one place.
-
-</div>
-```
-
-Add the scoped rule to your stylesheet:
-
-```css
-.instance-admonition > .admonition > .admonition-title {
-  background: #f5c842; /* Golden yellow */
-}
-```
+| `.admonition` | `background`, `border`, `box-shadow`, `margin`, `color` | The whole callout, including its frame and inherited text color |
+| `.admonition > .admonition-title` | `background`, `border-bottom`, `font-family`, `font-size`, `padding` | Title fill, divider, typography, and inset |
+| `.admonition > :not(.admonition-title)` | `margin-left`, `margin-right` | The inset around body content |

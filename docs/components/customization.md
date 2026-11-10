@@ -7,7 +7,8 @@ want all your tables to share a color or one particular note to stand out.
 This guide walks through changing the color of table headers, loading your
 styles, and applying a change to selected tables. Along the way, you'll find
 live examples and links to the CSS used to style them. You can use the same
-approach with the examples in each component guide's Customization section.
+approach with the properties and selectors in each component guide's
+Customization section.
 
 For the overall look of your site, including its palette, fonts, and branding,
 start with [Theme setup](../setup/index.md). Here, we'll look at how those
@@ -18,17 +19,17 @@ applies:
 
 | Approach | Scope of changes | Method |
 | --- | --- | --- |
-| [Theme settings](#theme-settings) | Every component that uses the setting, throughout the site | Set values in the `theme` section of `mkdocs.yml`. |
+| [Theme overrides](#theme-overrides) | Every component that uses the setting, throughout the site | Set values in the `theme` section of `mkdocs.yml`. |
 | [Component overrides](#component-overrides) | All instances of one component, such as every table | Add a CSS rule for that component to your custom stylesheet. |
 | [Instance overrides](#instance-overrides) | Selected components on one or several pages | Wrap the selected Markdown in a named class and target that class in your stylesheet. |
 
-## Theme settings
+## Theme overrides
 
-Theme settings define shared colors and other appearance values in
+Theme overrides change shared appearance values in the `theme` section of
 `mkdocs.yml`. Several components can use the same setting, which helps keep
-their appearance consistent across your site. Each component guide lists
-the settings that affect it, so you can check whether an existing option
-already does what you need.
+their appearance consistent across your site. Each component guide's Component
+properties table describes the CSS variables it uses and lists their theme
+settings and default values.
 
 For example, tables get their outer border color from `border_color`. If
 you'd like those borders to be red, you can add the setting to the existing
@@ -42,7 +43,8 @@ theme:
 
 This also changes the outlines of code blocks, notes, and other components,
 because they use the same setting. For a walkthrough of the theme's shared
-colors, see the [Colors guide](../setup/colors.md).
+colors, see [Colors](../setup/colors.md). For typography defaults and overrides,
+see [Fonts](../setup/fonts.md).
 
 ## Component overrides
 
@@ -52,19 +54,29 @@ with CSS and load it through your MkDocs configuration.
 
 ### Define custom CSS
 
-Choose the component part you want to style and the properties to change.
+Each component guide provides two references:
+
+- Component properties lists CSS variables, their descriptions, and the theme
+  settings that supply their defaults. See [Table properties](tables.md#component-properties).
+- Component styles lists selectors for the parts you can style and the CSS
+  properties you can change. See [Table styles](tables.md#component-styles).
+
+Choose a selector and either override a component variable or set a CSS property.
 For example, this rule gives every table header a red background with white text:
 
 ```css
 /* Keep the selector; edit or add properties to change the appearance. */
 .main th {              /* Selector */
-  background: #e60012;   /* Property: value */
-  color: #ffffff;       /* Property: value */
+  --surface2: #e60012;   /* Component property: value */
+  color: #ffffff;       /* CSS property: value */
 }
 ```
 
-To find selectors and properties, start with the component guide's
-Customization section, such as [Table customization](tables.md#customization).
+Overriding a variable changes the styles that use it within the selected part.
+Setting a CSS property directly changes that property on the selected element.
+To keep a property connected to a theme variable, use `var(--surface2)` as its
+value instead of a fixed color.
+
 For all styles defined by the theme, see the
 [theme stylesheet source](https://github.com/trained-by-humans/mkdocs-pixel-lab/blob/main/src/mkdocs_pixel_lab/assets/css/style.css).
 
@@ -118,7 +130,7 @@ the selector to your wrapper's class. For this table, replace `.main` with
 
 ```css
 .instance-table th {
-  background: #e60012;
+  --surface2: #e60012;
   color: #ffffff;
 }
 ```

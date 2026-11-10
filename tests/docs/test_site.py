@@ -23,6 +23,7 @@ GUIDES = sorted(
     if source.name not in {"index.md", "customization.md"}
 )
 PARAMETER_HEADER = "| Parameter | Default | Effect |"
+COMPONENT_PROPERTY_HEADER = "| Property | Description | Theme setting | Default |"
 YAML_EXAMPLE = re.compile(r"^```yaml(?:[ \t]+[^\n]*)?\n(.*?)\n```$", re.MULTILINE | re.DOTALL)
 
 
@@ -48,17 +49,22 @@ def parameter_rows(source: Path):
 
 
 def parameter_rows_in(content: str):
-    in_parameters = False
+    columns = None
     for line in content.splitlines():
         if line == PARAMETER_HEADER:
-            in_parameters = True
+            columns = (0, 1, 2)
+            continue
+        if line == COMPONENT_PROPERTY_HEADER:
+            # Normalize component properties to theme setting, default, and
+            # description for the shared checks against the theme source.
+            columns = (2, 3, 1)
             continue
         if not line.startswith("|"):
-            in_parameters = False
-        if in_parameters:
+            columns = None
+        if columns is not None:
             cells = [cell.strip() for cell in line.strip("|").split("|")]
-            if len(cells) == 3 and not cells[0].startswith("---"):
-                yield cells
+            if len(cells) == max(columns) + 1 and not cells[0].startswith("---"):
+                yield [cells[index] for index in columns]
 
 
 def guide_section(source: Path, heading: str) -> str:
@@ -375,28 +381,17 @@ def test_components_have_syntax_and_relevant_appearance_options() -> None:
             assert "## Automatic defaults\n" in content, source
         else:
             assert "## Customization\n" in content, source
+            assert "### Component properties\n" in content, source
+            assert "### Component styles\n" in content, source
+            assert "[Customization](customization.md)" in content, source
         assert "```markdown\n" in content, source
 
 
-@pytest.mark.parametrize(
-    ("section", "name", "wrapper", "component"),
-    [
-        ("components", "admonitions", "instance-admonition", '<div class="admonition note">'),
-        ("components", "alerts", "instance-alert", 'class="gh-alert gh-alert--tip"'),
-        ("components", "code-blocks", "instance-code", 'class="language-python highlight"'),
-        ("components", "details", "instance-details", '<details class="note">'),
-        ("setup", "heading-permalinks", "instance-heading", '<h2 id="a-specific-section">'),
-        ("components", "media", "instance-media", '<img '),
-        ("components", "tables", "instance-table", '<table>'),
-        ("components", "tabs", "instance-tabs", 'class="tabbed-set tabbed-alternate"'),
-        ("components", "text", "instance-quote", '<blockquote>'),
-    ],
-)
-def test_component_and_scoped_overrides_render(
-    documentation_dir: Path, section: str, name: str, wrapper: str, component: str,
-) -> None:
+def test_heading_permalink_overrides_render(documentation_dir: Path) -> None:
+    section, name = "setup", "heading-permalinks"
+    wrapper, component = "instance-heading", '<h2 id="a-specific-section">'
     source = DOCS / section / f"{name}.md"
-    heading = "Further customization" if section == "setup" else "Customization"
+    heading = "Further customization"
     customization = guide_section(source, heading)
     theme_settings, overrides = customization.split("### Component-wide overrides\n", 1)
     component_scope, scoped_overrides = overrides.split("### Scoped overrides\n", 1)
@@ -514,7 +509,7 @@ def test_customization_examples_use_the_linked_stylesheet(documentation_dir: Pat
     assert (documentation_dir / "stylesheets/customization.css").read_text() == css
 
 
-def test_appearance_guides_link_to_common_attributes(documentation_dir: Path) -> None:
+def test_appearance_guides_link_to_relevant_theme_guides(documentation_dir: Path) -> None:
     reference = DOCS / "reference/configuration.md"
     common = guide_section(reference, "Common attributes")
     assert "site-wide" in common and "multiple components" in common
@@ -531,7 +526,13 @@ def test_appearance_guides_link_to_common_attributes(documentation_dir: Path) ->
         if heading is None:
             continue
         section = guide_section(source, heading)
-        assert section.count("[Common attributes](../reference/configuration.md#common-attributes)") == 1, source
+        if source.parent.name == "components":
+            assert "[Colors](../setup/colors.md)" in section, source
+            if source.name != "media.md":
+                assert "[Fonts](../setup/fonts.md)" in section, source
+            assert "#common-attributes" not in section, source
+        else:
+            assert section.count("[Common attributes](../reference/configuration.md#common-attributes)") == 1, source
         assert not re.search(
             r"shared (?:tokens|theme settings|theme colors)|"
             r"(?:tokens|colors) (?:are shared|also affect)|"
@@ -592,6 +593,13 @@ def test_main_configuration_tables_stay_with_their_instructions() -> None:
 
 def test_customization_tables_cover_appearance_not_feature_setup() -> None:
     defaults = yaml.safe_load((ROOT / "src/mkdocs_pixel_lab/mkdocs_theme.yml").read_text())
+    palette_variables = {
+        setting: variable
+        for variable, setting in re.findall(
+            r"(--[\w-]+): \{\{ config\.theme\.(\w+) \}\};",
+            (ROOT / "src/mkdocs_pixel_lab/base.html").read_text(),
+        )
+    }
     appearance_options = {
         key for key in defaults if key.endswith("_color") or key == "header_background"
     } | {f"icon.{key}" for key in defaults["icon"]} | {
@@ -610,6 +618,15 @@ def test_customization_tables_cover_appearance_not_feature_setup() -> None:
         for parameter, default, effect in rows:
             keys = re.findall(r"`([^`]+)`", parameter)
             assert keys and set(keys) <= appearance_options, (source, parameter)
+        if source.parent.name == "components":
+            section = guide_section(source, heading)
+            mappings = re.findall(
+                r"^\| `(--[\w-]+)` \| ([^|]+) \| `([^`]+)` \| ([^|]+) \|$",
+                section, re.MULTILINE,
+            )
+            assert len(mappings) == len(rows), source
+            for variable, description, setting, default in mappings:
+                assert variable == palette_variables[setting], (source, setting)
 
 
 def test_feature_guides_use_further_customization(documentation_dir: Path) -> None:
@@ -640,12 +657,17 @@ def test_related_sites_explains_items_before_presentations(documentation_dir: Pa
 
 def test_setup_and_component_guides_have_parameter_tables(documentation_dir: Path) -> None:
     for source in GUIDES:
-        assert PARAMETER_HEADER in source.read_text(), source
+        content = source.read_text()
+        header = next(
+            (header for header in (PARAMETER_HEADER, COMPONENT_PROPERTY_HEADER) if header in content),
+            None,
+        )
+        assert header is not None, source
         assert list(parameter_rows(source)), source
         relative = source.relative_to(DOCS).with_suffix("") / "index.html"
         rendered = (documentation_dir / relative).read_text()
-        for header in ("Parameter", "Default", "Effect"):
-            assert f"<th>{header}</th>" in rendered, (source, header)
+        for label in (cell.strip() for cell in header.strip("|").split("|")):
+            assert f"<th>{label}</th>" in rendered, (source, label)
 
 
 def test_parameter_table_theme_defaults_match_implementation() -> None:

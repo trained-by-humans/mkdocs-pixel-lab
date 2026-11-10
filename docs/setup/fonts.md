@@ -47,8 +47,8 @@ describe the bundled typography before overrides:
 
 This example changes body text and headings only. Components with their own
 font declarations keep IBM Plex Mono; override their selectors explicitly if
-needed. See [Content tabs](../components/tabs.md#component-wide-overrides) for a tab-label
-example.
+needed. See [Content tabs](../components/tabs.md#component-styles) for the tab-label
+selector.
 
 If you supply another font, host its files yourself and define `@font-face` in
 the same stylesheet. Check its license and test long titles and narrow screens.
