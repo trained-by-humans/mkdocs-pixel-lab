@@ -418,8 +418,12 @@ Options:
 - `shadow_colors_set`: `rainbow` (default), `rainbow-inverted`, `rainbow-muted`, or 1–64 CSS colors ordered nearest to farthest.
 - `text_color`: CSS face color; omitted, `null`, or blank uses the first palette color and reserves the rest for shadows.
   An explicit color leaves the entire palette available for shadows.
+- `character_styles`: optional nonempty array repeated across visible characters in text order (including spaces and punctuation).
+  Each entry is `null` to inherit global colors, or an object overriding `text_color` and/or `shadow_colors_set`.
+  Combining marks and joined emoji stay together using the browser's `Intl.Segmenter`.
 - `shadow_layers`: integer from `0` to the available shadow-color count; omitted or `null` uses all, and `0` renders only text.
   The maximum is the palette length with an explicit `text_color`, or one fewer without it.
+  With `character_styles`, the count must fit every palette; `null` uses each character's full available stack.
 - `font_size`: base lettering size in SVG units, `1`–`512` (default: `80`); the SVG scales to fit, with a 40px header-height cap.
 - `font_family`: CSS font-family list (default: Impact, Arial Black, Inter, sans-serif); glyphs depend on available local/bundled fonts.
 - `font_weight`: numeric font weight, `1`–`1000` (default: `900`).
@@ -448,6 +452,34 @@ initializes newly added elements. Automatic titles retain accessible plain text
 without JavaScript or with invalid settings. Try the fixture site's **Guide →
 Stacked lettering** for editable controls and SVG downloads; exported text requires
 the chosen font to be available.
+
+Give each character its own face and shadow palette with `character_styles`:
+
+```javascript
+const gold = ["#FFD166", "#FFBE26", "#E8A200", "#AB7800", "#765200"];
+const coral = ["#FF8B78", "#FF5134", "#F42200", "#B41900", "#7C1100"];
+const purple = ["#B9A0FF", "#8255FF", "#4E0FFF", "#3400C7", "#240089"];
+
+await PixelLabStackedText.render(document.querySelector("#my-title"), {
+  text: "VLM-TASKS",
+  tilt_angle: 0,
+  shadow_angle: 120,
+  shadow_spacing: 3,
+  character_styles: [gold, coral, purple].map(shadow_colors_set => ({ shadow_colors_set }))
+});
+```
+
+Each palette above contains the face first, then shadows nearest to farthest.
+An explicit per-character `text_color` instead leaves the entire palette for
+shadows. Unspecified properties inherit the global options, including an explicit
+global `text_color`; use `text_color: null` to restore a palette's first-color face.
+Palettes are assigned by position, so repeated letters can have different colors.
+The array repeats from its start when it runs out; a single entry styles the
+whole text. Extra entries are unused. Only character styles repeat; the shadow
+colors within each entry remain ordered nearest to farthest without cycling
+between layers. The same
+`character_styles` structure works in `stacked_title` YAML and `data-stacked-text`
+JSON. The fixture guide includes the complete VLM-TASKS example.
 
 ## Site navigation
 

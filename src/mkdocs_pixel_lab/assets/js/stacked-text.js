@@ -14,6 +14,7 @@
     shadow_angle: 90,
     shadow_colors_set: "rainbow",
     text_color: null,
+    character_styles: null,
     shadow_layers: null,
     shadow_thickness: 6,
     shadow_spacing: 0,
@@ -30,7 +31,7 @@
     return element;
   }
 
-  function optionsFor(options) {
+  function optionsFor(options, text) {
     if (options === true) options = {};
     if (!options || typeof options !== "object" || Array.isArray(options)) {
       throw new TypeError("Stacked text options must be an object (or true for defaults).");
@@ -50,6 +51,36 @@
     if (typeof settings.font_family !== "string" || !settings.font_family.trim()) {
       throw new TypeError("font_family must be a nonempty font-family string.");
     }
+    const colors = colorsFor(settings);
+    if (settings.character_styles == null) {
+      return { ...settings, ...colors, character_styles: null };
+    }
+    if (!Array.isArray(settings.character_styles) || !settings.character_styles.length) {
+      throw new TypeError("character_styles must be a nonempty array or null.");
+    }
+    // Segment visible characters, keeping combining marks and joined emoji together.
+    const characters = [...new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(text)]
+      .map(part => part.segment);
+    const styles = Array.from(settings.character_styles, (style, index) => {
+      if (style === null) return colors;
+      if (!style || typeof style !== "object" || Array.isArray(style)
+          || Object.keys(style).some(key => !["text_color", "shadow_colors_set"].includes(key))) {
+        throw new TypeError(`character_styles[${index}] must be null or an object containing text_color and/or shadow_colors_set.`);
+      }
+      try {
+        return colorsFor({ ...settings, ...style });
+      } catch (error) {
+        error.message = `character_styles[${index}]: ${error.message}`;
+        throw error;
+      }
+    });
+    return {
+      ...settings, ...colors, characters,
+      character_styles: characters.map((_, index) => styles[index % styles.length]),
+    };
+  }
+
+  function colorsFor(settings) {
     const colors = Array.isArray(settings.shadow_colors_set)
       ? settings.shadow_colors_set.slice()
       : presets[settings.shadow_colors_set];
@@ -76,21 +107,21 @@
     if (!Number.isInteger(count) || count < 0 || count > shadowColors.length) {
       throw new RangeError(`shadow_layers must be an integer between 0 and ${shadowColors.length} for this colors set.`);
     }
-    return { ...settings, text_color: textColor, colors: shadowColors.slice(0, count) };
+    return { text_color: textColor, colors: shadowColors.slice(0, count) };
   }
 
   async function render(element, options = {}) {
     if (!(element instanceof HTMLElement)) throw new TypeError("Supply an HTML text element.");
-    const settings = optionsFor(options);
     let state = states.get(element);
     if (!state) {
       state = { text: element.textContent.trim(), revision: 0 };
-      states.set(element, state);
     }
-    const text = options.text === undefined ? state.text : options.text;
+    const text = options?.text === undefined ? state.text : options.text;
     if (typeof text !== "string" || !text.trim() || text.length > 512) {
       throw new TypeError("Text must contain 1–512 characters.");
     }
+    const settings = optionsFor(options, text);
+    states.set(element, state);
     const revision = ++state.revision;
     if (document.fonts) {
       await document.fonts.load(`${settings.font_weight} ${settings.font_size}px ${settings.font_family}`, text);
@@ -106,7 +137,17 @@
       "font-size": settings.font_size, "font-weight": settings.font_weight,
       "letter-spacing": 0, "text-anchor": "start", "xml:space": "preserve",
     });
-    glyph.textContent = text;
+    if (settings.character_styles) {
+      // Keep split text runs from changing their advance widths as the SVG scales.
+      glyph.setAttribute("text-rendering", "geometricPrecision");
+      settings.characters.forEach((character, index) => {
+        const span = node("tspan", { "data-character": index, fill: settings.character_styles[index].text_color });
+        span.textContent = character;
+        glyph.append(span);
+      });
+    } else {
+      glyph.textContent = text;
+    }
     defs.append(glyph);
     svg.append(defs);
     // Measure in a connected, invisible SVG without disturbing the original title.
@@ -130,8 +171,11 @@
     const dx = Math.cos(direction);
     const dy = Math.sin(direction);
     const stride = settings.shadow_thickness + settings.shadow_spacing;
-    const depth = settings.colors.length
-      ? settings.colors.length * settings.shadow_thickness + (settings.colors.length - 1) * settings.shadow_spacing
+    const layerCount = settings.character_styles
+      ? Math.max(...settings.character_styles.map(style => style.colors.length))
+      : settings.colors.length;
+    const depth = layerCount
+      ? layerCount * settings.shadow_thickness + (layerCount - 1) * settings.shadow_spacing
       : 0;
     const pad = 2;
     const left = Math.min(...corners.map(([x]) => x)) + Math.min(0, dx * depth) - pad;
@@ -143,23 +187,38 @@
     svg.setAttribute("height", height);
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
 
-    const copyAt = distance => node("use", {
-      href: `#${id}`,
+    const copyAt = (distance, glyphId) => node("use", {
+      href: `#${glyphId}`,
       transform: `translate(${dx * distance} ${dy * distance}) rotate(${settings.tilt_angle % 360})`,
     });
-    function sweep(target, start, end) {
+    function sweep(target, start, end, glyphId) {
       // Subpixel copies close unwanted gaps within each solid band.
       const steps = Math.ceil((end - start) / 0.5);
       for (let step = steps; step >= 1; step--) {
-        target.append(copyAt(start + (end - start) * step / steps));
+        target.append(copyAt(start + (end - start) * step / steps, glyphId));
       }
     }
 
     // Keep full colored copies underneath: spacing reveals lower layers instead
     // of cutting transparent holes through the stack. Paint farthest first.
-    for (let layer = settings.colors.length - 1; layer >= 0; layer--) {
-      const band = node("g", { class: "stacked-text__band", fill: settings.colors[layer], "data-layer": layer });
-      sweep(band, layer * stride, layer * stride + settings.shadow_thickness);
+    for (let layer = layerCount - 1; layer >= 0; layer--) {
+      const band = node("g", { class: "stacked-text__band", "data-layer": layer });
+      let glyphId = id;
+      if (settings.character_styles) {
+        // Keep each layer as one text run so kerning, shaping, and spacing agree
+        // with the face. Transparent spans preserve positions for shorter stacks.
+        glyphId = `${id}-layer-${layer}`;
+        const shadow = glyph.cloneNode(true);
+        shadow.setAttribute("id", glyphId);
+        shadow.setAttribute("data-layer", layer);
+        [...shadow.children].forEach((span, index) => {
+          span.setAttribute("fill", settings.character_styles[index].colors[layer] ?? "none");
+        });
+        defs.append(shadow);
+      } else {
+        band.setAttribute("fill", settings.colors[layer]);
+      }
+      sweep(band, layer * stride, layer * stride + settings.shadow_thickness, glyphId);
       svg.append(band);
     }
     svg.append(node("use", { class: "stacked-text__face", href: `#${id}`, fill: settings.text_color, transform: `rotate(${settings.tilt_angle % 360})` }));

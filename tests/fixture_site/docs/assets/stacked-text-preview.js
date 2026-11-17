@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
         shadow_thickness: Number(values.get("shadow_thickness")),
         shadow_spacing: Number(values.get("shadow_spacing")),
         text_color: values.get("text_color"),
+        character_styles: values.get("character_styles").trim()
+          ? JSON.parse(values.get("character_styles")) : null,
         shadow_layers: values.get("shadow_layers") === "" ? null : Number(values.get("shadow_layers")),
         shadow_colors_set: values.get("shadow_colors_set") === "custom"
           ? JSON.parse(values.get("custom_colors")) : values.get("shadow_colors_set"),
