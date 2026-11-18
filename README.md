@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/pixel-lab-logo.svg" alt="Pixel Lab retro logo" width="480">
+  <img src="assets/pixel-lab-logo-arcade.svg" alt="Pixel Lab Arcade logo" width="640">
 </p>
 
 <p align="center">
