@@ -251,8 +251,9 @@ def test_consent_actions_right_aligned(analytics_browser, width):
     page.set_viewport_size({"width": width, "height": 844})
     page.goto(ORIGIN)
     actions = page.locator(".analytics-consent__actions")
-    expect(actions).to_have_css("justify-content", "flex-end")
+    expect(actions).to_be_visible()
     expect(actions.locator("button")).to_have_text(["Allow analytics", "Decline"])
+    # Check rendered alignment across browser CSS serialization differences.
     group = actions.bounding_box()
     allow = page.get_by_role("button", name="Allow analytics", exact=True).bounding_box()
     decline = page.get_by_role("button", name="Decline", exact=True).bounding_box()
@@ -264,6 +265,7 @@ def test_consent_actions_right_aligned(analytics_browser, width):
     if allow["y"] == decline["y"]:
         assert allow["x"] + allow["width"] < decline["x"]
     else:
+        assert allow["x"] + allow["width"] == pytest.approx(group["x"] + group["width"], abs=1)
         assert allow["y"] + allow["height"] < decline["y"]
     assert not google_requests
 
