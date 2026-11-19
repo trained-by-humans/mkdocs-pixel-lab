@@ -6,8 +6,8 @@ Use Python 3.10 or newer. Clone the repository and install the theme in editable
 mode with its test dependencies:
 
 ```bash
-git clone https://github.com/trained-by-humans/mkdocs-pixel-lab.git
-cd mkdocs-pixel-lab
+git clone https://github.com/trained-by-humans/pixel-lab.git
+cd pixel-lab
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[test]'

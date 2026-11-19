@@ -78,7 +78,7 @@ To keep a property connected to a theme variable, use `var(--surface2)` as its
 value instead of a fixed color.
 
 For all styles defined by the theme, see the
-[theme stylesheet source](https://github.com/trained-by-humans/mkdocs-pixel-lab/blob/main/src/mkdocs_pixel_lab/assets/css/style.css).
+[theme stylesheet source](https://github.com/trained-by-humans/pixel-lab/blob/main/src/mkdocs_pixel_lab/assets/css/style.css).
 
 ### Load custom CSS
 
@@ -182,11 +182,11 @@ on this site:
 
 You can follow the setup in the site's source files:
 
-- [Site configuration](https://github.com/trained-by-humans/mkdocs-pixel-lab/blob/main/mkdocs.yml)
+- [Site configuration](https://github.com/trained-by-humans/pixel-lab/blob/main/mkdocs.yml)
   enables `md_in_html` and loads `stylesheets/customization.css` through `extra_css`.
 - The [example CSS source](../stylesheets/customization.css) contains the
   scoped rule that styles the wrapped table.
-- The [Markdown source of this page](https://github.com/trained-by-humans/mkdocs-pixel-lab/blob/main/docs/components/customization.md)
+- The [Markdown source of this page](https://github.com/trained-by-humans/pixel-lab/blob/main/docs/components/customization.md)
   shows the wrapper around the table.
 
 ## Preview your changes

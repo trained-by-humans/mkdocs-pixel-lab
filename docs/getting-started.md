@@ -88,4 +88,4 @@ For hosting options, follow [MkDocs deployment documentation](https://www.mkdocs
 ## Preview this documentation from a checkout
 
 To preview or contribute to this website, follow the
-[contributor guide](https://github.com/trained-by-humans/mkdocs-pixel-lab/blob/main/.github/CONTRIBUTING.md#documentation-website).
+[contributor guide](https://github.com/trained-by-humans/pixel-lab/blob/main/.github/CONTRIBUTING.md#documentation-website).

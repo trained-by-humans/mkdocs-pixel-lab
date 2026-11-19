@@ -28,11 +28,11 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/trained-by-humans/mkdocs-pixel-lab"
-Documentation = "https://github.com/trained-by-humans/mkdocs-pixel-lab#readme"
-Repository = "https://github.com/trained-by-humans/mkdocs-pixel-lab"
-Issues = "https://github.com/trained-by-humans/mkdocs-pixel-lab/issues"
-Changelog = "https://github.com/trained-by-humans/mkdocs-pixel-lab/releases"
+Homepage = "https://github.com/trained-by-humans/pixel-lab"
+Documentation = "https://github.com/trained-by-humans/pixel-lab#readme"
+Repository = "https://github.com/trained-by-humans/pixel-lab"
+Issues = "https://github.com/trained-by-humans/pixel-lab/issues"
+Changelog = "https://github.com/trained-by-humans/pixel-lab/releases"
 
 [project.entry-points."mkdocs.themes"]
 pixel-lab = "mkdocs_pixel_lab"

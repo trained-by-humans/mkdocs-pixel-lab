@@ -543,7 +543,7 @@ def test_desktop_experience(page, site_url: str, tmp_path: Path) -> None:
     expect(page).to_have_title("Home — Pixel Lab Fixture")
     expect(page.locator('link[rel="canonical"]')).to_have_attribute("href", "https://example.invalid/")
     expect(page.get_by_role("link", name="PIXEL LAB", exact=True)).to_have_attribute(
-        "href", "https://github.com/trained-by-humans/mkdocs-pixel-lab"
+        "href", "https://github.com/trained-by-humans/pixel-lab"
     )
     expect(page.get_by_role("link", name="TRAINED-BY-HUMANS")).to_have_attribute(
         "href", "https://github.com/trained-by-humans"

@@ -9,7 +9,7 @@ python -m mkdocs build --strict
 python -m mkdocs serve
 ```
 
-Check [release notes](https://github.com/trained-by-humans/mkdocs-pixel-lab/releases)
+Check [release notes](https://github.com/trained-by-humans/pixel-lab/releases)
 for the version you're adopting. Projects with pinned dependencies should
 update their pin or lockfile through their normal workflow.
 

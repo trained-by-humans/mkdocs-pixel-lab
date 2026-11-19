@@ -9,7 +9,7 @@ arcade-style shadows. This website uses Pixel Lab's default appearance: what
 you see here is what you start with.
 
 [Get started](getting-started.md) · [Explore components](components/index.md) ·
-[View on GitHub](https://github.com/trained-by-humans/mkdocs-pixel-lab)
+[View on GitHub](https://github.com/trained-by-humans/pixel-lab)
 
 ## Start with your site
 
@@ -47,7 +47,7 @@ See the [configuration reference](reference/configuration.md) for defaults and
 
 ## Project
 
-[Contributing](https://github.com/trained-by-humans/mkdocs-pixel-lab/blob/main/.github/CONTRIBUTING.md) ·
-[Report an issue](https://github.com/trained-by-humans/mkdocs-pixel-lab/issues) ·
-[Releases](https://github.com/trained-by-humans/mkdocs-pixel-lab/releases) ·
-[License](https://github.com/trained-by-humans/mkdocs-pixel-lab/blob/main/LICENSE)
+[Contributing](https://github.com/trained-by-humans/pixel-lab/blob/main/.github/CONTRIBUTING.md) ·
+[Report an issue](https://github.com/trained-by-humans/pixel-lab/issues) ·
+[Releases](https://github.com/trained-by-humans/pixel-lab/releases) ·
+[License](https://github.com/trained-by-humans/pixel-lab/blob/main/LICENSE)

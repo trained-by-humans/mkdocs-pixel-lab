@@ -1,7 +1,7 @@
 site_name: Pixel Lab
 site_description: A retro-inspired MkDocs theme with pixel borders, bold colors, and arcade-style shadows.
-site_url: https://trained-by-humans.github.io/mkdocs-pixel-lab/
-repo_url: https://github.com/trained-by-humans/mkdocs-pixel-lab
+site_url: https://trained-by-humans.github.io/pixel-lab/
+repo_url: https://github.com/trained-by-humans/pixel-lab
 repo_name: GitHub
 edit_uri: edit/main/docs/
 docs_dir: docs
