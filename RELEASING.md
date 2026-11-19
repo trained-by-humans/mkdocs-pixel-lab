@@ -1,23 +1,18 @@
-# Releasing `mkdocs-pixel-lab`
+# Releasing Pixel Lab
 
 ## Prepare a release
 
 Update the version in `pyproject.toml` and relevant documentation in a pull
-request. CI tests Python 3.10 through 3.13, builds and validates distribution
-artifacts, and installs the built wheel in a clean environment. Import checks
-run in isolated Python mode (`-I`) and verify that the package is loaded from
-that environment. A strict MkDocs fixture build checks the installed theme.
+request. CI tests Python 3.10 through 3.13, validates the release artifacts,
+and checks installation in a clean environment.
 
 ## Stage on TestPyPI
 
 Push a `v<package-version>` tag to start the `Stage` workflow. It validates
-the tag, runs CI, builds the wheel and source distribution, and uploads them
-to a GitHub Release with SHA-256 checksums. It then verifies and publishes
-those artifacts to TestPyPI using the `test-pypi` environment and trusted
-publishing, and checks installation with an isolated import and strict
-MkDocs fixture build. The target wheel is downloaded exclusively from
-TestPyPI, then installed locally with runtime dependencies resolved from
-PyPI. A missing TestPyPI artifact cannot fall back to a PyPI copy.
+the tag, runs CI, and stages the release artifacts on GitHub with SHA-256
+checksums. It then publishes to TestPyPI using the `test-pypi` environment
+and trusted publishing, and verifies installation from TestPyPI in a clean
+environment.
 
 ## Promote to PyPI
 
